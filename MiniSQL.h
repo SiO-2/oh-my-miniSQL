@@ -1,0 +1,145 @@
+#pragma once
+#include <iostream>
+#include <vector>
+// #include"CatalogManager.h"
+// #include"RecordManager.h"
+// #include"IndexManager.h"
+using namespace std;
+
+typedef enum{
+    INT_UNIT,
+    CHAR_UNIT,
+    FLOAT_UNIT
+} DataType;
+
+typedef enum{
+    NO_OP_, // No Opeartion
+    EQ_, // = 
+    NE_, // <>
+    L_, // <
+    G_, // >
+    LE_, // <=
+    GE_ // >=
+} OpCode;
+
+class TableMetadata{
+public:
+	string name;	//表名
+	int attr_num;	//表中字段（列）数，属性attr的编号从0开始
+	int primary_key;	//主键，用attr的编号表示，若没有则为-1
+	int primary_index;	//主索引，用attr的编号表示，若没有则为-1
+	TableMetadata(string name, int attr_num, int primary_key=-1, int primary_index=-1);
+};
+
+// 记录属性的类
+class Attribute{
+public: //方便调试先都Public
+    string name;//属性名
+    int type;//属性的类型，实际上是DataType, 记成int保留可扩展性
+    int charlen;//如果是char类型，保存其最大长度 char(n)
+    bool notnull;//not null标记
+    bool unique;//unique 标记
+    bool primary_key;// primary key 标记
+public:
+    // name: Attribute constructor
+    // Function: init value in class
+    Attribute(string name, string typestr, bool notnull = false, bool unique = false, bool primary_key = false);
+    // name:set_pk
+    // Function: set primary key of attribute, becase "primary key(pk)" usually occurs in the end
+    void set_pk(bool pk);
+    // name: print
+    // Function: Print Attribute info
+    void print();
+};
+
+class Table	//数据库中的一张表
+{
+	TableMetadata m_metadata;	//表的定义信息
+	vector<Attribute> m_attribute;	//表中字段的信息
+	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
+};
+
+class Index	//建立在表m_table中attr_num上的索引，名为m_index_name
+{
+	string index_name;
+	Table* table;	//表
+	int attr_num;	//索引建立在该属性上
+};
+
+
+class DataUnit		//数据单元，里面包含了数据类型，值以及对应的属性编号，用于插入语句的输入以及选择语句的返回值
+{
+	union Value
+	{
+		int int_value;
+		string char_n_value;
+		float float_value;
+	} value;
+	int attr_num;
+	string attr_name;
+	DataType data_type;
+};
+
+class ConditionUnit		//条件单元，用于select中的where，格式：attr_num  op_code  value（列 op 值）
+{
+	int attr_num;
+	OpCode op_code;
+	DataType data_type;
+	union Value
+	{
+		int int_value;
+		string char_n_value;
+		float float_value;
+	} value;
+};
+
+
+
+/*
+* 创建表，表的信息由table提供
+* 返回值：如果创建成功返回true，创建失败返回false
+*/
+bool CreateTable(Table& table);
+
+/*
+* 删除表，表的信息由table_name提供
+* 返回值：如果删除成功返回true，创建失败返回false
+*/
+bool DropTable(string& table_name);
+
+/*
+* 创建索引，索引的信息由index提供
+* 返回值：如果创建成功返回true，创建失败返回false
+*/
+bool CreateIndex(Index& index);
+
+/*
+* 删除索引，索引的信息由table_name提供
+* 返回值：如果删除成功返回true，创建失败返回false
+*/
+bool DropIndex(string& index_name);
+
+/*
+* 查找名为table_name的表的信息
+* 返回值：table_name的表的信息
+*/
+Table GetTableInfo(string& table_name);
+
+
+/*
+* 将数据data插入到表名为table_name的表中
+* 返回值：如果插入成功返回true，插入失败返回false
+*/
+bool Insert(string& table_name, vector<struct DataUnit>& data);
+
+/*
+* 将数据data插入到表名为table_name的表中
+* 返回值：选择的结果
+*/
+vector<vector<struct DataUnit>> Select(string& table_name, vector<struct ConditionUnit>& condition);
+
+/*
+* 将数据data从表名为table_name删除
+* 返回值：如果删除成功返回true，删除失败返回false
+*/
+bool Delete(string& table_name, vector<struct ConditionUnit>& condition);
