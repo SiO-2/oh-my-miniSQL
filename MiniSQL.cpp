@@ -74,3 +74,19 @@ void Attribute::print(){
 
 Table::Table(TableMetadata m_metadata, vector<Attribute> m_attribute):m_metadata(m_metadata), m_attribute(m_attribute){
 };
+
+Table::Table(Table& table)
+{
+    this->m_metadata.name = table.m_metadata.name;
+    this->m_metadata.attr_num = table.m_metadata.attr_num;
+    this->m_metadata.primary_key = table.m_metadata.primary_key;
+    this->m_metadata.primary_index = table.m_metadata.primary_index;
+    this->m_attribute.assign(table.m_attribute.begin(), table.m_attribute.end());
+}
+
+Index::Index(Index& index)
+{
+    this->attr_num = index.attr_num;
+    this->index_name = index.index_name;
+    this->table = index.table;
+}

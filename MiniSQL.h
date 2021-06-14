@@ -28,6 +28,7 @@ public:
 	int attr_num;	//表中字段（列）数，属性attr的编号从0开始
 	int primary_key;	//主键，用attr的编号表示，若没有则为-1
 	int primary_index;	//主索引，用attr的编号表示，若没有则为-1
+	TableMetadata();
 	TableMetadata(string name, int attr_num, int primary_key=-1, int primary_index=-1);
 };
 
@@ -54,21 +55,26 @@ public:
 
 class Table	//数据库中的一张表
 {
+public:
 	TableMetadata m_metadata;	//表的定义信息
 	vector<Attribute> m_attribute;	//表中字段的信息
 	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
+	Table(Table& table);
 };
 
 class Index	//建立在表m_table中attr_num上的索引，名为m_index_name
 {
+public:
 	string index_name;
 	Table* table;	//表
 	int attr_num;	//索引建立在该属性上
+	Index(Index& index);
 };
 
 
 class DataUnit		//数据单元，里面包含了数据类型，值以及对应的属性编号，用于插入语句的输入以及选择语句的返回值
 {
+public:
 	union Value
 	{
 		int int_value;
@@ -80,8 +86,10 @@ class DataUnit		//数据单元，里面包含了数据类型，值以及对应�
 	DataType data_type;
 };
 
-class ConditionUnit		//条件单元，用于select中的where，格式：attr_num  op_code  value（列 op 值）
+class ConditionUnit		//条件单元，用于select中的where，格式：attr_name attr_num  op_code  value（列 op 值）
 {
+public:
+	string attr_name;
 	int attr_num;
 	OpCode op_code;
 	DataType data_type;
