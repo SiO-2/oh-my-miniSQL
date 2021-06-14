@@ -2,60 +2,54 @@
 #define MINISQL_BUFFERMANAGER_H
 
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <cstring>
-#include <vector>
-#include <map>
-#include <cstdio>
-#include <utility>
 #include "MiniSQL.h"
 
 using namespace std;
 
+typedef unsigned int BID;
+const unsigned int MAX_BLOCK_NUMBER = 0x1000;
+const unsigned int BLOCKSIZE = 0x4000;
+
 struct Block
 {
     string filename;
-    unsigned int bid;
+    BID bid;   //在buffer manager中的序号
     bool dirty;
     bool busy;
-    char data[BlockSize];
-    int count;
+    bool valid;         //由于不需要考虑多线程，直接通过valid表示
+    char data[BLOCKSIZE];
+    unsigned int offset;    //对于文件而言的偏移地址
 };
 
 class BufferManager
 {
+private:
+    Block blocks[MAX_BLOCK_NUMBER];
+    BID GetBlock(const string &filename, int offset);
+
 public:
     BufferManager();
 
     ~BufferManager() = default;
 
-    //将所有的块写回文件中
-    void WriteAllBlock2File();
+    //将文件读入block
+    void ReadFile2Block(const string &filename, const unsigned int &offset);
 
     //将块写回文件
-    void WriteBlock2File();
+    void WriteBlock2File(const string &filename, const unsigned int &offset);
 
-    //获取表的可插入位置，找到文件中最后一个block，如果有空间则返回块，如果没有则返回NULL
-    int GetTailBlock(string filename);
+    //设置dirty与busy
+    void SetDirty(const unsigned int &bid);
+    void SetUndirty(const unsigned int &bid);
+    void SetBusy(const unsigned int &bid);
+    void SetUnbusy(const unsigned int &bid);
 
-    //根据文件和bid设置dirty
-    void SetDirty(const string &filename, unsigned int bid);
+    //释放buffer manager中指定的block
+    void ReleaseBlock();
 
-    //根据filenam与bid从文件中获取返回指向block中数据的指针，如果是新的block则返回空指针
-    char *GetBlockData(string filename, unsigned int bid, bool new = false);
-
-    //删除给定表的给定块的给定位移处的一条记录
-    void DeleteValues(int blockoffset, int offset, Table tableinfo);
-
-    //新建文件，包括表文件、元文件等
-    void CreateFile(string filename);
-
-    //删除文件
-    void RemoveFile(string filename);
-
-    //释放block的占用
-    void SetFree(string filename, unsigned int bid);
+    //删除文件在Block中的数据
+    void BlockFlush(const string &filename);
 };
 
 #endif //MINISQL_BUFFERMANAGER_H
