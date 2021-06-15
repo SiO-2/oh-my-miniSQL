@@ -28,8 +28,11 @@ void BufferManager::ReadFile2Block(const string &filename, const unsigned int &o
     BID bid;
     if ((fp = fopen(filename.c_str(), "rb")) == NULL)
     {
-        printf("Can't open %s\n", filename);
-        exit(EXIT_FAILURE);
+        if ((fp = fopen(filename.c_str(), "wb+")) == NULL)
+        {
+            printf("Can't open %s\n", filename);
+            exit(EXIT_FAILURE);
+        }
     }
     fseek(fp, offset * BLOCKSIZE, SEEK_SET);
     bid = GetBlock(filename, offset);
