@@ -1,12 +1,11 @@
 #include "BufferManager.h"
 
-//假设实验展示的不会让buffer满，所以先不考虑LRU（狗头
+//假设实验展示的操作不会将buffer写满，所以先不考虑LRU（狗头
 BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) const
 {
     BID empty = 0;
     for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
     {
-
         if (blocks[bid].filename == filename && blocks[bid].offset == offset)
             return bid;
         else if (blocks[bid].valid == false)
@@ -19,6 +18,8 @@ void SetBlockInfo(const BID &bid, const string &filename, const unsigned int &of
 {
     blocks[bid].filename = filename;
     blocks[bid].offset = offset;
+    SetValid(bid);
+    SetUndirty(bid);
 }
 
 //将文件读入block
@@ -40,8 +41,6 @@ void BufferManager::ReadFile2Block(const string &filename, const unsigned int &o
         fread(blocks[bid].data, BLOCKSIZE, 1, fp);
     fclose(fp);
     SetBlockInfo(bid, filename, offset);
-    SetValid(bid);
-    SetUndirty(bid);
 }
 
 //将块写回文件
