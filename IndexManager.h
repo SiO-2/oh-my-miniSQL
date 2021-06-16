@@ -1,11 +1,29 @@
-#pragma once
-#include "BPTree.h" //ÓĞµã¶à»¹Ã»Ğ´Íêqaq,¼Ù×°ÓĞÁË¾ÍĞĞ
+ï»¿#pragma once
+#include "BPTree.h" //æœ‰ç‚¹å¤šè¿˜æ²¡å†™å®Œqaq,å‡è£…æœ‰äº†å°±è¡Œ
 #include "Index.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
 
 using namespace std;
+
+
+class Index
+{
+public:
+	Index(string indexName, string tableName, string attriName, int type)
+	{
+		this->indexName = indexName;
+		this->tableName = tableName;
+		this->attriName = attriName;
+		this->type = type;
+	}
+	string indexName;
+	string tableName;
+	string attriName;
+	int type;
+};
+
 
 class IndexManager
 {
@@ -17,7 +35,7 @@ private:
 	
 	static const int INT = 0;
 	static const int FLOAT = -1;
-	//ÕâÀïÏëÓÃÕûÊıÖ±½Ó±íÊ¾stringµÄ³¤¶È
+	//è¿™é‡Œæƒ³ç”¨æ•´æ•°ç›´æ¥è¡¨ç¤ºstringçš„é•¿åº¦
 	
 	int intTemp;
 	float floatTemp;
@@ -43,7 +61,7 @@ private:
 		case INT: return sizeof(int);
 		case FLOAT: return sizeof(float);
 		default:
-			return type;  //ÕâÀïÏëÓÃÕûÊıÖ±½Ó±íÊ¾stringµÄ³¤¶ÈÒÔ±ãÓÚÖ±½Ó·µ»ØkeysizeµÄ³¤¶È
+			return type;  //è¿™é‡Œæƒ³ç”¨æ•´æ•°ç›´æ¥è¡¨ç¤ºstringçš„é•¿åº¦ä»¥ä¾¿äºç›´æ¥è¿”å›keysizeçš„é•¿åº¦
 		}
 	}
 
