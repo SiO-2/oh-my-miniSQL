@@ -8,48 +8,52 @@
 using namespace std;
 
 typedef unsigned int BID;
-const unsigned int MAX_BLOCK_NUMBER = 0x1000;
-const unsigned int BLOCKSIZE = 0x4000;
+const BID MAX_BLOCK_NUMBER = 0x4000;
+const unsigned int BLOCKSIZE = 4096;
 
 struct Block
 {
     string filename;
-    BID bid;   //在buffer manager中的序号
+    unsigned int offset; //对于文件而言的偏移地址
+    bool valid;          //由于不需要考虑多线程，直接通过valid表示
     bool dirty;
-    bool busy;
-    bool valid;         //由于不需要考虑多线程，直接通过valid表示
     char data[BLOCKSIZE];
-    unsigned int offset;    //对于文件而言的偏移地址
 };
 
 class BufferManager
 {
 private:
+    //record不能调用分配和管理block的函数
+
     Block blocks[MAX_BLOCK_NUMBER];
-    BID GetBlock(const string &filename, int offset);
+
+    //返回对应的bid
+    BID GetBlock(const string &filename, const unsigned int &offset) const;     
+    
+    //写block的相关信息
+    void SetBlockInfo(const BID &bid, const string &filename, const unsigned int &offset);
+
+    //设置dirty,busy与valid
+    void SetDirty(const BID &bid);
+    void SetUndirty(const BID &bid);
+    void SetValid(const BID &bid);   //表示占用该block
+    void SetUnValid(const BID &bid); //相当于释放这个block
 
 public:
+    //record可以调用的只有读文件和写文件
+
     BufferManager();
 
     ~BufferManager() = default;
 
+
     //将文件读入block
-    void ReadFile2Block(const string &filename, const unsigned int &offset);
+    BID ReadFile2Block(const string &filename, const unsigned int &offset);
 
     //将块写回文件
-    void WriteBlock2File(const string &filename, const unsigned int &offset);
+    void WriteBlock2File(const BID &bid);
 
-    //设置dirty与busy
-    void SetDirty(const unsigned int &bid);
-    void SetUndirty(const unsigned int &bid);
-    void SetBusy(const unsigned int &bid);
-    void SetUnbusy(const unsigned int &bid);
 
-    //释放buffer manager中指定的block
-    void ReleaseBlock();
-
-    //删除文件在Block中的数据
-    void BlockFlush(const string &filename);
 };
 
 #endif //MINISQL_BUFFERMANAGER_H
