@@ -1,6 +1,10 @@
 #include <regex>
 #include "MiniSQL.h"
 
+TableMetadata::TableMetadata(){
+
+}
+
 TableMetadata::TableMetadata(string name, int attr_num, int primary_key, int primary_index){
     this->name = name;
     this->attr_num = attr_num;
@@ -8,6 +12,13 @@ TableMetadata::TableMetadata(string name, int attr_num, int primary_key, int pri
     this->primary_index = primary_index;
 }
 
+void TableMetadata::Print(){
+    cout<<"[Table Meta]:\n";
+    cout<<"Name:"<<this->name<<endl;
+    cout<<"Attr num:"<<this->attr_num<<endl;
+    cout<<"Primary Key:"<<this->primary_key<<endl;
+    cout<<"Primary Index:"<<this->primary_index<<endl;
+}
 
 Attribute::Attribute(string name, string typestr, bool notnull, bool unique, bool primary_key){
     std::regex re_char("char\\(\\d+\\)", regex_constants::icase);
@@ -47,7 +58,7 @@ void Attribute::set_pk(bool pk){
     this->primary_key = pk;
 }
 
-void Attribute::print(){
+void Attribute::Print(){
     // cout<<"[debug]: "<<this->name.length()<<endl;
     cout<<"[info]: Attr:"<<this->name<<", type:";
     if(this->type == INT_UNIT){
@@ -84,9 +95,89 @@ Table::Table(Table& table)
     this->m_attribute.assign(table.m_attribute.begin(), table.m_attribute.end());
 }
 
+void Table::Print(){
+    cout<<"[Table Info]:\n";
+    this->m_metadata.Print();
+    for(auto Attr:this->m_attribute){
+        Attr.Print();
+    }
+}
+
 Index::Index(Index& index)
 {
     this->attr_num = index.attr_num;
     this->index_name = index.index_name;
     this->table = index.table;
+}
+
+void DataUnit::Print(){
+    cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
+    switch (this->data_type)
+    {
+    case INT_UNIT:
+        cout<<"int: "<<this->value.int_value;
+        break;
+    case FLOAT_UNIT:
+        cout<<"float:"<<this->value.float_value;
+        break;
+    case CHAR_UNIT:
+        cout<<"char: "<<this->value.char_n_value;
+        break;
+    
+    default:
+        break;
+    }
+    cout<<endl;
+}
+
+ConditionUnit::ConditionUnit(string attr_name, int attr_num, OpCode op_code, DataType data_type):value(){
+    this->attr_name = attr_name;
+    this->attr_num = attr_num;
+    this->op_code = op_code;
+    this->data_type = data_type;
+}
+
+
+void ConditionUnit::Print(){
+    cout<<"[Condition Unit]:\n"<<"attr name = \""<<this->attr_name<<"\", Op = \"";
+    switch (this->op_code)
+    {
+    case EQ_:
+        cout<<"=\"";
+        break;
+    case NE_:
+        cout<<"!=\"";
+        break;
+    case LE_:
+        cout<<"<=\"";
+        break;
+    case GE_:
+        cout<<">=\"";
+        break;
+    case L_:
+        cout<<"<\"";
+        break;
+    case G_:
+        cout<<">\"";
+        break;
+    default:
+        break;
+    }
+    cout<<", value = \"";
+    switch (this->data_type)
+    {
+    case INT_UNIT:
+        cout<<this->value.int_value;
+        break;
+    case FLOAT_UNIT:
+        cout<<this->value.float_value;
+        break;
+    case CHAR_UNIT:
+        cout<<this->value.char_n_value;
+        break;
+    
+    default:
+        break;
+    }
+    cout<<"\""<<endl;
 }

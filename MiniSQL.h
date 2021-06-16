@@ -30,6 +30,7 @@ public:
 	int primary_index;	//主索引，用attr的编号表示，若没有则为-1
 	TableMetadata();
 	TableMetadata(string name, int attr_num, int primary_key=-1, int primary_index=-1);
+	void Print();
 };
 
 // 记录属性的类
@@ -50,7 +51,7 @@ public:
     void set_pk(bool pk);
     // name: print
     // Function: Print Attribute info
-    void print();
+    void Print();
 };
 
 class Table	//数据库中的一张表
@@ -60,6 +61,7 @@ public:
 	vector<Attribute> m_attribute;	//表中字段的信息
 	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
 	Table(Table& table);
+	void Print();
 };
 
 class Index	//建立在表m_table中attr_num上的索引，名为m_index_name
@@ -78,27 +80,32 @@ public:
 	union Value
 	{
 		int int_value;
-		string char_n_value;
+		char* char_n_value;
 		float float_value;
 	} value;
-	int attr_num;
+	int attr_num; //这个属性Interpreter调用的时候没法赋值
 	string attr_name;
 	DataType data_type;
+	void Print();
 };
 
 class ConditionUnit		//条件单元，用于select中的where，格式：attr_name attr_num  op_code  value（列 op 值）
 {
 public:
 	string attr_name;
-	int attr_num;
+	int attr_num;//attr_num Interpreter调用的时候可能没法传值
 	OpCode op_code;
 	DataType data_type;
 	union Value
 	{
 		int int_value;
-		string char_n_value;
+		char* char_n_value; // 不能用string, union中的类型不能自带构造函数（by wyc: 不太确定 但确实改了就好了）
 		float float_value;
+		// Value(){};
 	} value;
+	ConditionUnit(){};
+	ConditionUnit(string attr_name, int attr_num, OpCode op_code, DataType data_type);
+	void Print();
 };
 
 
