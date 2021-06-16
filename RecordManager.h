@@ -8,6 +8,13 @@
 #include "BufferManager.h"
 using namespace std;
 
+//数据文件的存放目录
+const string FILEPATH= ".database/data/";
+
+//文件后缀名
+const string TABLE_SUFFIX=".table";
+const string INDEX_SUFFIX=".index";
+
 class RecordManager
 {
 private:
@@ -18,17 +25,20 @@ public:
 	RecordManager(){};
 	~RecordManager(){};
 
-	bool CreateTable(const string &table);															   //创建表
-	bool DropTable(const string &table);																   //删除表
-	bool InsertValue(const string &table, const vector<struct DataUnit> &data);						   //插入值
-	bool Select(const struct Table &table);																	   //无条件查找全部属性输出
-	bool Select(const struct Table &table, const vector<string> &attribute);								   //无条件查找部分属性输出
-	bool Select(const struct Table &table, vector<ConditionUnit> &condition);								   //有条件查找全部属性输出
-	bool Select(const struct Table &table, const vector<string> &attribute, vector<ConditionUnit> &condition); //有条件查找部分属性输出
-	bool Delete(const struct Table &Table);																	   //无条件删除所有元组
-	bool Delect(const struct Table &table, const vector<ConditionUnit> &condition);							   //删除对应条件的元组
-	bool SelectFromIndex(const struct Table &table);														   //根据索引提供的位置信息进行查找全部属性输出
-	bool SelectFromIndex(const struct Table &table, const vector<string> &attribute);						   //根据索引提供的位置信息进行查找部分属性输出
+	//创建一个新的表
+	bool CreateTableFile(const string &tablename);
+
+	//删除表
+	bool DropTableFile(const string &tablename);
+
+	//插入记录，支持每次一条记录的插入操作
+	bool InsertTuple(const string &tablename, const vector<struct DataUnit> &tuple);
+
+	//数据查询，可以通过指定用and 连接的多个条件进行查询，支持等值查询和区间查询
+	bool SelectTuple(const Table &tablename, const vector<string> &attribute = NULL, const vector<ConditionUnit> &condition = NULL) const;
+
+	//删除元组，支持每次一条或多条记录的删除操作
+	bool DelectTuple(const Table &tablename, const vector<ConditionUnit> &condition = NULL);
 };
 
 #endif //MINISQL_RECORDMANAGER_H
