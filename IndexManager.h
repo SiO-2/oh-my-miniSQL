@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "BPTree.h" //有点多还没写完qaq,假装有了就行
-#include "Index.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
