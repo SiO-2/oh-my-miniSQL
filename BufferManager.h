@@ -48,12 +48,14 @@ public:
 
 
     //将文件读入block
+    //offset根据文件及数据大小计算
     BID ReadFile2Block(const string &filename, const unsigned int &offset);
 
     //将块写回文件
     void WriteBlock2File(const BID &bid);
 
-
+    //当表被删除时，将对应的block清空
+    void FlushBlock(const string &filename);
 };
 
 #endif //MINISQL_BUFFERMANAGER_H
