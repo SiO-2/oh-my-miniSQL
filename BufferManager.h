@@ -48,7 +48,7 @@ public:
 
 
     //将文件读入block
-    void ReadFile2Block(const string &filename, const unsigned int &offset);
+    BID ReadFile2Block(const string &filename, const unsigned int &offset);
 
     //将块写回文件
     void WriteBlock2File(const BID &bid);

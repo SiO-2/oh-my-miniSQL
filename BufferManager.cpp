@@ -23,7 +23,7 @@ void SetBlockInfo(const BID &bid, const string &filename, const unsigned int &of
 }
 
 //将文件读入block
-void BufferManager::ReadFile2Block(const string &filename, const unsigned int &offset)
+BID BufferManager::ReadFile2Block(const string &filename, const unsigned int &offset)
 {
     FILE *fp;
     BID bid;
@@ -41,6 +41,7 @@ void BufferManager::ReadFile2Block(const string &filename, const unsigned int &o
         fread(blocks[bid].data, BLOCKSIZE, 1, fp);
     fclose(fp);
     SetBlockInfo(bid, filename, offset);
+    return bid;
 }
 
 //将块写回文件
