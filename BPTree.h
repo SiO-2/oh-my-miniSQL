@@ -738,7 +738,6 @@ void BPTree<T>::write()
 	{
 		char* contentAddr = Block[tmp_bid].data;
 		char* baseAddr = contentAddr;
-		bufferManager.setDirty(tmp_bid, true);
 		for (int i = 0; i < ntemp->count; i++)
 		{
 			char* key = (char*)&(ntemp->keys[i]);
@@ -772,3 +771,9 @@ int BufferManager::getBlocknum(File* file)
 }
 
 //还需要知道每一个block用了多少size了
+
+
+int BufferManager::getBlocknum(File* file)
+{
+
+}
