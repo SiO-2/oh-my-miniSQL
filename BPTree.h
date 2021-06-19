@@ -688,7 +688,7 @@ BPTree<T>::~BPTree()
 
 
 
-
+//这里希望buffer建立一个file类型，指向他的block头
 
 
 template<typename T>
@@ -701,8 +701,8 @@ void BPTree<T>::readBlock(Bid block)
 	T key;
 	int offset;
 
-    //这里假设都满，但实际上不可能都满
-	while (offsetAddr - contentAddr < 4096)
+
+	while (offsetAddr - contentAddr <= 4096)  //相当于把它读完但是这里的块可能没有满啊啊啊啊啊啊
 	{
 		key = *(T*)indexAddr;
 		offset = *(int*)offsetAddr;
@@ -717,7 +717,7 @@ void BPTree<T>::read()
 {
 	file = bufferManager.getFile(fileName);
 	Bid tmp_bid = bufferManager.getBlockHead(file);
-	int numofblock;
+	int numofblock = getBlocknum(file);
 	//等于文件大小除以快的大小,在这里就是叶子的个数了2333
 
 	for (int i = 0; i < numofblock; i++)
@@ -765,3 +765,10 @@ Bid BufferManager::getBlockHead(File* file)
 {
 
 }
+
+int BufferManager::getBlocknum(File* file)
+{
+
+}
+
+//还需要知道每一个block用了多少size了
