@@ -84,6 +84,7 @@ public:
 		float float_value;
 	} value;
 	int attr_num; //这个属性Interpreter调用的时候没法赋值
+	// bool isnull;
 	string attr_name;
 	DataType data_type;
 	void Print();

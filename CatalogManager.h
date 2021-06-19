@@ -27,6 +27,7 @@ public:
 	
 	int SelectTest(string& table_name, vector<struct ConditionUnit>& condition);	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
 	//返回值：-1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
+	// !!
 
 	Table* GetTableCatalog(string& table_name);	//获取表名为table_name的Catalog信息，如果不存在则返回空的Table
 	
