@@ -48,7 +48,7 @@ CatalogManager::CatalogManager()
 }
 
 //创建包含Catalog的表，需要检查重复性，返回值true表示成功，false表示失败
-bool CatalogManager::CreateTable(struct Table& table)
+bool CatalogManager::CreateTable(Table& table)
 {
     fstream table_file;
     int n = m_table.size();
@@ -67,7 +67,7 @@ bool CatalogManager::CreateTable(struct Table& table)
 }
 
 //创建索引，需要检查重复性，返回值true表示成功，false表示失败
-bool CatalogManager::CreateIndex(struct Index& index)
+bool CatalogManager::CreateIndex(Index& index)
 {
     fstream index_file;
     int n = m_index.size();
@@ -146,7 +146,7 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
 
 //判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
 //返回值：-2（表格不存在） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
-pair<int, string> CatalogManager::SelectTest(string& table_name, vector<struct ConditionUnit>& condition)
+pair<int, string> CatalogManager::SelectTest(string& table_name, vector<ConditionUnit>& condition)
 {
     pair<int, string> ret;
     ret.first = 0;
@@ -190,8 +190,8 @@ Table* CatalogManager::GetTableCatalog(string& table_name)
 {
     int i = FindTable(table_name);
     if (i == -1)
-        return ;
-    Table *t = &Table(m_table[i]);
+        return NULL;
+    Table *t = &m_table[i];
     return t;
 }
 
@@ -201,13 +201,13 @@ Index* CatalogManager::TableToIndex(string& table_name)
     int i = FindIndex(table_name);
     if (i == -1)
         return NULL;
-    Index *I = &Index(m_index[i]);
+    Index *I = &m_index[i];
     return I;
 }
 
 //判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
 //返回值：-2（表格不存在） -1（删除条件出错）；0（只能通过遍历Record删除）；1（可以利用索引优化删除）
-pair<int, string> CatalogManager::DeleteTest(string& table_name, vector<struct ConditionUnit>& condition)
+pair<int, string> CatalogManager::DeleteTest(string& table_name, vector<ConditionUnit>& condition)
 {
     pair<int, string> ret;
     ret.first = 0;
@@ -257,7 +257,7 @@ bool CatalogManager::CheckAttr(Attribute& attr, struct Unit& data)
 //检测condition
 bool CatalogManager::CheckCond(ConditionUnit& cond)
 {
-
+    return true;
 }
 
 int CatalogManager::FindIndex(string& index_name)

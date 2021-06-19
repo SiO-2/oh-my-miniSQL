@@ -73,7 +73,9 @@ public:
 	Table* table;	//表   //这个没必要吧（要不要删掉，给个意见
 	int attr_num;	//索引建立在该属性上
 	Index(Index& index);
-	Index(){}
+	Index(){
+		
+	}
 };
 
 
@@ -88,6 +90,7 @@ public:
 		float float_value;
 	} value;
 	int attr_num; //这个属性Interpreter调用的时候没法赋值
+	// bool isnull;
 	string attr_name;
 	DataType data_type;
 	void Print();

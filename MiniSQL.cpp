@@ -110,25 +110,25 @@ Index::Index(Index& index)
     this->table = index.table;
 }
 
-void DataUnit::Print(){
-    cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
-    switch (this->data_type)
-    {
-    case INT_UNIT:
-        cout<<"int: "<<this->value.int_value;
-        break;
-    case FLOAT_UNIT:
-        cout<<"float:"<<this->value.float_value;
-        break;
-    case CHAR_UNIT:
-        cout<<"char: "<<this->value.char_n_value;
-        break;
+// void DataUnit::Print(){
+//     cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
+//     switch (this->data_type)
+//     {
+//     case INT_UNIT:
+//         cout<<"int: "<<this->value.int_value;
+//         break;
+//     case FLOAT_UNIT:
+//         cout<<"float:"<<this->value.float_value;
+//         break;
+//     case CHAR_UNIT:
+//         cout<<"char: "<<this->value.char_n_value;
+//         break;
     
-    default:
-        break;
-    }
-    cout<<endl;
-}
+//     default:
+//         break;
+//     }
+//     cout<<endl;
+// }
 
 ConditionUnit::ConditionUnit(string attr_name, int attr_num, OpCode op_code, DataType data_type):value(){
     this->attr_name = attr_name;
