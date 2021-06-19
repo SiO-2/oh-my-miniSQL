@@ -74,6 +74,7 @@ public:
 };
 
 
+/*
 class DataUnit		//数据单元，里面包含了数据类型，值以及对应的属性编号，用于插入语句的输入以及选择语句的返回值
 {
 public:
@@ -88,6 +89,28 @@ public:
 	string attr_name;
 	DataType data_type;
 	void Print();
+};
+*/
+
+//DataUnit
+union Value
+{
+	int int_value;
+	char *char_n_value;
+	float float_value;
+};
+
+class Tuple
+{
+public:
+	vector<union Value> tuple_value;
+	bool valid;
+};
+
+struct BPlusNode
+{
+	unsigned int block_offset;
+	unsigned int tuple_offset;
 };
 
 class ConditionUnit		//条件单元，用于select中的where，格式：attr_name attr_num  op_code  value（列 op 值）

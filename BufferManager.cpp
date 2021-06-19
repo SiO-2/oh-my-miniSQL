@@ -1,5 +1,23 @@
 #include "BufferManager.h"
 
+//设置dirty与busy
+void BufferManager::SetDirty(const BID &bid)
+{
+    blocks[bid].dirty = true;
+}
+void BufferManager::SetUndirty(const BID &bid)
+{
+    blocks[bid].dirty = false;
+}
+void BufferManager::SetValid(const BID &bid)
+{
+    blocks[bid].valid = true;
+}
+void BufferManager::SetUnValid(const BID &bid)
+{
+    blocks[bid].valid = false;
+}
+
 //假设实验展示的操作不会将buffer写满，所以先不考虑LRU（狗头
 BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) const
 {
@@ -62,20 +80,10 @@ void BufferManager::WriteBlock2File(const BID &bid)
     SetUnValid(bid);
 }
 
-//设置dirty与busy
-void BufferManager::SetDirty(const BID &bid)
-{
-    blocks[bid].dirty = true;
-}
-void BufferManager::SetUndirty(const BID &bid)
-{
-    blocks[bid].dirty = false;
-}
-void BufferManager::SetValid(const BID &bid)
-{
-    blocks[bid].valid = true;
-}
-void BufferManager::SetUnValid(const BID &bid)
-{
-    blocks[bid].valid = false;
+//当表被删除时，将对应的block清空
+void FlushBlock(const string &filename){
+    for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++){
+        if(blocks[bid].valid && blocks[bid].filename==filename)
+            SetUnValid(bid);
+    }
 }
