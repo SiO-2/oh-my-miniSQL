@@ -12,6 +12,8 @@ public:
     void CreateIndex(string str); // 针对create index 场景的函数
     void Insert(string str); // 针对insert 场景的函数
     void Select(string str); // 针对select 场景的函数
+    void DropTable(std::string str);
+    void DropIndex(std::string str);
 };
 
 #endif
