@@ -15,7 +15,7 @@ CatalogManager::CatalogManager()
         for (int i=0; i<table_n; i++)
         {
             t = readTable(table_file);
-            m_table[i]=(*t);
+            m_table.push_back(t);
         }
         table_file.close();
     }
@@ -35,7 +35,7 @@ CatalogManager::CatalogManager()
             I = new Index;
             readIndex(*I, index_file);
             // m_index.push_back(*I);
-            m_index[i] = *I;
+            m_index[i] = I;
         }
         index_file.close();
     }
@@ -55,13 +55,13 @@ bool CatalogManager::CreateTable(Table& table)
     int n = m_table.size();
     for (int i=0; i<n; i++)
     {
-        if (table.m_metadata.name == m_table[i].m_metadata.name)
+        if (table.m_metadata.name == m_table[i]->m_metadata.name)
             return false;
     }
     table_file.open(table_name, ios::out|ios::binary|ios::app);
-    m_table[n] = table;
-    // m_table.push_back(table);
-    writeTable(table, table_file);
+    // m_table[n] = table;
+    m_table.push_back(&table);
+    writeTable(&table, table_file);
     table_file.close();
     table_file.open(table.m_metadata.name, ios::out|ios::binary);
     table_file.close();
@@ -75,13 +75,13 @@ bool CatalogManager::CreateIndex(Index& index)
     int n = m_index.size();
     for (int i=0; i<n; i++)
     {
-        if (index.index_name == m_index[i].index_name)
+        if (index.index_name == m_index[i]->index_name)
             return false;
     }
-    writeIndex(index, index_file);
-    // m_index.push_back(index);
+    writeIndex(&index, index_file);
+    m_index.push_back(&index);
     index_file.open(index_name, ios::out|ios::binary|ios::app);
-    m_index[n] = index;
+    // m_index[n] = index;
     index_file.close();
     index_file.open(index.index_name, ios::out|ios::binary);
     index_file.close();
@@ -95,7 +95,7 @@ bool CatalogManager::DropTable(string& name)
     fstream table_file;
     for (int i=0; i<n; i++)
     {
-        if (name == m_table[i].m_metadata.name){
+        if (name == m_table[i]->m_metadata.name){
             table_file.open(table_name, ios::out|ios::binary|ios::trunc);
             m_table.erase(m_table.begin()+i);
             writeallTable(table_file);
@@ -113,7 +113,7 @@ bool CatalogManager::DropIndex(string& name)
     fstream index_file;
     for (int i=0; i<n; i++)
     {
-        if (name == m_index[i].index_name){
+        if (name == m_index[i]->index_name){
             index_file.open(index_name, ios::out|ios::binary|ios::trunc);
             m_index.erase(m_index.begin()+i);
             writeallIndex(index_file);
@@ -132,12 +132,12 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     int n = m_table.size(), i;
     for (i=0; i<n; i++)
     {
-        if (table_name == m_table[i].m_metadata.name)
+        if (table_name == m_table[i]->m_metadata.name)
             break;
     }
     if (i==n) // 表不存在
         return false;
-    t = &m_table[i];
+    t = m_table[i];
     n = t->m_metadata.attr_num;
     for (i=0; i<n; i++)
     {
@@ -159,7 +159,7 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<Conditio
         ret.first = -2;
         return ret;
     }
-    Table *t = &m_table[i];
+    Table *t = m_table[i];
     int n = condition.size();
     int m = t->m_attribute.size();
     ret.second = t->m_metadata.name;
@@ -179,9 +179,9 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<Conditio
         }
         for (int k=0; k<m_index.size(); k++)
         {
-            if (condition[i].attr_num == m_index[k].attr_num){
+            if (condition[i].attr_num == m_index[k]->attr_num){
                 ret.first = 1;
-                ret.second = m_index[k].index_name;
+                ret.second = m_index[k]->index_name;
             }
         }
     }
@@ -194,7 +194,7 @@ Table* CatalogManager::GetTableCatalog(string& table_name)
     int i = FindTable(table_name);
     if (i == -1)
         return NULL;
-    Table *t = &m_table[i];
+    Table *t = m_table[i];
     return t;
 }
 
@@ -204,7 +204,7 @@ Index* CatalogManager::TableToIndex(string& table_name)
     int i = FindIndex(table_name);
     if (i == -1)
         return NULL;
-    Index *I = &m_index[i];
+    Index *I = m_index[i];
     return I;
 }
 
@@ -220,7 +220,7 @@ pair<int, string> CatalogManager::DeleteTest(string& table_name, vector<Conditio
         ret.first = -2;
         return ret;
     }
-    Table *t = &m_table[i];
+    Table *t = m_table[i];
     int n = condition.size();
     int m = t->m_attribute.size();
     ret.second = t->m_metadata.name;
@@ -241,10 +241,10 @@ pair<int, string> CatalogManager::DeleteTest(string& table_name, vector<Conditio
         }
         for (int k=0; k<m_index.size(); k++)
         {
-            if (condition[i].attr_num == m_index[k].attr_num)
+            if (condition[i].attr_num == m_index[k]->attr_num)
             {
                 ret.first = 1;
-                ret.second = m_index[k].index_name;
+                ret.second = m_index[k]->index_name;
             }
         }
     }
@@ -268,7 +268,7 @@ int CatalogManager::FindIndex(string& index_name)
     int n = m_index.size(), i;
     for (i=0; i<n; i++)
     {
-        if (index_name == m_table[i].m_metadata.name)
+        if (index_name == m_table[i]->m_metadata.name)
             return i;
     }
     return -1;
@@ -279,7 +279,7 @@ int CatalogManager::FindTable(string& table_name)
     int n = m_table.size(), i;
     for (i=0; i<n; i++)
     {
-        if (table_name == m_table[i].m_metadata.name)
+        if (table_name == m_table[i]->m_metadata.name)
             return i;
     }
     return -1;
@@ -371,19 +371,19 @@ Table* CatalogManager::readTable(fstream& f)
     return t;
 }
 
-void CatalogManager::writeTable(Table& t, fstream& f)
+void CatalogManager::writeTable(Table* t, fstream& f)
 {
-    int num = t.m_metadata.attr_num;
-    writestring(t.m_metadata.name, f);
+    int num = t->m_metadata.attr_num;
+    writestring(t->m_metadata.name, f);
     writeint(num, f);
     for (int i=0; i<num; i++)
-        writeAttr(t.m_attribute[i], f);
+        writeAttr(t->m_attribute[i], f);
 }
 
-void CatalogManager::writeIndex(Index& i, fstream& f)
+void CatalogManager::writeIndex(Index* i, fstream& f)
 {
-    writestring(i.index_name, f);
-    writeint(i.attr_num, f);
+    writestring(i->index_name, f);
+    writeint(i->attr_num, f);
 }
 
 void CatalogManager::writeallTable(fstream& f)

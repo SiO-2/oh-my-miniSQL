@@ -37,8 +37,8 @@ public:
 	//返回值：-2（表格不存在） -1（删除条件出错）；0（只能通过遍历Record删除）；1（可以利用索引优化删除）
 
 private:
-	vector<Table> m_table;
-	vector<Index> m_index;
+	vector<Table*> m_table;
+	vector<Index*> m_index;
 	
     string table_name = "./data/head/table.tb";
     string index_name = "./data/head/index.id";
@@ -55,8 +55,8 @@ private:
 	void writeint(int& i, fstream& f);
 	void writebool(bool&b, fstream& f);
 	void writeAttr(Attribute& a, fstream& f);
-	void writeTable(Table& t, fstream& f);
-	void writeIndex(Index& i, fstream& f);
+	void writeTable(Table* t, fstream& f);
+	void writeIndex(Index* i, fstream& f);
 	void writeallTable(fstream& f);
 	void writeallIndex(fstream& f);
 	Table* readTable(fstream& f);

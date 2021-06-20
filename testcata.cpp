@@ -4,7 +4,7 @@
 
 int main()
 {
-    vector<Table> vt;
+    vector<Table*> vt;
     CatalogManager catalog;
     Table t;
     t.m_metadata.attr_num=1;
@@ -14,8 +14,8 @@ int main()
     s.charlen = 0;
     s.notnull = 1;
     s.type = DataType::INT_UNIT;
-    vt.push_back(t);
-    // t.m_attribute.push_back(s);
+    vt.push_back(&t);
+    t.m_attribute.push_back(s);
     catalog.CreateTable(t);
     
 }
