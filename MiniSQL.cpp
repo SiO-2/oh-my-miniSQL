@@ -12,6 +12,14 @@ TableMetadata::TableMetadata(string name, int attr_num, int primary_key, int pri
     this->primary_index = primary_index;
 }
 
+TableMetadata::TableMetadata(TableMetadata& t)
+{
+    this->attr_num = t.attr_num;
+    this->name = t.name;
+    this->primary_index = t.primary_index;
+    this->primary_key = t.primary_key;
+}
+
 void TableMetadata::Print(){
     cout<<"[Table Meta]:\n";
     cout<<"Name:"<<this->name<<endl;
@@ -88,10 +96,7 @@ Table::Table(TableMetadata m_metadata, vector<Attribute> m_attribute):m_metadata
 
 Table::Table(Table& table)
 {
-    this->m_metadata.name = table.m_metadata.name;
-    this->m_metadata.attr_num = table.m_metadata.attr_num;
-    this->m_metadata.primary_key = table.m_metadata.primary_key;
-    this->m_metadata.primary_index = table.m_metadata.primary_index;
+    this->m_metadata = table.m_metadata;
     this->m_attribute.assign(table.m_attribute.begin(), table.m_attribute.end());
 }
 

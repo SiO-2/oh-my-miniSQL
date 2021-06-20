@@ -30,6 +30,7 @@ public:
 	int primary_index;	//主索引，用attr的编号表示，若没有则为-1
 	TableMetadata();
 	TableMetadata(string name, int attr_num, int primary_key=-1, int primary_index=-1);
+	TableMetadata(TableMetadata& t);
 	void Print();
 };
 

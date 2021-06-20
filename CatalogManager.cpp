@@ -58,10 +58,10 @@ bool CatalogManager::CreateTable(Table& table)
         if (table.m_metadata.name == m_table[i].m_metadata.name)
             return false;
     }
-    table_file.open(table_name, ios::out|ios::binary|ios::ate);
-    writeTable(table, table_file);
-    // m_table.push_back(table);
+    table_file.open(table_name, ios::out|ios::binary|ios::app);
     m_table[n] = table;
+    // m_table.push_back(table);
+    writeTable(table, table_file);
     table_file.close();
     table_file.open(table.m_metadata.name, ios::out|ios::binary);
     table_file.close();
@@ -78,9 +78,9 @@ bool CatalogManager::CreateIndex(Index& index)
         if (index.index_name == m_index[i].index_name)
             return false;
     }
-    index_file.open(index_name, ios::out|ios::binary|ios::ate);
     writeIndex(index, index_file);
     // m_index.push_back(index);
+    index_file.open(index_name, ios::out|ios::binary|ios::app);
     m_index[n] = index;
     index_file.close();
     index_file.open(index.index_name, ios::out|ios::binary);
