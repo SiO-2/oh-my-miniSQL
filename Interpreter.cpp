@@ -30,30 +30,57 @@ void Interpreter::Parse(){
     string token = get_token(t);
     // cout<<"token = "<<token<<endl;
     try{
-        if(token == "CREATE"){
+        if( icasecompare(token, "CREATE") ){
             // pos = t.find_first_of(' ');
             // token = t.substr(0, pos);
             // t.erase(0, pos);
             // t = strip(t);
             token = get_token(t);
-            if(token == "TABLE"){
+            if( icasecompare(token, "TABLE") ){
                 this->CreateTable(t); 
-            }else if(token == "INDEX"){
+            }else if( icasecompare(token, "INDEX") ){
                 this->CreateIndex(t); 
             }
 
-        }else if(token == "INSERT"){
+        }else if( icasecompare(token, "INSERT") ){
             token = get_token(t);
-            if(token == "INTO"){
+            if(  icasecompare(token, "INTO") ){
                 this->Insert(t);
             }
-        }else if(token == "SELECT"){
+        }else if( icasecompare(token, "SELECT") ){
             this->Select(t);
+        }else if( icasecompare(token, "DROP") ){
+            token = get_token(t);
+            if( icasecompare(token, "TABLE") ){
+                this->DropTable(t);
+            }else if( icasecompare(token, "INDEX") ){
+                this->DropIndex(t);
+            }
         }
     }catch(SyntaxError e){
         cout<<"[Error]: "<<e.msg<<endl;
     }
     
+}
+
+void Interpreter::DropTable(string str){
+    strip(str);
+    if( str.find(" ") != string::npos){
+        SyntaxError e("Invalid Table Name in Drop Table");
+        throw e;
+    }
+    // Here Table Name to Drop is 'str'
+    cout<<"[info]: Drop Table Name=\""<<str<<"\""<<endl;
+}
+
+void Interpreter::DropIndex(string str){
+    strip(str);
+    if( str.find(" ") != string::npos){
+        SyntaxError e("Invalid Table Name in Drop Index");
+        throw e;
+    }
+    // Here Index Name to Drop is 'str'
+    cout<<"[info]: Drop Index Name=\""<<str<<"\""<<endl;
 }
 
 void Interpreter::Select(string str){
@@ -220,60 +247,60 @@ void Interpreter::Select(string str){
 }
 
 void Interpreter::Insert(string str){
-    string ostr = str;
-    string targ_table_name = get_token(str);
+    // string ostr = str;
+    // string targ_table_name = get_token(str);
 
-    int pos = str.find_first_of('(');
-    string s1 = str.substr(0, pos);
-    strip(s1);
-    if( ! icasecompare(s1, "VALUES") || str[ str.length() - 1] != ')'){
-        cout<<"[debug]: insert query="<<s1<<endl;
-        SyntaxError e("Invalid Syntax please insert value by: insert into tablename values(values...)\n");
-        throw e;
-    }
-    str = str.substr(pos+1, str.length() - 2 - pos);
-    // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
+    // int pos = str.find_first_of('(');
+    // string s1 = str.substr(0, pos);
+    // strip(s1);
+    // if( ! icasecompare(s1, "VALUES") || str[ str.length() - 1] != ')'){
+    //     cout<<"[debug]: insert query="<<s1<<endl;
+    //     SyntaxError e("Invalid Syntax please insert value by: insert into tablename values(values...)\n");
+    //     throw e;
+    // }
+    // str = str.substr(pos+1, str.length() - 2 - pos);
+    // // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
 
-    vector<string> value_vec;
-    vector<DataUnit> dataunit_vec;
-    split(str, value_vec, ',');
+    // vector<string> value_vec;
+    // vector<DataUnit> dataunit_vec;
+    // split(str, value_vec, ',');
 
-    int int_value; 
-    float float_value;
-    DataType data_type;
-    for(vector<string>::iterator iter = value_vec.begin(); iter!=value_vec.end(); iter++){
-        string value_str = *iter;
-        strip(value_str);
-        DataUnit data_unit;
-        // if( value_str == "NULL" || value_str == "null"){
-            // NULL 判断，暂不支持
-        // }
-        data_type = ParseDataType(value_str);
-        data_unit.data_type = data_type;
-        switch(data_type){
-            case INT_UNIT:
-                try{
-                    int_value = stoi(value_str);
-                }catch(...){
-                    SyntaxError e("Wrong condition value syntax in " + value_str);
-                    throw e;
-                }
-                data_unit.value.int_value = int_value;break;
-            case FLOAT_UNIT:
-                float_value = stof(value_str);
-                data_unit.value.float_value = float_value;break;
-            case CHAR_UNIT:
-                char* value_str_c = (char *)malloc(sizeof(char) * (value_str.length() + 1) );
-                strcpy(value_str_c, value_str.c_str());
-                data_unit.value.char_n_value = value_str_c; break;
-        }
-        dataunit_vec.push_back(data_unit);
-    }
+    // int int_value; 
+    // float float_value;
+    // DataType data_type;
+    // for(vector<string>::iterator iter = value_vec.begin(); iter!=value_vec.end(); iter++){
+    //     string value_str = *iter;
+    //     strip(value_str);
+    //     DataUnit data_unit;
+    //     // if( value_str == "NULL" || value_str == "null"){
+    //         // NULL 判断，暂不支持
+    //     // }
+    //     data_type = ParseDataType(value_str);
+    //     data_unit.data_type = data_type;
+    //     switch(data_type){
+    //         case INT_UNIT:
+    //             try{
+    //                 int_value = stoi(value_str);
+    //             }catch(...){
+    //                 SyntaxError e("Wrong condition value syntax in " + value_str);
+    //                 throw e;
+    //             }
+    //             data_unit.value.int_value = int_value;break;
+    //         case FLOAT_UNIT:
+    //             float_value = stof(value_str);
+    //             data_unit.value.float_value = float_value;break;
+    //         case CHAR_UNIT:
+    //             char* value_str_c = (char *)malloc(sizeof(char) * (value_str.length() + 1) );
+    //             strcpy(value_str_c, value_str.c_str());
+    //             data_unit.value.char_n_value = value_str_c; break;
+    //     }
+    //     dataunit_vec.push_back(data_unit);
+    // }
 
-    cout<<"[Insert Info]:"<<endl;
-    for(auto unit: dataunit_vec){
-        unit.Print();
-    }
+    // cout<<"[Insert Info]:"<<endl;
+    // for(auto unit: dataunit_vec){
+    //     unit.Print();
+    // }
 }
 
 void Interpreter::CreateIndex(string str){

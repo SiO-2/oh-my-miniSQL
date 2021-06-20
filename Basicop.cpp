@@ -48,7 +48,7 @@ string get_token(string &s){
     s = lstrip(s);
     int pos = s.find_first_of(' ');
     string token = s.substr(0, pos);
-    transform(token.begin(), token.end(), token.begin(), ::toupper);
+    // transform(token.begin(), token.end(), token.begin(), ::toupper);
     s = s.erase(0, pos);
     return token;
 }
