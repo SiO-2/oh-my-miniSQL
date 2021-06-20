@@ -11,12 +11,13 @@
 #include "SqlError.h"
 // #include "Attribute.h"
 #include "MiniSQL.h"
+#include "CatalogManager.h"
 
 // DEBUG INFO开关
 // #define DEBUG 0
 using namespace std;
 
-Interpreter::Interpreter(string sql){
+Interpreter::Interpreter(string sql):Cata(){
     this->sql = strip(sql);
 }
 
@@ -451,14 +452,9 @@ void Interpreter::CreateTable(string str){
 
     table.Print();
     // 输出环节
-    // #ifdef DEBUG
-        // cout<<"[info]: Create Table Back Info:"<<endl;
-        // cout<<"[info]: Table Name = "<<tablename<<endl;
-        // for(vector<Attribute>::iterator iter = Attributes.begin(); iter != Attributes.end(); iter++ ){
-        //     (*iter).Print();
-        // }
-    // #endif
-    // std::cout<<"create table name = "<<tablename<<endl;
-
-    // std::cout<<str<<endl;
+    if( Cata.CreateTable(table) ){
+        cout<<"[info]: Create Table Successfully"<<endl;
+    }else{
+        cout<<"[info]: Create Table Failed"<<endl;
+    }
 }

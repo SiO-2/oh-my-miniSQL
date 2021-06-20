@@ -46,6 +46,13 @@ CatalogManager::CatalogManager()
         writeint(n, index_file);
         index_file.close();
     }
+    // by wyc print to debug:
+    cout<<"[Catalog]: table list"<<endl;
+    for(auto table:this->m_table){
+        table->Print();
+    }
+    cout<<"[catalog]: end of table list"<<endl;
+
 }
 
 //创建包含Catalog的表，需要检查重复性，返回值true表示成功，false表示失败
