@@ -115,6 +115,45 @@ Index::Index(Index& index)
     this->table = index.table;
 }
 
+Index::Index(){
+
+}
+
+void Index::Print(){
+    cout<<"[Index Info]: index name = "<<this->index_name<<endl;
+}
+
+Unit::Unit(){
+
+}
+
+Unit::Unit(Value& value, DataType& datatype){
+    this->value = value;
+    this->datatype = datatype;
+}
+
+void Unit::Print(){
+    cout<<"[Unit info]: ";
+    string str;
+    switch(this->datatype)
+    {
+    case INT_UNIT:
+        cout<<"int: "<<this->value.int_value<<endl;
+        break;
+    case FLOAT_UNIT:
+        cout<<"float: "<<this->value.float_value<<endl;
+        break;
+    case CHAR_UNIT:
+        str = this->value.char_n_value;
+        cout<<"string: "<<str<<endl;
+        break;
+    default:
+        break;
+    }
+}
+Tuple::Tuple(): tuple_value(), valid(true){
+}
+
 // void DataUnit::Print(){
 //     cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
 //     switch (this->data_type)

@@ -71,12 +71,11 @@ class Index	//建立在表m_table中attr_num上的索引，名为m_index_name
 {
 public:
 	string index_name;
-	Table* table;	//表   //这个没必要吧（要不要删掉，给个意见
+	Table* table;	//表   //这个没必要吧（要不要删掉，给个意见 (wyc:不太懂，或许先WORK再说)
 	int attr_num;	//索引建立在该属性上
 	Index(Index& index);
-	Index(){
-		
-	}
+	Index();
+	void Print();
 };
 
 
@@ -107,10 +106,13 @@ union Value
 };
 
 //不这样写根本没法做检测啊kora！！
-struct Unit 
-{
+class Unit {
+public:
 	union Value value;
 	DataType datatype;
+	Unit();
+	Unit(Value& value, DataType& datatype);
+	void Print();
 };
 
 class Tuple
@@ -118,6 +120,7 @@ class Tuple
 public:
 	vector<struct Unit> tuple_value;
 	bool valid;
+	Tuple();
 };
 
 struct BPlusNode

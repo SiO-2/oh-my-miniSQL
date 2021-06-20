@@ -22,7 +22,7 @@ public:
 	bool CheckAttr(Attribute& attr, struct Unit& data); //这里实际上只能检测type,类型正确返回true
 	bool CheckCond(ConditionUnit& cond); //这个我没用到，不知道要不要调用
 
-	//这里有table不需要传入attribute to：wyc
+	//这里有table不需要传入attribute to：wyc, (wyc:get)
 	bool InsertTest(string& table_name, Tuple& data);	//判断是否可以插入：检查每个DataUnit中的数据类型是否与表定义的数据类型匹配
 	
 	pair<int, string> SelectTest(string& table_name, vector<ConditionUnit>& condition);	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num

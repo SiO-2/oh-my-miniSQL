@@ -80,5 +80,5 @@ string rstrip(string& s);
 bool icasecompare(const string& a, const string& b);
 
 DataType ParseDataType(string& str);
-
+Value ParseStringType(DataType type, string& str);
 #endif

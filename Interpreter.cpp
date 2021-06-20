@@ -72,6 +72,13 @@ void Interpreter::DropTable(string str){
     }
     // Here Table Name to Drop is 'str'
     cout<<"[info]: Drop Table Name=\""<<str<<"\""<<endl;
+
+    // 调用Catalog的部分
+    if( Cata.DropTable(str) ){
+        cout<<"[Catalog res]: Drop Table "<<str<<" succussfully"<<endl;
+    }else{
+        cout<<"[Catalog res]: Drop Table "<<str<<" failed"<<endl;
+    }
 }
 
 void Interpreter::DropIndex(string str){
@@ -248,60 +255,51 @@ void Interpreter::Select(string str){
 }
 
 void Interpreter::Insert(string str){
-    // string ostr = str;
-    // string targ_table_name = get_token(str);
+    string ostr = str;
+    string targ_table_name = get_token(str);
 
-    // int pos = str.find_first_of('(');
-    // string s1 = str.substr(0, pos);
-    // strip(s1);
-    // if( ! icasecompare(s1, "VALUES") || str[ str.length() - 1] != ')'){
-    //     cout<<"[debug]: insert query="<<s1<<endl;
-    //     SyntaxError e("Invalid Syntax please insert value by: insert into tablename values(values...)\n");
-    //     throw e;
-    // }
-    // str = str.substr(pos+1, str.length() - 2 - pos);
-    // // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
+    int pos = str.find_first_of('(');
+    string s1 = str.substr(0, pos);
+    strip(s1);
+    if( ! icasecompare(s1, "VALUES") || str[ str.length() - 1] != ')'){
+        cout<<"[debug]: insert query="<<s1<<endl;
+        SyntaxError e("Invalid Syntax please insert value by: insert into tablename values(values...)\n");
+        throw e;
+    }
+    str = str.substr(pos+1, str.length() - 2 - pos);
+    // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
 
-    // vector<string> value_vec;
-    // vector<DataUnit> dataunit_vec;
-    // split(str, value_vec, ',');
+    vector<string> value_vec;
+    vector<DataUnit> dataunit_vec;
+    split(str, value_vec, ',');
 
-    // int int_value; 
-    // float float_value;
-    // DataType data_type;
-    // for(vector<string>::iterator iter = value_vec.begin(); iter!=value_vec.end(); iter++){
-    //     string value_str = *iter;
-    //     strip(value_str);
-    //     DataUnit data_unit;
-    //     // if( value_str == "NULL" || value_str == "null"){
-    //         // NULL 判断，暂不支持
-    //     // }
-    //     data_type = ParseDataType(value_str);
-    //     data_unit.data_type = data_type;
-    //     switch(data_type){
-    //         case INT_UNIT:
-    //             try{
-    //                 int_value = stoi(value_str);
-    //             }catch(...){
-    //                 SyntaxError e("Wrong condition value syntax in " + value_str);
-    //                 throw e;
-    //             }
-    //             data_unit.value.int_value = int_value;break;
-    //         case FLOAT_UNIT:
-    //             float_value = stof(value_str);
-    //             data_unit.value.float_value = float_value;break;
-    //         case CHAR_UNIT:
-    //             char* value_str_c = (char *)malloc(sizeof(char) * (value_str.length() + 1) );
-    //             strcpy(value_str_c, value_str.c_str());
-    //             data_unit.value.char_n_value = value_str_c; break;
-    //     }
-    //     dataunit_vec.push_back(data_unit);
-    // }
+    int int_value; 
+    float float_value;
+    DataType data_type;
+    Tuple tuple;
+    for(vector<string>::iterator iter = value_vec.begin(); iter!=value_vec.end(); iter++){
+        string value_str = *iter;
+        strip(value_str);
+        // if( value_str == "NULL" || value_str == "null"){
+            // NULL 判断，暂不支持
+        // }
+        data_type = ParseDataType(value_str);
+        Unit unit;
+        Value value;
+        try{
+            value = ParseStringType(data_type, value_str);
+        }catch( SyntaxError e){
+            throw e;
+        }
+        unit.value = value;
+        unit.datatype = data_type;
+        tuple.tuple_value.push_back(unit);
+    }
 
-    // cout<<"[Insert Info]:"<<endl;
-    // for(auto unit: dataunit_vec){
-    //     unit.Print();
-    // }
+    cout<<"[Insert Info]:"<<endl;
+    for(auto tunit:tuple.tuple_value){
+        tunit.Print();
+    }
 }
 
 void Interpreter::CreateIndex(string str){
@@ -341,6 +339,8 @@ void Interpreter::CreateIndex(string str){
     // 索引名字在 index_name中
     // 对象表格在 targ_table_name中
     cout<<"[debug create index]:"<<index_name<<" on "<<targ_table_name<<"("<<attr_name<<")"<<endl;
+
+
 }
 
 void Interpreter::CreateTable(string str){
@@ -450,8 +450,10 @@ void Interpreter::CreateTable(string str){
     TableMetadata Meta(tablename, Attributes.size(), pk_mark, main_index);
     Table table(Meta, Attributes);
 
-    table.Print();
     // 输出环节
+    table.Print();
+
+    // 调用Catalog
     if( Cata.CreateTable(table) ){
         cout<<"[info]: Create Table Successfully"<<endl;
     }else{
