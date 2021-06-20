@@ -11,19 +11,63 @@ typedef unsigned int BID;
 const BID MAX_BLOCK_NUMBER = 0x7FFF;
 const unsigned int BLOCKSIZE = 4096;
 
-struct Block
+class Block
 {
+private:
     string filename;
     unsigned int offset; //对于文件而言的偏移地址
     bool valid;          //由于不需要考虑多线程，直接通过valid表示
     bool dirty;
+
+public:
+    //只有data可以给其他manager修改
     char data[BLOCKSIZE];
+
+    Block();
+
+
+    //大量的读取和设置函数主要是为了保护Block的相关信息不被修改，保证block的分配完全由buffermanager管理
+    string GetFilename()const{
+        return this->filename;
+    }
+    unsigned int GetOffset()const{
+        return this->offset;
+    }
+    bool IsValid()const{
+        return this->valid;
+    }
+    bool IsDirty()const{
+        return this->dirty;
+    }
+    void SetFilename(const string &filename){
+        this->filename=filename;
+    }
+    void SetOffset(const unsigned int &offset){
+        this->offset=offset;
+    }
+
+    //设置dirty与valid
+    void SetDirty()
+    {
+        this->dirty = true;
+    }
+    void SetUnDirty()
+    {
+        this->dirty = false;
+    }
+    void SetValid() //表示占用该block
+    { 
+        this->valid = true;
+    }
+    void SetUnValid()   //相当于释放这个block
+    { 
+        this->valid = false;
+    }
 };
 
 class BufferManager
 {
 private:
-
     /*
         函数功能：进行BID的分配
         传入参数：带路径的文件名，以及地址偏移
@@ -37,12 +81,6 @@ private:
         返回值：没有返回值
     */
     void SetBlockInfo(const BID &bid, const string &filename, const unsigned int &offset);
-
-    //设置dirty与valid
-    void SetDirty(const BID &bid); 
-    void SetUndirty(const BID &bid);
-    void SetValid(const BID &bid);   //表示占用该block
-    void SetUnValid(const BID &bid); //相当于释放这个block
 
 public:
     //record不能调用分配和管理block的函数

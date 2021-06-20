@@ -1,23 +1,4 @@
 #include "BufferManager.h"
-
-//设置dirty与busy
-void BufferManager::SetDirty(const BID &bid)
-{
-    blocks[bid].dirty = true;
-}
-void BufferManager::SetUndirty(const BID &bid)
-{
-    blocks[bid].dirty = false;
-}
-void BufferManager::SetValid(const BID &bid)
-{
-    blocks[bid].valid = true;
-}
-void BufferManager::SetUnValid(const BID &bid)
-{
-    blocks[bid].valid = false;
-}
-
 /*
     函数功能：获取文件的大小
     传入参数：带路径的文件名
@@ -42,9 +23,9 @@ BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) 
     BID empty = 0;
     for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
     {
-        if (blocks[bid].filename == filename && blocks[bid].offset == offset)
+        if (blocks[bid].GetFilename() == filename && blocks[bid].GetOffset() == offset)
             return bid;
-        else if (blocks[bid].valid == false)
+        else if (blocks[bid].IsValid() == false)
             empty = bid;
     }
     return empty;
@@ -57,10 +38,10 @@ BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) 
 */
 void BufferManager::SetBlockInfo(const BID &bid, const string &filename, const unsigned int &offset)
 {
-    blocks[bid].filename = filename;
-    blocks[bid].offset = offset;
-    SetValid(bid);
-    SetUndirty(bid);
+    blocks[bid].SetFilename(filename);
+    blocks[bid].SetOffset(offset);
+    blocks[bid].SetUnDirty();
+    blocks[bid].SetValid();
 }
 
 /*
@@ -95,7 +76,7 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
     {
         fseek(fp, *it * BLOCKSIZE, SEEK_SET);
         bids.push_back(GetBlock(filename, *it));
-        if (blocks[*bids.end()].valid == false)
+        if (blocks[*bids.end()].IsValid() == false)
         {
             fread(blocks[*bids.end()].data, BLOCKSIZE, 1, fp);
             SetBlockInfo(*bids.end(), filename, *it);
@@ -113,18 +94,18 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
 void BufferManager::WriteBlock2File(const BID &bid)
 {
     FILE *fp;
-    if (blocks[bid].dirty) //没有修改就不用重新写回
+    if (blocks[bid].IsDirty()) //没有修改就不用重新写回
     {
-        if ((fp = fopen(blocks[bid].filename.c_str(), "wb")) == NULL)
+        if ((fp = fopen(blocks[bid].GetFilename().c_str(), "wb")) == NULL)
         {
-            printf("Can't open %s\n", blocks[bid].filename);
+            printf("Can't open %s\n", blocks[bid].GetFilename());
             exit(EXIT_FAILURE);
         }
-        fseek(fp, blocks[bid].offset * BLOCKSIZE, SEEK_SET);
+        fseek(fp, blocks[bid].GetOffset() * BLOCKSIZE, SEEK_SET);
         fwrite(blocks[bid].data, BLOCKSIZE, 1, fp);
         fclose(fp);
     }
-    SetUnValid(bid);
+    blocks[bid].SetUnValid();
 }
 
 /*
@@ -136,7 +117,7 @@ void BufferManager::FlushBlock(const string &filename)
 {
     for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
     {
-        if (blocks[bid].valid && blocks[bid].filename == filename)
-            SetUnValid(bid);
+        if (blocks[bid].IsValid() && blocks[bid].GetFilename() == filename)
+            blocks[bid].SetUnValid();
     }
 }
