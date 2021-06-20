@@ -7,6 +7,7 @@ template <typename T>
 class TreeNode
 {
 public:
+
 	size_t count;
 	bool isLeaf;
 	std::vector<TreeNode*> childs;
@@ -687,3 +688,92 @@ BPTree<T>::~BPTree()
 
 
 
+//这里希望buffer建立一个file类型，指向他的block头
+
+
+template<typename T>
+void BPTree<T>::readBlock(Bid block)
+{
+	int offsetSize = sizeof(int);
+	char* indexAddr = Block[block].data;
+	char* contentAddr = Block[block].data;
+	char* offsetAddr = indexAddr + keySize;
+	T key;
+	int offset;
+
+
+	while (offsetAddr - contentAddr <= 4096)  //相当于把它读完但是这里的块可能没有满啊啊啊啊啊啊
+	{
+		key = *(T*)indexAddr;
+		offset = *(int*)offsetAddr;
+		insertKey(key, offset);
+		offsetAddr += keySize + offsetSize;
+		indexAddr += keySize + offsetSize;
+	}
+}
+
+template<typename T>
+void BPTree<T>::read()
+{
+	file = bufferManager.getFile(fileName);
+	Bid tmp_bid = bufferManager.getBlockHead(file);
+	int numofblock = getBlocknum(file);
+	//等于文件大小除以快的大小,在这里就是叶子的个数了2333
+
+	for (int i = 0; i < numofblock; i++)
+	{
+		readBlock(tmp_bid + i);
+	}
+
+}
+
+template<typename T>
+void BPTree<T>::write()
+{
+	Bid tmp_bid = bufferManager.getBlockHead(file);
+	Node ntemp = leafHead;
+	int offsetSize = sizeof(int);
+
+	while (ntemp != NULL) //这里先一个叶子存放一个block吧啊啊啊啊啊啊啊
+	{
+		char* contentAddr = Block[tmp_bid].data;
+		char* baseAddr = contentAddr;
+		for (int i = 0; i < ntemp->count; i++)
+		{
+			char* key = (char*)&(ntemp->keys[i]);
+			char* offset = (char*)&(ntemp->offsets[i]);
+			memcpy(contentAddr, key, keySize);
+			contentAddr += keySize;
+			memcpy(contentAddr, offset, offsetSize);
+			contentAddr += offsetSize;
+		}
+		tmp_bid++;
+		ntemp = ntemp->next;
+	}
+}
+
+
+File* BufferManager::getFile(const string fileName, bool pin)
+{
+	//返回文件指针
+}
+
+
+//Get head block, load file in the head block
+Bid BufferManager::getBlockHead(File* file)
+{
+
+}
+
+int BufferManager::getBlocknum(File* file)
+{
+
+}
+
+//还需要知道每一个block用了多少size了
+
+
+int BufferManager::getBlocknum(File* file)
+{
+
+}
