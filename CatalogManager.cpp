@@ -65,10 +65,11 @@ bool CatalogManager::CreateTable(Table& table)
         if (table.m_metadata.name == m_table[i]->m_metadata.name)
             return false;
     }
-    table_file.open(table_name, ios::out|ios::binary|ios::app);
+    table_file.open(table_name, ios::out|ios::binary);
     // m_table[n] = table;
     m_table.push_back(&table);
-    writeTable(&table, table_file);
+    // writeTable(&table, table_file);
+    writeallTable(table_file);
     table_file.close();
     table_file.open(table.m_metadata.name, ios::out|ios::binary);
     table_file.close();
@@ -85,9 +86,9 @@ bool CatalogManager::CreateIndex(Index& index)
         if (index.index_name == m_index[i]->index_name)
             return false;
     }
-    writeIndex(&index, index_file);
     m_index.push_back(&index);
-    index_file.open(index_name, ios::out|ios::binary|ios::app);
+    index_file.open(index_name, ios::out|ios::binary);
+    writeallIndex(index_file);
     // m_index[n] = index;
     index_file.close();
     index_file.open(index.index_name, ios::out|ios::binary);
@@ -330,9 +331,11 @@ void CatalogManager::readIndex(Index& i, fstream& f)
 
 void CatalogManager::writestring(string&s, fstream& f)
 {
-    int n = s.size();
+    int n = s.size() + 1;
     writeint(n, f);
-    f.write(s.c_str(), n);
+    f.write(s.c_str(), n-1);
+    char a = '\0';
+    f.write(&a, 1);
 }
 
 void CatalogManager::writeint(int& i, fstream& f)
@@ -371,8 +374,8 @@ Table* CatalogManager::readTable(fstream& f)
     {
         attr = new Attribute;
         readAttr(*attr, f);
-        // m_attribute.push_back(*attr);
-        m_attribute[j] = *attr;
+        m_attribute.push_back(*attr);
+        // m_attribute[j] = *attr;
     }
     t = new Table(m_metadata, m_attribute);
     return t;
