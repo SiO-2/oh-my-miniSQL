@@ -40,8 +40,8 @@ private:
 	vector<Table> m_table;
 	vector<Index> m_index;
 	
-    string table_name = "data/head/table.tb";
-    string index_name = "data/head/index.id";
+    string table_name = "./data/head/table.tb";
+    string index_name = "./data/head/index.id";
 
 	int FindTable(string& table_name);
 	int FindIndex(string& index_name);

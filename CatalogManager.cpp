@@ -5,8 +5,8 @@
 CatalogManager::CatalogManager()
 {
     fstream table_file, index_file;
-    table_file.open(table_name.c_str(), ios::in|ios::binary);
-    index_file.open(index_name.c_str(), ios::in|ios::binary);
+    table_file.open(table_name, ios::in|ios::binary);
+    index_file.open(index_name, ios::in|ios::binary);
     int table_n, index_n;
     if (table_file)
     {
@@ -15,13 +15,13 @@ CatalogManager::CatalogManager()
         for (int i=0; i<table_n; i++)
         {
             t = readTable(table_file);
-            m_table.push_back(*t);
+            m_table[i]=(*t);
         }
         table_file.close();
     }
     else
     {
-        table_file.open(table_name.c_str(), ios::out|ios::binary);
+        table_file.open(table_name, ios::out|ios::binary);
         int n = 0;
         writeint(n, table_file);
         table_file.close();
@@ -34,13 +34,14 @@ CatalogManager::CatalogManager()
         {
             I = new Index;
             readIndex(*I, index_file);
-            m_index.push_back(*I);
+            // m_index.push_back(*I);
+            m_index[i] = *I;
         }
         index_file.close();
     }
     else
     {
-        index_file.open(index_name.c_str(), ios::out|ios::binary);
+        index_file.open(index_name, ios::out|ios::binary);
         int n=0;
         writeint(n, index_file);
         index_file.close();
@@ -57,11 +58,12 @@ bool CatalogManager::CreateTable(Table& table)
         if (table.m_metadata.name == m_table[i].m_metadata.name)
             return false;
     }
-    table_file.open(table_name.c_str(), ios::out|ios::binary|ios::ate);
+    table_file.open(table_name, ios::out|ios::binary|ios::ate);
     writeTable(table, table_file);
-    m_table.push_back(table);
+    // m_table.push_back(table);
+    m_table[n] = table;
     table_file.close();
-    table_file.open(table.m_metadata.name.c_str(), ios::out|ios::binary);
+    table_file.open(table.m_metadata.name, ios::out|ios::binary);
     table_file.close();
     return true;
 }
@@ -76,11 +78,12 @@ bool CatalogManager::CreateIndex(Index& index)
         if (index.index_name == m_index[i].index_name)
             return false;
     }
-    index_file.open(index_name.c_str(), ios::out|ios::binary|ios::ate);
+    index_file.open(index_name, ios::out|ios::binary|ios::ate);
     writeIndex(index, index_file);
-    m_index.push_back(index);
+    // m_index.push_back(index);
+    m_index[n] = index;
     index_file.close();
-    index_file.open(index.index_name.c_str(), ios::out|ios::binary);
+    index_file.open(index.index_name, ios::out|ios::binary);
     index_file.close();
     return true;
 }
@@ -361,7 +364,8 @@ Table* CatalogManager::readTable(fstream& f)
     {
         attr = new Attribute;
         readAttr(*attr, f);
-        m_attribute.push_back(*attr);
+        // m_attribute.push_back(*attr);
+        m_attribute[j] = *attr;
     }
     t = new Table(m_metadata, m_attribute);
     return t;
