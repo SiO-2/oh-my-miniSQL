@@ -270,7 +270,7 @@ void Interpreter::Insert(string str){
     // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
 
     vector<string> value_vec;
-    vector<DataUnit> dataunit_vec;
+    // vector<DataUnit> dataunit_vec;
     split(str, value_vec, ',');
 
     int int_value; 

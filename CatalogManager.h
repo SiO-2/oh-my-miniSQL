@@ -42,6 +42,12 @@ private:
 	
     string table_name = "./data/head/table.tb";
     string index_name = "./data/head/index.id";
+	string table_dir = "./data/table/";
+	string index_dir = "./data/index/";
+	string table_ex = ".mta";
+
+	string NameToTF(string& name);
+	string NameToIF(string& name);
 
 	int FindTable(string& table_name);
 	int FindIndex(string& index_name);

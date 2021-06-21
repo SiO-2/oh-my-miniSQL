@@ -71,7 +71,7 @@ bool CatalogManager::CreateTable(Table& table)
     // writeTable(&table, table_file);
     writeallTable(table_file);
     table_file.close();
-    table_file.open(table.m_metadata.name, ios::out|ios::binary);
+    table_file.open(NameToTF(table.m_metadata.name), ios::out|ios::binary);
     table_file.close();
     return true;
 }
@@ -91,7 +91,7 @@ bool CatalogManager::CreateIndex(Index& index)
     writeallIndex(index_file);
     // m_index[n] = index;
     index_file.close();
-    index_file.open(index.index_name, ios::out|ios::binary);
+    index_file.open(NameToIF(index.index_name), ios::out|ios::binary);
     index_file.close();
     return true;
 }
@@ -104,7 +104,7 @@ bool CatalogManager::DropTable(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_table[i]->m_metadata.name){
-            table_file.open(table_name, ios::out|ios::binary|ios::trunc);
+            table_file.open(NameToTF(table_name), ios::out|ios::binary|ios::trunc);
             m_table.erase(m_table.begin()+i);
             writeallTable(table_file);
             table_file.close();
@@ -122,7 +122,7 @@ bool CatalogManager::DropIndex(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_index[i]->index_name){
-            index_file.open(index_name, ios::out|ios::binary|ios::trunc);
+            index_file.open(NameToIF(index_name), ios::out|ios::binary|ios::trunc);
             m_index.erase(m_index.begin()+i);
             writeallIndex(index_file);
             index_file.close();
@@ -410,4 +410,16 @@ void CatalogManager::writeallIndex(fstream& f)
     writeint(n, f);
     for (int i=0; i<n; i++)
         writeIndex(m_index[i], f);
+}
+
+string CatalogManager::NameToTF(string& name)
+{
+    string tf = table_dir + name + table_ex;
+    return tf;
+}
+
+string CatalogManager::NameToIF(string& name)
+{
+    string inf = index_dir + name + table_ex;
+    return inf;
 }
