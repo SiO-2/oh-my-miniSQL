@@ -1,209 +1,295 @@
 #include "IndexManager.h"
+#include "API.h"
 
-const int FLOAT = -1;
-const int INT = 0;
-
-IndexManager::IndexManager()
-{
-	//vector<Index> indexList;
+IndexManager::IndexManager(API* ap) :api(ap) {//构造函数，需要读取index文件并建立对应B+树
+	vector<IndexInfo> indexList;
+	string filepath;
+	api->getAllIndex(&indexList);
+	for(auto i = indexList.begin(); i != indexList.end(); i++) {
+		filepath = i->indexName + ".index";
+		readIndex(filepath, i->type);
+	}
 }
 
-IndexManager::IndexManager(vector<Index>& indexList)
-{
-	for (int i = 0; i < indexList.size(); i++)
-	{
-		int keySize = this->getKeySize(indexList[i].type);
-		switch (indexList[i].type)
-		{
-		case INT: this->intIndices.push_back(new BPTree<int>(indexList[i].indexName, keySize, 19)); break;
-		case FLOAT: this->floatIndices.push_back(new BPTree<float>(indexList[i].indexName, keySize, 19)); break;
-		default: this->stringIndices.push_back(new BPTree<string>(indexList[i].indexName, keySize, 19)); break;
+IndexManager::~IndexManager() {
+	//销毁对象前将index的改变写回缓冲区中
+	for(intMap::iterator itInt = indexIntMap.begin(); itInt != indexIntMap.end(); itInt++) {
+		if(itInt->second) {
+			itInt->second->WriteBack();
+			delete itInt->second;
+		}
+	}
+	for(stringMap::iterator itString = indexStringMap.begin(); itString != indexStringMap.end(); itString++) {
+		if(itString->second) {
+			itString->second->WriteBack();
+			delete itString->second;
+		}
+	}
+	for(floatMap::iterator itFloat = indexFloatMap.begin(); itFloat != indexFloatMap.end(); itFloat++) {
+		if(itFloat->second) {
+			itFloat->second->WriteBack();
+			delete itFloat->second;
 		}
 	}
 }
 
-
-IndexManager::~IndexManager()
-{
-	//
+int IndexManager::getDegree(int type) {//获取块能存储的key数量
+	int degree =  BLOCKSIZE / (getKeySize(type) + sizeof(offsetNumber));
+	return degree;
+}
+int IndexManager::getKeySize(int type) {//获取key的大小
+	if(type == TYPE_FLOAT) return sizeof(float);
+	else if(type == TYPE_INT) return sizeof(int);
+	else if(type > 0) return type + 1;
+	else {
+		cout << "ERROR: Invalid type" << endl;
+		return -1;
+	}
+}
+void IndexManager::setKey(int type, string key) {//将key存入一个临时变量中
+	stringstream ss;
+	ss << key;
+	if(type == TYPE_FLOAT) ss >> this->floatTmp;
+	else if(type == TYPE_INT) ss >> this->intTmp;
+	else if(type > 0) ss >> this->stringTmp;
+	else cout << "ERROR: Invalid type" << endl;
+	ss.clear();
 }
 
-//Create an empty index with new fileName
-void IndexManager::createIndex(string fileName, int type)
-{
-	int keySize = getKeySize(type);
-	int degree = 19;
-	FILE* fp = fopen(fileName.c_str(), "wb+");
-	if (!fp)
+//这里还要传记录过来
+ 
+void IndexManager::createIndex(string filePath, int type) {//建立索引
+	ifstream newfile_in(filePath.c_str());
+	ofstream newfile_out;
+	if(newfile_in) {
+		cout << "in Create index: file " << filePath << "already exist" << endl;
+		newfile_in.close();
+	}
+	else {
+		newfile_out.open(filePath.c_str());
+		newfile_out.close();
+	}
+
+
+	int keysize = getKeySize(type);
+	int degree = getDegree(type);
+	
+	//将传过来的记录创建成一个新的文件
+	
+	
+	 
+	//创建新文件，并建立对应B+树
+	if(type == TYPE_INT) {
+		BPlusTree<int> *tree = new BPlusTree<int>(filePath, keysize, degree);
+		indexIntMap.insert(intMap::value_type(filePath, tree));
+	}
+	else if(type == TYPE_FLOAT) {
+		BPlusTree<float> *tree = new BPlusTree<float>(filePath, keysize, degree);
+		indexFloatMap.insert(floatMap::value_type(filePath, tree));
+	}
+	else if(type > 0) {
+		BPlusTree<string> *tree = new BPlusTree<string>(filePath, keysize, degree);
+		indexStringMap.insert(stringMap::value_type(filePath, tree));
+	}
+	else { 
+		cout << "ERROR: in create index: Invalid type" << endl;
+	}
+}
+void IndexManager::dropIndex(string filePath, int type) {//删除索引
+	ifstream oldfile(filePath.c_str());
+	if(oldfile.is_open()) {
+		oldfile.close();
+		remove(filePath.c_str());
+	}
+	//在map容器中查找索引名，找到后删除B+树及该记录
+	if(type == TYPE_INT) {
+		intMap::iterator itInt = indexIntMap.find(filePath);
+		if(itInt == indexIntMap.end()) {
+			cout << "Error:in drop index: index not exits" << endl;
+			return;
+		}
+		else {
+			delete itInt->second;
+			indexIntMap.erase(itInt);
+		}
+	}
+	else if(type == TYPE_FLOAT) {
+		floatMap::iterator itFloat = indexFloatMap.find(filePath);
+		if(itFloat == indexFloatMap.end()) {
+			cout << "Error:in drop index: index not exits" << endl;
+			return;
+		}
+		else {
+			delete itFloat->second;
+			indexFloatMap.erase(itFloat);
+		}
+	}
+	else if(type > 0) {
+		stringMap::iterator itString = indexStringMap.find(filePath);
+		if(itString == indexStringMap.end()) {
+			cout << "Error:in drop index: index not exits" << endl;
+			return;
+		}
+		else {
+			delete itString->second;
+			indexStringMap.erase(itString);
+		}
+	}
+	else {
+		cout << "ERROR: in drop index: Invalid type" << endl;
+	}
+}
+offsetNumber IndexManager::searchIndex(string filePath, string key, int type) {//查找索引，并返回偏移量
+	setKey(type, key);
+	//在索引对应B+树中查找key
+	if(type == TYPE_INT) {
+		intMap::iterator itInt = indexIntMap.find(filePath);
+		if(itInt == indexIntMap.end()) {
+			cout << "Error:in search index, index not exits" << endl;
+			return -1;
+		}
+		else {
+			return itInt->second->Search(intTmp);
+		}
+	}
+	else if(type == TYPE_FLOAT) {
+		floatMap::iterator itFloat = indexFloatMap.find(filePath);
+		if(itFloat == indexFloatMap.end()) {
+			cout << "Error:in search index, index not exits" << endl;
+			return -1;
+		}
+		else {
+			return itFloat->second->Search(floatTmp);
+		}
+	}
+	else if(type > 0) {
+		stringMap::iterator itString = indexStringMap.find(filePath);
+		if(itString == indexStringMap.end()) {
+			cout << "Error:in search index, index not exits" << endl;
+			return -1;
+		}
+		else {
+			return itString->second->Search(stringTmp);
+		}
+	}
+	else {
+		cout << "ERROR: in search index: Invalid type" << endl;
+		return -2;
+	}
+}
+void IndexManager::insertIndex(string filePath, string key, offsetNumber Offset, int type) {//在指定位置插入key
+	setKey(type, key);
+	//在索引对应B+树中，插入key
+	if(type == TYPE_INT) {
+		intMap::iterator itInt = indexIntMap.find(filePath);
+		if(itInt == indexIntMap.end()) {
+			cout << "Error:in insert index, index not exits" << endl;
+			return;
+		}
+		else {
+			itInt->second->Insert(intTmp, Offset);
+			return;
+		}
+	}
+	else if(type == TYPE_FLOAT) {
+		floatMap::iterator itFloat = indexFloatMap.find(filePath);
+		if(itFloat == indexFloatMap.end()) {
+			cout << "Error:in insert index, index not exits" << endl;
+			return;
+		}
+		else {
+			itFloat->second->Insert(floatTmp, Offset);
+			return;
+		}
+	}
+	else if(type > 0) {
+		stringMap::iterator itString = indexStringMap.find(filePath);
+		if(itString == indexStringMap.end()) {
+			cout << "Error:in insert index, index not exits" << endl;
+			return;
+		}
+		else {
+			itString->second->Insert(stringTmp, Offset);
+			return;
+		}
+	}
+	else {
+		cout << "ERROR: in insert index: Invalid type" << endl;
 		return;
-	fclose(fp);
-	if (type == INT)
-		intIndices.push_back(new BPTree<int>(fileName, keySize, degree));
-	else if (type == FLOAT)
-		floatIndices.push_back(new BPTree<float>(fileName, keySize, degree));
-	else
-		stringIndices.push_back(new BPTree<string>(fileName, keySize, degree));
+	}
 }
-
-void IndexManager::dropIndex(string fileName, int type)
-{
-	if (type == INT)
-	{
-		for (int i = 0; i < intIndices.size(); i++)
-		{
-			if (intIndices[i]->fileName == fileName)
-			{
-				delete intIndices[i];
-				std::vector<BPTree<int>*>::iterator it = intIndices.begin() + i;
-				intIndices.erase(it);
-				return;
-			}
-		}
-	}
-	else if (type == FLOAT)
-	{
-		for (int i = 0; i < floatIndices.size(); i++)
-		{
-			if (floatIndices[i]->fileName == fileName)
-			{
-				delete floatIndices[i];
-				std::vector<BPTree<float>*>::iterator it = floatIndices.begin() + i;
-				floatIndices.erase(it);
-				return;
-			}
-		}
-	}
-	else
-	{
-		for (int i = 0; i < stringIndices.size(); i++)
-		{
-			if (stringIndices[i]->fileName == fileName)
-			{
-				delete stringIndices[i];
-				std::vector<BPTree<string>*>::iterator it = stringIndices.begin() + i;
-				stringIndices.erase(it);
-				return;
-			}
-		}
-	}
-	//remove(fileName.c_str());//Remove file from disk
-}
-
-int IndexManager::searchIndex(string fileName, string key, int type)
-{
+void IndexManager::deleteIndex(string filePath, string key, int type) {//删除key
 	setKey(type, key);
-	if (type == INT)
-	{
-		for (int i = 0; i < intIndices.size(); i++)
-		{
-			if (intIndices[i]->fileName == fileName)
-				return intIndices[i]->searchKey(intTemp);
+	//在索引对应B+树中删除key
+	if(type == TYPE_INT) {
+		intMap::iterator itInt = indexIntMap.find(filePath);
+		if(itInt == indexIntMap.end()) {
+			cout << "Error:in delete index, index not exits" << endl;
+			return;
 		}
-		return -1;
+		else {
+			itInt->second->Delete(intTmp);
+			return;
+		}
 	}
-	else if (type == FLOAT)
-	{
-		for (int i = 0; i < floatIndices.size(); i++)
-		{
-			if (floatIndices[i]->fileName == fileName)
-				return floatIndices[i]->searchKey(floatTemp);
+	else if(type == TYPE_FLOAT) {
+		floatMap::iterator itFloat = indexFloatMap.find(filePath);
+		if(itFloat == indexFloatMap.end()) {
+			cout << "Error:in delete index, index not exits" << endl;
+			return;
 		}
-		return -1;
+		else {
+			itFloat->second->Delete(floatTmp);
+			return;
+		}
 	}
-	else
-	{
-		for (int i = 0; i < stringIndices.size(); i++)
-		{
-			if (stringIndices[i]->fileName == fileName)
-				return stringIndices[i]->searchKey(stringTemp);
+	else if(type > 0) {
+		stringMap::iterator itString = indexStringMap.find(filePath);
+		if(itString == indexStringMap.end()) {
+			cout << "Error:in delete index, index not exits" << endl;
+			return;
 		}
-		return -1;
+		else {
+			itString->second->Delete(stringTmp);
+			return;
+		}
+	}
+	else {
+		cout << "ERROR: in delete index: Invalid type" << endl;
+		return;
 	}
 }
 
-bool IndexManager::insertKeyIntoIndex(string fileName, string key, int type, int offset)
-{
-	setKey(type, key);
-	if (type == INT)
-	{
-		for (int i = 0; i < intIndices.size(); i++)
-		{
-			if (intIndices[i]->fileName == fileName)
-			{
-				return intIndices[i]->insertKey(intTemp, offset);
-				//return;
-			}
-		}
-		cout << "Index Not Found!" << endl;
-	}
-	else if (type == FLOAT)
-	{
-		for (int i = 0; i < floatIndices.size(); i++)
-		{
-			if (floatIndices[i]->fileName == fileName)
-			{
-				return floatIndices[i]->insertKey(floatTemp, offset);
-				
-			}
-		}
-		cout << "Index Not Found!" << endl;
-	}
-	else
-	{
-		for (int i = 0; i < stringIndices.size(); i++)
-		{
-			if (stringIndices[i]->fileName == fileName)
-			{
-				return stringIndices[i]->insertKey(stringTemp, offset);
-				//return;
-			}
-		}
-		cout << "Index Not Found!" << endl;
-	}
-	return false;
-}
 
-bool IndexManager::deleteKeyFromIndex(string fileName, string key, int type)
-{
-	setKey(type, key);
-	if (type == INT)
-	{
-		for (int i = 0; i < intIndices.size(); i++)
-		{
-			if (intIndices[i]->fileName == fileName)
-			{
-				return intIndices[i]->deleteKey(intTemp);
-				//return;
-			}
-			
-		}
-		cout << "Index Not Found!" << endl;
+void IndexManager::readIndex(string filePath, int type) {//读入索引文件，并创建B+树
+	ifstream newfile_in(filePath.c_str());
+	ofstream newfile_out;
+	if(!newfile_in) {
+		cout << "in Create index: file " << filePath << "not exist" << endl;
+		newfile_in.close();
 	}
-	else if (type == FLOAT)
-	{
-		for (int i = 0; i < floatIndices.size(); i++)
-		{
-			if (floatIndices[i]->fileName == fileName)
-			{
-				return floatIndices[i]->deleteKey(floatTemp);
-				//return;
-			}
-			
-		}
-		cout << "Index Not Found!" << endl;
+	else {
+		newfile_out.open(filePath.c_str());
+		newfile_out.close();
 	}
-	else
-	{
-		for (int i = 0; i < stringIndices.size(); i++)
-		{
-			if (stringIndices[i]->fileName == fileName)
-			{
-				return stringIndices[i]->deleteKey(stringTemp);
-				//return;
-			}
-			
-		}
-		cout << "Index Not Found!" << endl;
+
+
+	int keysize = getKeySize(type);
+	int degree = getDegree(type);
+	//根据文件名创建不同类型的B+数，并在map容器中建立映射
+	if(type == TYPE_INT) {
+		BPlusTree<int> *tree = new BPlusTree<int>(filePath, keysize, degree);
+		indexIntMap.insert(intMap::value_type(filePath, tree));
 	}
-	return false;
+	else if(type == TYPE_FLOAT) {
+		BPlusTree<float> *tree = new BPlusTree<float>(filePath, keysize, degree);
+		indexFloatMap.insert(floatMap::value_type(filePath, tree));
+	}
+	else if(type > 0) {
+		BPlusTree<string> *tree = new BPlusTree<string>(filePath, keysize, degree);
+		indexStringMap.insert(stringMap::value_type(filePath, tree));
+	}
+	else {
+		cout << "ERROR: in create index: Invalid type" << endl;
+	}
 }

@@ -11,12 +11,13 @@
 #include "SqlError.h"
 // #include "Attribute.h"
 #include "MiniSQL.h"
+#include "CatalogManager.h"
 
 // DEBUG INFO开关
 // #define DEBUG 0
 using namespace std;
 
-Interpreter::Interpreter(string sql){
+Interpreter::Interpreter(string sql):Cata(){
     this->sql = strip(sql);
 }
 
@@ -30,30 +31,64 @@ void Interpreter::Parse(){
     string token = get_token(t);
     // cout<<"token = "<<token<<endl;
     try{
-        if(token == "CREATE"){
+        if( icasecompare(token, "CREATE") ){
             // pos = t.find_first_of(' ');
             // token = t.substr(0, pos);
             // t.erase(0, pos);
             // t = strip(t);
             token = get_token(t);
-            if(token == "TABLE"){
+            if( icasecompare(token, "TABLE") ){
                 this->CreateTable(t); 
-            }else if(token == "INDEX"){
+            }else if( icasecompare(token, "INDEX") ){
                 this->CreateIndex(t); 
             }
 
-        }else if(token == "INSERT"){
+        }else if( icasecompare(token, "INSERT") ){
             token = get_token(t);
-            if(token == "INTO"){
+            if(  icasecompare(token, "INTO") ){
                 this->Insert(t);
             }
-        }else if(token == "SELECT"){
+        }else if( icasecompare(token, "SELECT") ){
             this->Select(t);
+        }else if( icasecompare(token, "DROP") ){
+            token = get_token(t);
+            if( icasecompare(token, "TABLE") ){
+                this->DropTable(t);
+            }else if( icasecompare(token, "INDEX") ){
+                this->DropIndex(t);
+            }
         }
     }catch(SyntaxError e){
         cout<<"[Error]: "<<e.msg<<endl;
     }
     
+}
+
+void Interpreter::DropTable(string str){
+    strip(str);
+    if( str.find(" ") != string::npos){
+        SyntaxError e("Invalid Table Name in Drop Table");
+        throw e;
+    }
+    // Here Table Name to Drop is 'str'
+    cout<<"[info]: Drop Table Name=\""<<str<<"\""<<endl;
+
+    // 调用Catalog的部分
+    if( Cata.DropTable(str) ){
+        cout<<"[Catalog res]: Drop Table "<<str<<" succussfully"<<endl;
+    }else{
+        cout<<"[Catalog res]: Drop Table "<<str<<" failed"<<endl;
+    }
+}
+
+void Interpreter::DropIndex(string str){
+    strip(str);
+    if( str.find(" ") != string::npos){
+        SyntaxError e("Invalid Table Name in Drop Index");
+        throw e;
+    }
+    // Here Index Name to Drop is 'str'
+    cout<<"[info]: Drop Index Name=\""<<str<<"\""<<endl;
 }
 
 void Interpreter::Select(string str){
@@ -207,15 +242,18 @@ void Interpreter::Select(string str){
         cond.Print();
     }
 
-    // 结果存储
-    // where条件存储在 vector<ConditionUnit> cond_vec 里
-    // from唯一的table名在 table_vec[0]
-    // Select的属性名在 vector<string> attr_vec里
-
     // cout<<"[debug]: select attr: "<<endl;
     // for(auto iter:attr_vec){
     //     cout<<(iter)<<endl;
     // }
+
+    // 结果存储
+    // where条件存储在 vector<ConditionUnit> cond_vec 里
+    // from唯一的table名在 table_vec[0]
+    // Select的属性名在 vector<string> attr_vec里
+    
+    // 调用Catalog
+    
 
 }
 
@@ -235,44 +273,44 @@ void Interpreter::Insert(string str){
     // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
 
     vector<string> value_vec;
-    vector<DataUnit> dataunit_vec;
     split(str, value_vec, ',');
 
     int int_value; 
     float float_value;
     DataType data_type;
+    Tuple tuple;
     for(vector<string>::iterator iter = value_vec.begin(); iter!=value_vec.end(); iter++){
         string value_str = *iter;
         strip(value_str);
-        DataUnit data_unit;
         // if( value_str == "NULL" || value_str == "null"){
             // NULL 判断，暂不支持
         // }
         data_type = ParseDataType(value_str);
-        data_unit.data_type = data_type;
-        switch(data_type){
-            case INT_UNIT:
-                try{
-                    int_value = stoi(value_str);
-                }catch(...){
-                    SyntaxError e("Wrong condition value syntax in " + value_str);
-                    throw e;
-                }
-                data_unit.value.int_value = int_value;break;
-            case FLOAT_UNIT:
-                float_value = stof(value_str);
-                data_unit.value.float_value = float_value;break;
-            case CHAR_UNIT:
-                char* value_str_c = (char *)malloc(sizeof(char) * (value_str.length() + 1) );
-                strcpy(value_str_c, value_str.c_str());
-                data_unit.value.char_n_value = value_str_c; break;
+        Unit unit;
+        Value value;
+        try{
+            value = ParseStringType(data_type, value_str);
+        }catch( SyntaxError e){
+            throw e;
         }
-        dataunit_vec.push_back(data_unit);
+        unit.value = value;
+        unit.datatype = data_type;
+        tuple.tuple_value.push_back(unit);
     }
 
     cout<<"[Insert Info]:"<<endl;
-    for(auto unit: dataunit_vec){
-        unit.Print();
+    for(auto tunit:tuple.tuple_value){
+        tunit.Print();
+    }
+    // 结果存储
+    // string:targ_table_name
+    // value: tuple
+
+    // 调用catalog
+    if( !Cata.InsertTest(targ_table_name, tuple) ){
+        cout<<"[Catalog res]: Insert invalid"<<endl;
+    }else {
+        cout<<"[Catalog res]: Insert validate"<<endl;
     }
 }
 
@@ -313,6 +351,8 @@ void Interpreter::CreateIndex(string str){
     // 索引名字在 index_name中
     // 对象表格在 targ_table_name中
     cout<<"[debug create index]:"<<index_name<<" on "<<targ_table_name<<"("<<attr_name<<")"<<endl;
+
+
 }
 
 void Interpreter::CreateTable(string str){
@@ -369,6 +409,10 @@ void Interpreter::CreateTable(string str){
             // cout<<"[debug]: pk line = "<<line<<", pkname = \""<<pk_name<<"\""<<endl;
             int flag = 0;
             int count = 0;
+            if(pk_mark != -1){
+                SyntaxError e("Duplicated Primary Key when Create Table");
+                throw e;
+            }
             for(vector<Attribute>::iterator Attr = Attributes.begin(); Attr != Attributes.end(); Attr++ ){
                 // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<endl;
                 if( (*Attr).name == pk_name ){
@@ -422,16 +466,13 @@ void Interpreter::CreateTable(string str){
     TableMetadata Meta(tablename, Attributes.size(), pk_mark, main_index);
     Table table(Meta, Attributes);
 
-    table.Print();
     // 输出环节
-    // #ifdef DEBUG
-        // cout<<"[info]: Create Table Back Info:"<<endl;
-        // cout<<"[info]: Table Name = "<<tablename<<endl;
-        // for(vector<Attribute>::iterator iter = Attributes.begin(); iter != Attributes.end(); iter++ ){
-        //     (*iter).Print();
-        // }
-    // #endif
-    // std::cout<<"create table name = "<<tablename<<endl;
+    table.Print();
 
-    // std::cout<<str<<endl;
+    // 调用Catalog
+    if( Cata.CreateTable(table) ){
+        cout<<"[info]: Create Table Successfully"<<endl;
+    }else{
+        cout<<"[info]: Create Table Failed"<<endl;
+    }
 }

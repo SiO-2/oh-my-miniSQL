@@ -10,11 +10,13 @@
 
 using namespace std;
 
-// string query = "create table testtable(attr char(10), test int not null unique, here float not null unique, primary key(test))";
+// string query = "create table testtable(charattr char(10), intattr int not null unique, floatattr float not null unique, primary key(intattr))";
+// string query = "Drop Table testtable";
+string query = "insert into testtable values(\"chartest\", 10, 10.5)";
+// 上面三个都可以通过和Catalog的测试了
 // string query = "create index idname on tbname(asdkhfjabldkfjykugl)";
-string query = "insert into tbname values(1, \"12\", 23, 3.3, \"NULLSTR\")";
 // string query = "select a.attr b.attr from table1 as a, table2 as b where a.v1 = b.v2";
-// string query = "select attr1, attr2 from table where v1 = 12";
+// string query = "select intattr, floatattr from table where intattr = 12";
 
 int main(){
     // string text="abc";

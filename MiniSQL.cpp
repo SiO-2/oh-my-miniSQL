@@ -12,6 +12,14 @@ TableMetadata::TableMetadata(string name, int attr_num, int primary_key, int pri
     this->primary_index = primary_index;
 }
 
+TableMetadata::TableMetadata(TableMetadata& t)
+{
+    this->attr_num = t.attr_num;
+    this->name = t.name;
+    this->primary_index = t.primary_index;
+    this->primary_key = t.primary_key;
+}
+
 void TableMetadata::Print(){
     cout<<"[Table Meta]:\n";
     cout<<"Name:"<<this->name<<endl;
@@ -93,10 +101,7 @@ Table::Table(TableMetadata m_metadata, vector<Attribute> m_attribute):m_metadata
 
 Table::Table(Table& table)
 {
-    this->m_metadata.name = table.m_metadata.name;
-    this->m_metadata.attr_num = table.m_metadata.attr_num;
-    this->m_metadata.primary_key = table.m_metadata.primary_key;
-    this->m_metadata.primary_index = table.m_metadata.primary_index;
+    this->m_metadata = table.m_metadata;
     this->m_attribute.assign(table.m_attribute.begin(), table.m_attribute.end());
 }
 
@@ -115,25 +120,64 @@ Index::Index(Index& index)
     this->table = index.table;
 }
 
-void DataUnit::Print(){
-    cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
-    switch (this->data_type)
+Index::Index(){
+
+}
+
+void Index::Print(){
+    cout<<"[Index Info]: index name = "<<this->index_name<<endl;
+}
+
+Unit::Unit(){
+
+}
+
+Unit::Unit(Value& value, DataType& datatype){
+    this->value = value;
+    this->datatype = datatype;
+}
+
+void Unit::Print(){
+    cout<<"[Unit info]: ";
+    string str;
+    switch(this->datatype)
     {
     case INT_UNIT:
-        cout<<"int: "<<this->value.int_value;
+        cout<<"int: "<<this->value.int_value<<endl;
         break;
     case FLOAT_UNIT:
-        cout<<"float:"<<this->value.float_value;
+        cout<<"float: "<<this->value.float_value<<endl;
         break;
     case CHAR_UNIT:
-        cout<<"char: "<<this->value.char_n_value;
+        str = this->value.char_n_value;
+        cout<<"string: "<<str<<endl;
         break;
-    
     default:
         break;
     }
-    cout<<endl;
 }
+Tuple::Tuple(): tuple_value(), valid(true){
+}
+
+// void DataUnit::Print(){
+//     cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
+//     switch (this->data_type)
+//     {
+//     case INT_UNIT:
+//         cout<<"int: "<<this->value.int_value;
+//         break;
+//     case FLOAT_UNIT:
+//         cout<<"float:"<<this->value.float_value;
+//         break;
+//     case CHAR_UNIT:
+//         cout<<"char: "<<this->value.char_n_value;
+//         break;
+    
+//     default:
+//         break;
+//     }
+//     cout<<endl;
+// }
 
 ConditionUnit::ConditionUnit(string attr_name, int attr_num, OpCode op_code, DataType data_type):value(){
     this->attr_name = attr_name;

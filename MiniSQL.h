@@ -30,12 +30,13 @@ public:
 	int primary_index;	//主索引，用attr的编号表示，若没有则为-1
 	TableMetadata();
 	TableMetadata(string name, int attr_num, int primary_key=-1, int primary_index=-1);
+	TableMetadata(TableMetadata& t);
 	void Print();
 };
 
 // 记录属性的类
 class Attribute{
-public: //方便调试先都Public
+public: //直接都Public算了吧
     string name;//属性名
     int type;//属性的类型，实际上是DataType, 记成int保留可扩展性
     int charlen;//如果是char类型，保存其最大长度 char(n)
@@ -46,7 +47,8 @@ public:
     // name: Attribute constructor
     // Function: init value in class
     Attribute(string name, string typestr, bool notnull = false, bool unique = false, bool primary_key = false);
-    // name:set_pk
+    Attribute(){};
+	// name:set_pk
     // Function: set primary key of attribute, becase "primary key(pk)" usually occurs in the end
     void set_pk(bool pk);
     // name: print
@@ -62,6 +64,7 @@ public:
 	unsigned int tuple_len;//tuple的长度，包括valid位
 	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
 	Table(Table& table);
+	Table(){}
 	void Print();
 };
 
@@ -69,9 +72,11 @@ class Index	//建立在表m_table中attr_num上的索引，名为m_index_name
 {
 public:
 	string index_name;
-	Table* table;	//表
+	Table* table;	//表   //这个没必要吧（要不要删掉，给个意见 (wyc:不太懂，或许先WORK再说)
 	int attr_num;	//索引建立在该属性上
 	Index(Index& index);
+	Index();
+	void Print();
 };
 
 
@@ -102,11 +107,22 @@ union Value
 	float float_value;
 };
 
+//不这样写根本没法做检测啊kora！！
+class Unit {
+public:
+	union Value value;
+	DataType datatype;
+	Unit();
+	Unit(Value& value, DataType& datatype);
+	void Print();
+};
+
 class Tuple
 {
 public:
-	vector<union Value> tuple_value;
+	vector<struct Unit> tuple_value;
 	bool valid;
+	Tuple();
 };
 
 struct BPlusNode
@@ -136,51 +152,51 @@ public:
 
 
 
-/*
-* 创建表，表的信息由table提供
-* 返回值：如果创建成功返回true，创建失败返回false
-*/
-bool CreateTable(Table& table);
+// /*
+// * 创建表，表的信息由table提供
+// * 返回值：如果创建成功返回true，创建失败返回false
+// */
+// bool CreateTable(Table& table);
 
-/*
-* 删除表，表的信息由table_name提供
-* 返回值：如果删除成功返回true，创建失败返回false
-*/
-bool DropTable(string& table_name);
+// /*
+// * 删除表，表的信息由table_name提供
+// * 返回值：如果删除成功返回true，创建失败返回false
+// */
+// bool DropTable(string& table_name);
 
-/*
-* 创建索引，索引的信息由index提供
-* 返回值：如果创建成功返回true，创建失败返回false
-*/
-bool CreateIndex(Index& index);
+// /*
+// * 创建索引，索引的信息由index提供
+// * 返回值：如果创建成功返回true，创建失败返回false
+// */
+// bool CreateIndex(Index& index);
 
-/*
-* 删除索引，索引的信息由table_name提供
-* 返回值：如果删除成功返回true，创建失败返回false
-*/
-bool DropIndex(string& index_name);
+// /*
+// * 删除索引，索引的信息由table_name提供
+// * 返回值：如果删除成功返回true，创建失败返回false
+// */
+// bool DropIndex(string& index_name);
 
-/*
-* 查找名为table_name的表的信息
-* 返回值：table_name的表的信息
-*/
-Table GetTableInfo(string& table_name);
+// /*
+// * 查找名为table_name的表的信息
+// * 返回值：table_name的表的信息
+// */
+// Table GetTableInfo(string& table_name);
 
 
-/*
-* 将数据data插入到表名为table_name的表中
-* 返回值：如果插入成功返回true，插入失败返回false
-*/
-bool Insert(string& table_name, vector<struct DataUnit>& data);
+// /*
+// * 将数据data插入到表名为table_name的表中
+// * 返回值：如果插入成功返回true，插入失败返回false
+// */
+// bool Insert(string& table_name, vector<struct DataUnit>& data);
 
-/*
-* 将数据data插入到表名为table_name的表中
-* 返回值：选择的结果
-*/
-vector<vector<struct DataUnit>> Select(string& table_name, vector<struct ConditionUnit>& condition);
+// /*
+// * 将数据data插入到表名为table_name的表中
+// * 返回值：选择的结果
+// */
+// vector<vector<struct DataUnit>> Select(string& table_name, vector<struct ConditionUnit>& condition);
 
-/*
-* 将数据data从表名为table_name删除
-* 返回值：如果删除成功返回true，删除失败返回false
-*/
-bool Delete(string& table_name, vector<struct ConditionUnit>& condition);
+// /*
+// * 将数据data从表名为table_name删除
+// * 返回值：如果删除成功返回true，删除失败返回false
+// */
+// bool Delete(string& table_name, vector<struct ConditionUnit>& condition);
