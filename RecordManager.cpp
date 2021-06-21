@@ -7,14 +7,19 @@
 */
 void RecordManager::CreateTableFile(const Table &table)
 {
-    string tablename = GetDataFileName(table.m_metadata.name);
+    // cout<<"[Record Manager Debug]: tablename = "<<table.m_metadata.name<<endl;
+    // string tablename = GetDataFileName(table.m_metadata.name);
+    // wyc: 上面这个是不是写错了
+    string tablename = table.m_metadata.name;
     string filename_data = GetDataFileName(tablename);
     FILE *fp;
 
     //新建数据文件，但无需写入
     if ((fp = fopen(filename_data.c_str(), "wb+")) == NULL)
     {
-        printf("Can't create %s\n", tablename);
+        cout<<"Can't create "<<tablename<<" by cannot open "<<filename_data<<endl;
+        // wyc: string 没法这么输出的
+        // printf("Can't create %s by cannot open %s\n", tablename, filename_data);
         exit(EXIT_FAILURE);
     }
     fclose(fp);
@@ -38,19 +43,22 @@ void RecordManager::DropTableFile(const Table &table)
     返回值：没有返回值
 */
 void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
-{
-    string tablename = GetDataFileName(table.m_metadata.name);
+{   
+    string tablename = table.m_metadata.name;
+    // wyc: 写错了吧，我帮你改了
+    // string tablename = GetDataFileName(table.m_metadata.name);
     string filename_data = GetDataFileName(tablename);
 
     //计算block_offset和tuple_offset来获取bid
     unsigned int file_size = bmanager->GetFileSize(filename_data);
     unsigned int boffset = file_size / BLOCKSIZE;
     unsigned int toffset = file_size % BLOCKSIZE;
-    if (toffset == 0 || toffset + table.tuple_len > BLOCKSIZE) //判断是否写得下
-    {
-        boffset++;
-        toffset = 0;
-    }
+    // wyc: 由于只能传catalog给我的table, 而这个没法获取tuple len暂时，我只能先强行注释掉了
+    // if (toffset == 0 || (toffset + table.tuple_len > BLOCKSIZE)) //判断是否写得下
+    // {
+        // boffset++;
+        // toffset = 0;
+    // }
     vector<unsigned int> block_offset;
     vector<unsigned int> tuple_offset;
     block_offset.push_back(boffset);
@@ -67,13 +75,13 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
         switch (table.m_attribute[i].type)
         {
         case INT_UNIT:
-            memcpy(data_addr, &tuple.tuple_value[i].int_value, table.m_attribute[i].charlen * sizeof(char));
+            memcpy(data_addr, &tuple.tuple_value[i].value.int_value, table.m_attribute[i].charlen * sizeof(char));
             break;
         case CHAR_UNIT:
-            memcpy(data_addr, tuple.tuple_value[i].char_n_value, table.m_attribute[i].charlen * sizeof(char));
+            memcpy(data_addr, tuple.tuple_value[i].value.char_n_value, table.m_attribute[i].charlen * sizeof(char));
             break;
         case FLOAT_UNIT:
-            memcpy(data_addr, &tuple.tuple_value[i].float_value, table.m_attribute[i].charlen * sizeof(char));
+            memcpy(data_addr, &tuple.tuple_value[i].value.float_value, table.m_attribute[i].charlen * sizeof(char));
             break;
         default:
             break;
@@ -103,18 +111,20 @@ Tuple RecordManager::ExtractTuple(const Table &table, const BID bid, const unsig
         switch (table.m_attribute[i].type)
         {
         case INT_UNIT:
-            memcpy(&tuple.tuple_value[i].int_value, data_addr, table.m_attribute[i].charlen * sizeof(char));
+            memcpy(&tuple.tuple_value[i].value.int_value, data_addr, table.m_attribute[i].charlen * sizeof(char));
             break;
         case CHAR_UNIT:
-            memcpy(tuple.tuple_value[i].char_n_value, data_addr, table.m_attribute[i].charlen * sizeof(char));
+            memcpy(tuple.tuple_value[i].value.char_n_value, data_addr, table.m_attribute[i].charlen * sizeof(char));
             break;
         case FLOAT_UNIT:
-            memcpy(&tuple.tuple_value[i].float_value, data_addr, table.m_attribute[i].charlen * sizeof(char));
+            memcpy(&tuple.tuple_value[i].value.float_value, data_addr, table.m_attribute[i].charlen * sizeof(char));
             break;
         default:
             break;
         }
-        tuple.tuple_value.push_back(temp_value); //将tuple push到结果中
+        // wyc: 这里是不是应该是对temp_value做点什么，不然temp_value不是空的吗，另，tuple里是unit,不是直接的Value, 为了让他不要报错，我加了下面这一行
+        Unit unit(temp_value, INT_UNIT);
+        tuple.tuple_value.push_back(unit); //将tuple push到结果中
         data_addr += table.m_attribute[i].charlen;
     }
     return tuple;
@@ -125,7 +135,7 @@ Tuple RecordManager::ExtractTuple(const Table &table, const BID bid, const unsig
     传入参数：Tuple类变量，条件
     返回值：bool型变量
 */
-bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const
+bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition) const
 {
     if (condition.size() == 0)
         return true;
@@ -168,7 +178,7 @@ bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit
     传入参数：Table类变量，查找条件
     返回值：vector<Tuple>，即符合条件的元组
 */
-vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const
+vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<ConditionUnit> &condition) const
 {
     unsigned int offset = 0;
     vector<Tuple> result;
@@ -191,7 +201,7 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
 /*
     函数功能：删除元组，支持每次一条或多条记录的删除操作
 */
-void RecordManager::DeleteTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>())
+void RecordManager::DeleteTuple(const Table &table, const vector<ConditionUnit> &condition)
 {
     const bool unvalid = false;
     unsigned int offset = 0;

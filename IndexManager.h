@@ -7,7 +7,7 @@
 #include <fstream>
 //#include "API.h"
 #include "BPlusTree.h"
-#include "Buffer_manager.h"
+#include "BufferManager.h"
 #define TYPE_FLOAT -1	//the type of the attribute,-1 represents float
 #define TYPE_INT 0		//0 represents int
 // other positive integer represents char and the value is the number of char

@@ -9,13 +9,13 @@
 #include <iterator>
 #include "MiniSQL.h"
 #include "BufferManager.h"
-#include "IndexManager.h"
+// #include "IndexManager.h"
 using namespace std;
 
 //数据文件的存放目录
-const string TABLE_PATH = ".database/data/";
-const string INDEX_PATH = ".database/index/";
-const string META_PATH = ".database/meta/";
+const string TABLE_PATH = "./database/data/";
+const string INDEX_PATH = "./database/index/";
+const string META_PATH = "./database/meta/";
 
 //文件后缀名
 const string TABLE_SUFFIX = ".table";
@@ -26,7 +26,7 @@ class RecordManager
 {
 private:
 	BufferManager *bmanager;
-	IndexManager *imanager;
+	// IndexManager *imanager;
 	Tuple ExtractTuple(const Table &table, const BID bid, const unsigned int tuple_offset) const;
 
 public:
@@ -40,6 +40,7 @@ public:
 	*/
 	string GetDataFileName(const string tablename) const
 	{
+		// cout<<"[DataFileName Debug]:"<<TABLE_PATH<<" "<<tablename<<" "<<TABLE_SUFFIX<<endl;
 		return TABLE_PATH + tablename + TABLE_SUFFIX;
 	}
 
@@ -82,11 +83,13 @@ public:
 		传入参数：表名称，元组变量
 		返回值：没有返回值
 	*/
+	// By wyc: 由于tuple len是新加的, catalog没适配，我这里获取不到，里面的那部分先注释掉了
 	void InsertTuple(const Table &table, const Tuple &tuple);
 
 	bool ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
 
 	//数据查询，可以通过指定用and 连接的多个条件进行查询，支持等值查询和区间查询
+	// wyc：似乎所有写Select的人都忽略了还有Attr list这个东西，罢了，我在Interpreter里加吧
 	vector<Tuple> SelectTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
 
 	//删除元组，支持每次一条或多条记录的删除操作

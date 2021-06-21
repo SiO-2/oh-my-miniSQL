@@ -49,7 +49,7 @@ void BufferManager::SetBlockInfo(const BID &bid, const string &filename, const u
     传入参数：文件名以及block在文件中的偏移量（偏移量可缺省）
     返回值：vector<BID> bids，即文件对应的所有的block的bid
 */
-vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &offset = vector<unsigned int>())
+vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &offset)
 {
     vector<BID> bids;
     FILE *fp;
@@ -58,6 +58,8 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
     {
         if ((fp = fopen(filename.c_str(), "wb+")) == NULL)
         {
+            cout<<"[ReadFile2Block Fail]"<<endl;
+            // cout<<"[ReadFile2Block]: Can't open "<<filename<<endl;
             printf("Can't open %s\n", filename);
             exit(EXIT_FAILURE);
         }
@@ -98,6 +100,8 @@ void BufferManager::WriteBlock2File(const BID &bid)
     {
         if ((fp = fopen(blocks[bid].GetFilename().c_str(), "wb")) == NULL)
         {
+            cout<<"[WriteBlock2File Fail]"<<endl;
+            // cout<<"[WriteBlock2File]: Can't open "<<blocks[bid].GetFilename()<<endl;
             printf("Can't open %s\n", blocks[bid].GetFilename());
             exit(EXIT_FAILURE);
         }

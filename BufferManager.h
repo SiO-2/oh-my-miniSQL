@@ -105,7 +105,7 @@ public:
         传入参数：文件名以及block在文件中的偏移量（偏移量可缺省）
         返回值：vector<BID> bids，即文件对应的所有的block的bid
     */
-    vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &offset = vector<unsigned int>());
+    vector<BID> ReadFile2Block(const string &filename, const vector<unsigned int> &offset = vector<unsigned int>());
 
     /*
         函数功能：将块写回文件

@@ -132,8 +132,8 @@ Unit::Unit(){
 
 }
 
-Unit::Unit(Value& value, DataType& datatype){
-    this->value = value;
+Unit::Unit(Value value, DataType datatype):value(value){
+    // this->value = value;
     this->datatype = datatype;
 }
 
@@ -159,6 +159,13 @@ void Unit::Print(){
 Tuple::Tuple(): tuple_value(), valid(true){
 }
 
+void Tuple::Print(){
+    cout<<"[Tuple info]:"<<endl;
+    for(auto unit:this->tuple_value){
+        unit.Print();
+    }
+    cout<<"[Tuple info end]"<<endl;
+}
 // void DataUnit::Print(){
 //     cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
 //     switch (this->data_type)
@@ -216,13 +223,13 @@ void ConditionUnit::Print(){
     switch (this->data_type)
     {
     case INT_UNIT:
-        cout<<this->value.int_value;
+        cout<<"int:"<<this->value.int_value;
         break;
     case FLOAT_UNIT:
-        cout<<this->value.float_value;
+        cout<<"float:"<<this->value.float_value;
         break;
     case CHAR_UNIT:
-        cout<<this->value.char_n_value;
+        cout<<"char:"<<this->value.char_n_value;
         break;
     
     default:

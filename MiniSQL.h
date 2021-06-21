@@ -102,18 +102,18 @@ public:
 union Value
 {
 	int int_value;
-	// char *char_n_value;
-	string char_n_value;
+	char *char_n_value;
+	// string char_n_value;
 	float float_value;
 };
 
 //不这样写根本没法做检测啊kora！！
 class Unit {
 public:
-	union Value value;
+	Value value;
 	DataType datatype;
 	Unit();
-	Unit(Value& value, DataType& datatype);
+	Unit(Value value, DataType datatype);
 	void Print();
 };
 
@@ -123,6 +123,7 @@ public:
 	vector<struct Unit> tuple_value;
 	bool valid;
 	Tuple();
+	void Print();
 };
 
 struct BPlusNode
