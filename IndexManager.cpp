@@ -1,7 +1,7 @@
 #include "IndexManager.h"
 #include "API.h"
 
-IndexManager::IndexManager(API* ap) :api(ap) {//¹¹Ôìº¯Êı£¬ĞèÒª¶ÁÈ¡indexÎÄ¼ş²¢½¨Á¢¶ÔÓ¦B+Ê÷
+IndexManager::IndexManager(API* ap) :api(ap) {//æ„é€ å‡½æ•°ï¼Œéœ€è¦è¯»å–indexæ–‡ä»¶å¹¶å»ºç«‹å¯¹åº”B+æ ‘
 	vector<IndexInfo> indexList;
 	string filepath;
 	api->getAllIndex(&indexList);
@@ -12,7 +12,7 @@ IndexManager::IndexManager(API* ap) :api(ap) {//¹¹Ôìº¯Êı£¬ĞèÒª¶ÁÈ¡indexÎÄ¼ş²¢½¨Á
 }
 
 IndexManager::~IndexManager() {
-	//Ïú»Ù¶ÔÏóÇ°½«indexµÄ¸Ä±äĞ´»Ø»º³åÇøÖĞ
+	//é”€æ¯å¯¹è±¡å‰å°†indexçš„æ”¹å˜å†™å›ç¼“å†²åŒºä¸­
 	for(intMap::iterator itInt = indexIntMap.begin(); itInt != indexIntMap.end(); itInt++) {
 		if(itInt->second) {
 			itInt->second->WriteBack();
@@ -33,11 +33,11 @@ IndexManager::~IndexManager() {
 	}
 }
 
-int IndexManager::getDegree(int type) {//»ñÈ¡¿éÄÜ´æ´¢µÄkeyÊıÁ¿
+int IndexManager::getDegree(int type) {//è·å–å—èƒ½å­˜å‚¨çš„keyæ•°é‡
 	int degree =  BLOCKSIZE / (getKeySize(type) + sizeof(offsetNumber));
 	return degree;
 }
-int IndexManager::getKeySize(int type) {//»ñÈ¡keyµÄ´óĞ¡
+int IndexManager::getKeySize(int type) {//è·å–keyçš„å¤§å°
 	if(type == TYPE_FLOAT) return sizeof(float);
 	else if(type == TYPE_INT) return sizeof(int);
 	else if(type > 0) return type + 1;
@@ -46,7 +46,7 @@ int IndexManager::getKeySize(int type) {//»ñÈ¡keyµÄ´óĞ¡
 		return -1;
 	}
 }
-void IndexManager::setKey(int type, string key) {//½«key´æÈëÒ»¸öÁÙÊ±±äÁ¿ÖĞ
+void IndexManager::setKey(int type, string key) {//å°†keyå­˜å…¥ä¸€ä¸ªä¸´æ—¶å˜é‡ä¸­
 	stringstream ss;
 	ss << key;
 	if(type == TYPE_FLOAT) ss >> this->floatTmp;
@@ -56,9 +56,9 @@ void IndexManager::setKey(int type, string key) {//½«key´æÈëÒ»¸öÁÙÊ±±äÁ¿ÖĞ
 	ss.clear();
 }
 
-//ÕâÀï»¹Òª´«¼ÇÂ¼¹ıÀ´
+//è¿™é‡Œè¿˜è¦ä¼ è®°å½•è¿‡æ¥
  
-void IndexManager::createIndex(string filePath, int type) {//½¨Á¢Ë÷Òı
+void IndexManager::createIndex(string filePath, int type) {//å»ºç«‹ç´¢å¼•
 	ifstream newfile_in(filePath.c_str());
 	ofstream newfile_out;
 	if(newfile_in) {
@@ -74,11 +74,11 @@ void IndexManager::createIndex(string filePath, int type) {//½¨Á¢Ë÷Òı
 	int keysize = getKeySize(type);
 	int degree = getDegree(type);
 	
-	//½«´«¹ıÀ´µÄ¼ÇÂ¼´´½¨³ÉÒ»¸öĞÂµÄÎÄ¼ş
+	//å°†ä¼ è¿‡æ¥çš„è®°å½•åˆ›å»ºæˆä¸€ä¸ªæ–°çš„æ–‡ä»¶
 	
 	
 	 
-	//´´½¨ĞÂÎÄ¼ş£¬²¢½¨Á¢¶ÔÓ¦B+Ê÷
+	//åˆ›å»ºæ–°æ–‡ä»¶ï¼Œå¹¶å»ºç«‹å¯¹åº”B+æ ‘
 	if(type == TYPE_INT) {
 		BPlusTree<int> *tree = new BPlusTree<int>(filePath, keysize, degree);
 		indexIntMap.insert(intMap::value_type(filePath, tree));
@@ -95,13 +95,13 @@ void IndexManager::createIndex(string filePath, int type) {//½¨Á¢Ë÷Òı
 		cout << "ERROR: in create index: Invalid type" << endl;
 	}
 }
-void IndexManager::dropIndex(string filePath, int type) {//É¾³ıË÷Òı
+void IndexManager::dropIndex(string filePath, int type) {//åˆ é™¤ç´¢å¼•
 	ifstream oldfile(filePath.c_str());
 	if(oldfile.is_open()) {
 		oldfile.close();
 		remove(filePath.c_str());
 	}
-	//ÔÚmapÈİÆ÷ÖĞ²éÕÒË÷ÒıÃû£¬ÕÒµ½ºóÉ¾³ıB+Ê÷¼°¸Ã¼ÇÂ¼
+	//åœ¨mapå®¹å™¨ä¸­æŸ¥æ‰¾ç´¢å¼•åï¼Œæ‰¾åˆ°ååˆ é™¤B+æ ‘åŠè¯¥è®°å½•
 	if(type == TYPE_INT) {
 		intMap::iterator itInt = indexIntMap.find(filePath);
 		if(itInt == indexIntMap.end()) {
@@ -139,9 +139,9 @@ void IndexManager::dropIndex(string filePath, int type) {//É¾³ıË÷Òı
 		cout << "ERROR: in drop index: Invalid type" << endl;
 	}
 }
-offsetNumber IndexManager::searchIndex(string filePath, string key, int type) {//²éÕÒË÷Òı£¬²¢·µ»ØÆ«ÒÆÁ¿
+offsetNumber IndexManager::searchIndex(string filePath, string key, int type) {//æŸ¥æ‰¾ç´¢å¼•ï¼Œå¹¶è¿”å›åç§»é‡
 	setKey(type, key);
-	//ÔÚË÷Òı¶ÔÓ¦B+Ê÷ÖĞ²éÕÒkey
+	//åœ¨ç´¢å¼•å¯¹åº”B+æ ‘ä¸­æŸ¥æ‰¾key
 	if(type == TYPE_INT) {
 		intMap::iterator itInt = indexIntMap.find(filePath);
 		if(itInt == indexIntMap.end()) {
@@ -177,9 +177,9 @@ offsetNumber IndexManager::searchIndex(string filePath, string key, int type) {/
 		return -2;
 	}
 }
-void IndexManager::insertIndex(string filePath, string key, offsetNumber Offset, int type) {//ÔÚÖ¸¶¨Î»ÖÃ²åÈëkey
+void IndexManager::insertIndex(string filePath, string key, offsetNumber Offset, int type) {//åœ¨æŒ‡å®šä½ç½®æ’å…¥key
 	setKey(type, key);
-	//ÔÚË÷Òı¶ÔÓ¦B+Ê÷ÖĞ£¬²åÈëkey
+	//åœ¨ç´¢å¼•å¯¹åº”B+æ ‘ä¸­ï¼Œæ’å…¥key
 	if(type == TYPE_INT) {
 		intMap::iterator itInt = indexIntMap.find(filePath);
 		if(itInt == indexIntMap.end()) {
@@ -218,9 +218,9 @@ void IndexManager::insertIndex(string filePath, string key, offsetNumber Offset,
 		return;
 	}
 }
-void IndexManager::deleteIndex(string filePath, string key, int type) {//É¾³ıkey
+void IndexManager::deleteIndex(string filePath, string key, int type) {//åˆ é™¤key
 	setKey(type, key);
-	//ÔÚË÷Òı¶ÔÓ¦B+Ê÷ÖĞÉ¾³ıkey
+	//åœ¨ç´¢å¼•å¯¹åº”B+æ ‘ä¸­åˆ é™¤key
 	if(type == TYPE_INT) {
 		intMap::iterator itInt = indexIntMap.find(filePath);
 		if(itInt == indexIntMap.end()) {
@@ -261,7 +261,7 @@ void IndexManager::deleteIndex(string filePath, string key, int type) {//É¾³ıkey
 }
 
 
-void IndexManager::readIndex(string filePath, int type) {//¶ÁÈëË÷ÒıÎÄ¼ş£¬²¢´´½¨B+Ê÷
+void IndexManager::readIndex(string filePath, int type) {//è¯»å…¥ç´¢å¼•æ–‡ä»¶ï¼Œå¹¶åˆ›å»ºB+æ ‘
 	ifstream newfile_in(filePath.c_str());
 	ofstream newfile_out;
 	if(!newfile_in) {
@@ -276,7 +276,7 @@ void IndexManager::readIndex(string filePath, int type) {//¶ÁÈëË÷ÒıÎÄ¼ş£¬²¢´´½¨B
 
 	int keysize = getKeySize(type);
 	int degree = getDegree(type);
-	//¸ù¾İÎÄ¼şÃû´´½¨²»Í¬ÀàĞÍµÄB+Êı£¬²¢ÔÚmapÈİÆ÷ÖĞ½¨Á¢Ó³Éä
+	//æ ¹æ®æ–‡ä»¶ååˆ›å»ºä¸åŒç±»å‹çš„B+æ•°ï¼Œå¹¶åœ¨mapå®¹å™¨ä¸­å»ºç«‹æ˜ å°„
 	if(type == TYPE_INT) {
 		BPlusTree<int> *tree = new BPlusTree<int>(filePath, keysize, degree);
 		indexIntMap.insert(intMap::value_type(filePath, tree));
