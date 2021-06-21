@@ -34,7 +34,7 @@ IndexManager::~IndexManager() {
 }
 
 int IndexManager::getDegree(int type) {//获取块能存储的key数量
-	int degree = buffer.getBlockSize() / (getKeySize(type) + sizeof(offsetNumber));
+	int degree =  BLOCKSIZE / (getKeySize(type) + sizeof(offsetNumber));
 	return degree;
 }
 int IndexManager::getKeySize(int type) {//获取key的大小
@@ -56,6 +56,8 @@ void IndexManager::setKey(int type, string key) {//将key存入一个临时变量中
 	ss.clear();
 }
 
+//这里还要传记录过来
+ 
 void IndexManager::createIndex(string filePath, int type) {//建立索引
 	ifstream newfile_in(filePath.c_str());
 	ofstream newfile_out;
@@ -71,6 +73,11 @@ void IndexManager::createIndex(string filePath, int type) {//建立索引
 
 	int keysize = getKeySize(type);
 	int degree = getDegree(type);
+	
+	//将传过来的记录创建成一个新的文件
+	
+	
+	 
 	//创建新文件，并建立对应B+树
 	if(type == TYPE_INT) {
 		BPlusTree<int> *tree = new BPlusTree<int>(filePath, keysize, degree);
@@ -170,9 +177,9 @@ offsetNumber IndexManager::searchIndex(string filePath, string key, int type) {/
 		return -2;
 	}
 }
-void IndexManager::insertIndex(string filePath, string key, offsetNumber blockOffset, int type) {//在指定位置插入key
+void IndexManager::insertIndex(string filePath, string key, offsetNumber Offset, int type) {//在指定位置插入key
 	setKey(type, key);
-	//在索引对应B+树中，根据偏移量插入key
+	//在索引对应B+树中，插入key
 	if(type == TYPE_INT) {
 		intMap::iterator itInt = indexIntMap.find(filePath);
 		if(itInt == indexIntMap.end()) {
@@ -180,7 +187,7 @@ void IndexManager::insertIndex(string filePath, string key, offsetNumber blockOf
 			return;
 		}
 		else {
-			itInt->second->Insert(intTmp, blockOffset);
+			itInt->second->Insert(intTmp, Offset);
 			return;
 		}
 	}
@@ -191,7 +198,7 @@ void IndexManager::insertIndex(string filePath, string key, offsetNumber blockOf
 			return;
 		}
 		else {
-			itFloat->second->Insert(floatTmp, blockOffset);
+			itFloat->second->Insert(floatTmp, Offset);
 			return;
 		}
 	}
@@ -202,7 +209,7 @@ void IndexManager::insertIndex(string filePath, string key, offsetNumber blockOf
 			return;
 		}
 		else {
-			itString->second->Insert(stringTmp, blockOffset);
+			itString->second->Insert(stringTmp, Offset);
 			return;
 		}
 	}

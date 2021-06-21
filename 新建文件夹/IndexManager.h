@@ -7,7 +7,7 @@
 #include <fstream>
 //#include "API.h"
 #include "BPlusTree.h"
-
+#include "Buffer_manager.h"
 #define TYPE_FLOAT -1	//the type of the attribute,-1 represents float
 #define TYPE_INT 0		//0 represents int
 // other positive integer represents char and the value is the number of char
@@ -67,19 +67,15 @@ public:
 
 	void dropIndex(string filePath, int type);//删除一个指定名称（filePath）和类型（type）的.index文件，用法同上
 
-	offsetNumber searchIndex(string filePath, string key, int type);//获取指定名称（filePath）和类型（type）的.index文件中搜索码为key的index位置
-																	//.index文件中index的位置是用偏移量（一个整数）来表示的，知道了偏移量就能很容易地定位到相应的index
-																	//例：searchIndex("salary_index.index","10000",TYPE_INT);
-																	//会搜索名为“salary_index”且类型为TYPE_INT的.index文件中搜索码为“10000”的index所在位置
+	offsetNumber searchIndex(string filePath, string key, int type);//在B+树中搜索码为key的index，返回偏移量
+																	
 
-	void insertIndex(string filePath, string key, offsetNumber blockOffset, int type);//在一个指定名称（filePath）和类型（type）的.index文件中
-																					  //位于blockOffset的位置插入一个搜索码为key的index
-																					  //例：insertIndex("salary_index.index","20000",88,TYPE_INT);
-																					  //会在名为“salary_index”且类型为TYPE_INT的.index文件中88的位置插入一个搜索码为“20000”的index
+	void insertIndex(string filePath, string key, offsetNumber blockOffset, int type);//在B+数中插入一个搜索码为key的index
+																					  
 
-	void deleteIndex(string filePath, string key, int type);//在一个指定名称（filePath）和类型（type）的.index文件中删除一个搜索码为key的index
+	void deleteIndex(string filePath, string key, int type);//从B+数中删除一个搜索码为key的index
 															//例：deleteIndex("salary_index.index","20000",TYPE_INT);
-															//会在名为“salary_index”且类型为TYPE_INT的.index文件中删除搜索码为“20000”的index
+
 
 	void readIndex(string filePath, int type);//从一个指定名称（filePath）和类型（type）的.index文件中读取index信息，建立对应B+树，并在相应的map容器中建立二者的映射
 };
