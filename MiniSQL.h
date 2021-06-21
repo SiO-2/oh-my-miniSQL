@@ -59,6 +59,7 @@ class Table	//数据库中的一张表
 public:
 	TableMetadata m_metadata;	//表的定义信息
 	vector<Attribute> m_attribute;	//表中字段的信息
+	unsigned int tuple_len;//tuple的长度，包括valid位
 	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
 	Table(Table& table);
 	void Print();
@@ -96,7 +97,8 @@ public:
 union Value
 {
 	int int_value;
-	char *char_n_value;
+	// char *char_n_value;
+	string char_n_value;
 	float float_value;
 };
 

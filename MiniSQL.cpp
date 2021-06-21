@@ -84,6 +84,11 @@ void Attribute::Print(){
 }
 
 Table::Table(TableMetadata m_metadata, vector<Attribute> m_attribute):m_metadata(m_metadata), m_attribute(m_attribute){
+    vector<Attribute>::iterator it;
+    this->tuple_len=1; //valid位的存储需要一个字节
+    for(it=this->m_attribute.begin();it!=this->m_attribute.end();it++){
+        this->tuple_len+=it->charlen;   //计算存储一条tuple需要的字节数
+    }
 };
 
 Table::Table(Table& table)
