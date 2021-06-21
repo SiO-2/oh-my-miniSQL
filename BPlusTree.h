@@ -84,15 +84,15 @@ void BPlusTree<ElementType>::DropTree(Node pnode) {//删除整棵树
 
 
 template<typename T>
-void BPTree<T>::readBlock(Bid block)
+void BPTree<T>::readBlock(Bid tempblock)
 {
 	int offsetsize = sizeof(offsetNumber);
-	char* indexbegin = Block[block].data;
+	char* indexbegin = bufferManager.blocks[tempblock].data;
 	char* offsetbegin = indexbegin + keysize;
 	ElementType key;
 	offsetNumber offset;
 	
-	while(offsetbegin - indexbegin < 4096) 
+	while(offsetbegin - indexbegin < 4096)  //这里关于快的大小还有问题！
 	{//循环读入key和offset，并插入树中
 		key = *(ElementType*)indexbegin;
 		offset = *(offsetNumber*)offsetbegin;
@@ -113,7 +113,7 @@ void BPlusTree<ElementType>::ReadTree() {
 
 	for (int i = 0; i < tmp_bid.size(); i++)
 	{
-		readBlock(tmp_bid + i);
+		readBlock(tmp_bid.at(i));
 	}
 	
 }
@@ -121,14 +121,16 @@ void BPlusTree<ElementType>::ReadTree() {
 
 
 template <class ElementType>
-void BPlusTree<ElementType>::WriteBack() {//将key和offset信息写回缓冲区
+void BPlusTree<ElementType>::WriteBack() {//将key和offset信息写回文件中
     int i=0;
-    vector <int> tempblocks = ReadFile2Block(filename);
+    vector <int> tempblocks = bufferManager.ReadFile2Block(filename);
     Bid tempblock = tempblocks.at(i);  //第一个block 
 	Node tempnode = leafhead;
+
+
 	int offsetsize = sizeof(offsetNumber);
 	while(tempnode != NULL) {//从叶结点中读取key和offset信息，并写回块中
-		char* contentAddr = Block[tempblock].data;
+		char* contentAddr = bufferManager.blocks[tempblock].data;
 		char* baseAddr = contentAddr;
 		
 		for(int i = 0; i < tempnode->keycount; i++) {
@@ -139,7 +141,7 @@ void BPlusTree<ElementType>::WriteBack() {//将key和offset信息写回缓冲区
 			memcpy(contentAddr, offset, offsetsize);
 			contentAddr += offsetsize;
 		}
-		i++;
+		i++;  //下一块啦
 		tempblock = tempblocks.at(i);
 		tempnode = tempnode->nextLeafNode;
 	}
