@@ -150,51 +150,51 @@ public:
 
 
 
-/*
-* 创建表，表的信息由table提供
-* 返回值：如果创建成功返回true，创建失败返回false
-*/
-bool CreateTable(Table& table);
+// /*
+// * 创建表，表的信息由table提供
+// * 返回值：如果创建成功返回true，创建失败返回false
+// */
+// bool CreateTable(Table& table);
 
-/*
-* 删除表，表的信息由table_name提供
-* 返回值：如果删除成功返回true，创建失败返回false
-*/
-bool DropTable(string& table_name);
+// /*
+// * 删除表，表的信息由table_name提供
+// * 返回值：如果删除成功返回true，创建失败返回false
+// */
+// bool DropTable(string& table_name);
 
-/*
-* 创建索引，索引的信息由index提供
-* 返回值：如果创建成功返回true，创建失败返回false
-*/
-bool CreateIndex(Index& index);
+// /*
+// * 创建索引，索引的信息由index提供
+// * 返回值：如果创建成功返回true，创建失败返回false
+// */
+// bool CreateIndex(Index& index);
 
-/*
-* 删除索引，索引的信息由table_name提供
-* 返回值：如果删除成功返回true，创建失败返回false
-*/
-bool DropIndex(string& index_name);
+// /*
+// * 删除索引，索引的信息由table_name提供
+// * 返回值：如果删除成功返回true，创建失败返回false
+// */
+// bool DropIndex(string& index_name);
 
-/*
-* 查找名为table_name的表的信息
-* 返回值：table_name的表的信息
-*/
-Table GetTableInfo(string& table_name);
+// /*
+// * 查找名为table_name的表的信息
+// * 返回值：table_name的表的信息
+// */
+// Table GetTableInfo(string& table_name);
 
 
-/*
-* 将数据data插入到表名为table_name的表中
-* 返回值：如果插入成功返回true，插入失败返回false
-*/
-bool Insert(string& table_name, vector<struct DataUnit>& data);
+// /*
+// * 将数据data插入到表名为table_name的表中
+// * 返回值：如果插入成功返回true，插入失败返回false
+// */
+// bool Insert(string& table_name, vector<struct DataUnit>& data);
 
-/*
-* 将数据data插入到表名为table_name的表中
-* 返回值：选择的结果
-*/
-vector<vector<struct DataUnit>> Select(string& table_name, vector<struct ConditionUnit>& condition);
+// /*
+// * 将数据data插入到表名为table_name的表中
+// * 返回值：选择的结果
+// */
+// vector<vector<struct DataUnit>> Select(string& table_name, vector<struct ConditionUnit>& condition);
 
-/*
-* 将数据data从表名为table_name删除
-* 返回值：如果删除成功返回true，删除失败返回false
-*/
-bool Delete(string& table_name, vector<struct ConditionUnit>& condition);
+// /*
+// * 将数据data从表名为table_name删除
+// * 返回值：如果删除成功返回true，删除失败返回false
+// */
+// bool Delete(string& table_name, vector<struct ConditionUnit>& condition);

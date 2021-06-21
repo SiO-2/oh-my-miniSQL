@@ -242,15 +242,18 @@ void Interpreter::Select(string str){
         cond.Print();
     }
 
-    // 结果存储
-    // where条件存储在 vector<ConditionUnit> cond_vec 里
-    // from唯一的table名在 table_vec[0]
-    // Select的属性名在 vector<string> attr_vec里
-
     // cout<<"[debug]: select attr: "<<endl;
     // for(auto iter:attr_vec){
     //     cout<<(iter)<<endl;
     // }
+
+    // 结果存储
+    // where条件存储在 vector<ConditionUnit> cond_vec 里
+    // from唯一的table名在 table_vec[0]
+    // Select的属性名在 vector<string> attr_vec里
+    
+    // 调用Catalog
+    
 
 }
 
@@ -270,7 +273,6 @@ void Interpreter::Insert(string str){
     // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
 
     vector<string> value_vec;
-    vector<DataUnit> dataunit_vec;
     split(str, value_vec, ',');
 
     int int_value; 
@@ -299,6 +301,16 @@ void Interpreter::Insert(string str){
     cout<<"[Insert Info]:"<<endl;
     for(auto tunit:tuple.tuple_value){
         tunit.Print();
+    }
+    // 结果存储
+    // string:targ_table_name
+    // value: tuple
+
+    // 调用catalog
+    if( !Cata.InsertTest(targ_table_name, tuple) ){
+        cout<<"[Catalog res]: Insert invalid"<<endl;
+    }else {
+        cout<<"[Catalog res]: Insert validate"<<endl;
     }
 }
 
@@ -397,6 +409,10 @@ void Interpreter::CreateTable(string str){
             // cout<<"[debug]: pk line = "<<line<<", pkname = \""<<pk_name<<"\""<<endl;
             int flag = 0;
             int count = 0;
+            if(pk_mark != -1){
+                SyntaxError e("Duplicated Primary Key when Create Table");
+                throw e;
+            }
             for(vector<Attribute>::iterator Attr = Attributes.begin(); Attr != Attributes.end(); Attr++ ){
                 // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<endl;
                 if( (*Attr).name == pk_name ){

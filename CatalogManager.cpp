@@ -147,6 +147,13 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
         return false;
     t = m_table[i];
     n = t->m_metadata.attr_num;
+    // wyc test
+    // cout<<"[Catalog debug]:"<<endl;
+    // for(auto attr: t->m_attribute){
+    //     attr.Print();
+    // }
+    // cout<<"[Catalog debug]: end"<<endl;
+    // // end of wyc test
     for (i=0; i<n; i++)
     {
         if (!CheckAttr(t->m_attribute[i], data.tuple_value[i]))
