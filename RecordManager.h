@@ -3,9 +3,13 @@
 
 #include <iostream>
 #include <string>
+#include <string.h>
 #include <vector>
+#include <fstream>
+#include <iterator>
 #include "MiniSQL.h"
 #include "BufferManager.h"
+#include "IndexManager.h"
 using namespace std;
 
 //数据文件的存放目录
@@ -22,7 +26,8 @@ class RecordManager
 {
 private:
 	BufferManager *bmanager;
-	// IndexManager *imanager;
+	IndexManager *imanager;
+	Tuple ExtractTuple(const Table &table, const BID bid, const unsigned int tuple_offset) const;
 
 public:
 	RecordManager(){};
@@ -59,15 +64,15 @@ public:
 	}
 
 	/*
-		函数功能：创建一个新的表文件
-		传入参数：表名称
+		函数功能：创建一个表数据文件
+		传入参数：Table类变量
 		返回值：没有返回值
 	*/
 	void CreateTableFile(const Table &table);
 
 	/*
-		函数功能：删除表文件
-		传入参数：表名称
+		函数功能：清空被删除文件的block
+		传入参数：Table类变量
 		返回值：没有返回值
 	*/
 	void DropTableFile(const Table &table);
@@ -77,13 +82,15 @@ public:
 		传入参数：表名称，元组变量
 		返回值：没有返回值
 	*/
-	void InsertTuple(const string &tablename, const Tuple &tuple);
+	void InsertTuple(const Table &table, const Tuple &tuple);
+
+	bool ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
 
 	//数据查询，可以通过指定用and 连接的多个条件进行查询，支持等值查询和区间查询
-	bool SelectTuple(const string &tablename, const vector<string> &attribute = vector<string>(), const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
+	vector<Tuple> SelectTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
 
 	//删除元组，支持每次一条或多条记录的删除操作
-	bool DelectTuple(const string &tablename, const vector<ConditionUnit> &condition = vector<ConditionUnit>());
+	void DeleteTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>());
 };
 
 #endif //MINISQL_RECORDMANAGER_H
