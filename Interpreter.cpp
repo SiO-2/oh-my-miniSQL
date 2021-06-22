@@ -333,6 +333,8 @@ void Interpreter::Insert(string str){
     // Call Record Manager
     // Befor that call Catalog to get whole table info
     Table * table = Cata.GetTableCatalog(targ_table_name);
+    table->Print();
+    tuple.Print();
     Record.InsertTuple(*table, tuple);
 }
 

@@ -1,6 +1,6 @@
 #ifndef MINISQL_BUFFERMANAGER_H
 #define MINISQL_BUFFERMANAGER_H
-// #define DEBUG
+#define DEBUG
 #include <iostream>
 #include <string>
 #include "MiniSQL.h"
@@ -46,7 +46,8 @@ public:
     bool IsValid() const
     {
 #ifdef DEBUG
-        cout << "GetFilename return valid = " << this->valid << "   output finish" << endl;
+        // cout << "BufferManager.h::IsValid():49" << endl;
+        // cout << "GetFilename return valid = " << this->valid << "   output finish" << endl;
 #endif
         return this->valid;
     }
@@ -108,7 +109,12 @@ public:
 
     BufferManager(){};
 
-    ~BufferManager() = default;
+    ~BufferManager()
+    {
+        for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
+            if (blocks[bid].IsDirty())
+                WriteBlock2File(bid);
+    };
 
     /*
         函数功能：获取文件的大小

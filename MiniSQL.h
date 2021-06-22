@@ -38,7 +38,7 @@ class TableMetadata
 {
 public:
 	string name;	   //表名
-	int attr_num;	   //表中字段（列）数，属性attr的编号从0开始
+	int attr_num;	   //表中字段（列）数，属性attr的编号从1开始
 	int primary_key;   //主键，用attr的编号表示，若没有则为-1
 	int primary_index; //主索引，用attr的编号表示，若没有则为-1
 	TableMetadata();

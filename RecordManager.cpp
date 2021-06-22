@@ -1,5 +1,5 @@
 #include "RecordManager.h"
-
+#define DEBUG
 /*
     函数功能：创建一个表元数据文件以及一个表数据文件
     传入参数：Table类变量
@@ -54,6 +54,9 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
     unsigned int file_size = bmanager->GetFileSize(filename_data);
     unsigned int boffset = file_size / BLOCKSIZE;
     unsigned int toffset = file_size % BLOCKSIZE;
+#ifdef DEBUG
+    cout << "RecordManager::InsertTuple:58" << endl;
+#endif
     // wyc: 由于只能传catalog给我的table, 而这个没法获取tuple len暂时，我只能先强行注释掉了
     // if (toffset == 0 || (toffset + table.tuple_len > BLOCKSIZE)) //判断是否写得下
     // {
@@ -64,31 +67,56 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
     vector<unsigned int> tuple_offset;
     block_offset.push_back(boffset);
     tuple_offset.push_back(toffset);
-    vector<BID> bids(bmanager->ReadFile2Block(filename_data, block_offset));//
-    bmanager->blocks[*bids.begin()].SetDirty(); //设置为dirty
+    vector<BID> bids(bmanager->ReadFile2Block(filename_data, block_offset)); //
+    bmanager->blocks[*bids.begin()].SetDirty();                              //设置为dirty
+#ifdef DEBUG
+    cout << "RecordManager::InsertTuple:73" << endl;
+#endif
     //计算获得写入的地址，由于一次只能插入一条元组，所以不需要遍历
     char *data_addr = bmanager->blocks[*bids.begin()].data + *tuple_offset.begin();
     //先设置valid
     memcpy(data_addr++, &tuple.valid, 1 * sizeof(char));
+#ifdef DEBUG
+    cout << "RecordManager::InsertTuple:80" << endl;
+    cout << "RecordManager::InsertTuple:table.m_metadata.attr_num = " << table.m_metadata.attr_num << endl;
+#endif
     //通过tuple获取data
     for (int i = 0; i < table.m_metadata.attr_num; i++)
     {
         switch (table.m_attribute[i].type)
         {
         case INT_UNIT:
-            memcpy(data_addr, &tuple.tuple_value[i].value.int_value, table.m_attribute[i].charlen * sizeof(char));
+#ifdef DEBUG
+            cout << "RecordManager::InsertTuple:i = " << i << endl;
+            cout << "RecordManager::InsertTuple:tuple.tuple_value[i].value.int_value = " << tuple.tuple_value[i].value.int_value << endl;
+            cout << "RecordManager::InsertTuple:91" << endl;
+#endif
+            memcpy(data_addr, &tuple.tuple_value[i].value.int_value, sizeof(int));
             break;
         case CHAR_UNIT:
+#ifdef DEBUG
+            cout << "RecordManager::InsertTuple:i = " << i << endl;
+            printf("RecordManager::InsertTuple:tuple.tuple_value[i].value.char_n_value = %s\n", tuple.tuple_value[i].value.char_n_value);
+            cout << "RecordManager::InsertTuple:98" << endl;
+#endif
             memcpy(data_addr, tuple.tuple_value[i].value.char_n_value, table.m_attribute[i].charlen * sizeof(char));
             break;
         case FLOAT_UNIT:
-            memcpy(data_addr, &tuple.tuple_value[i].value.float_value, table.m_attribute[i].charlen * sizeof(char));
+#ifdef DEBUG
+            cout << "RecordManager::InsertTuple:i = " << i << endl;
+            cout << "RecordManager::InsertTuple:tuple.tuple_value[i].value.float_value = " << tuple.tuple_value[i].value.float_value << endl;
+            cout << "RecordManager::InsertTuple:105" << endl;
+#endif
+            memcpy(data_addr, &tuple.tuple_value[i].value.float_value, sizeof(float));
             break;
         default:
             break;
         }
         data_addr += table.m_attribute[i].charlen;
     }
+#ifdef DEBUG
+    cout << "RecordManager::InsertTuple:115" << endl;
+#endif
 
     //注意，需要将offset传给index建立索引
     vector<char> tuple_data;
@@ -184,6 +212,9 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     unsigned int offset = 0;
     vector<Tuple> result;
     string filename_data = GetDataFileName(table.m_metadata.name);
+#ifdef DEBUG
+    // cout << "SelectTuple filename_data = " << filename_data << endl;
+#endif
     vector<BID> bids;
     bids = bmanager->ReadFile2Block(filename_data);
     vector<BID>::iterator it;

@@ -85,13 +85,21 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
     for (it = offsets.begin(); it != offsets.end(); it++)
     {
         fseek(fp, *it * BLOCKSIZE, SEEK_SET);
-        bids.push_back(GetBlock(filename, *it));
-        if (blocks[*bids.end()].IsValid() == false)
+        BID bid = GetBlock(filename, *it);
+        bids.push_back(bid);
+#ifdef DEBUG
+        cout << "BufferManager::ReadFile2Block::90" << endl;
+        cout << "BufferManager::ReadFile2Block::bid" << bid << endl;
+#endif
+        if (blocks[bid].IsValid() == false)
         {
-            fread(blocks[*bids.end()].data, BLOCKSIZE, 1, fp);
-            SetBlockInfo(*bids.end(), filename, *it);
+            fread(blocks[bid].data, BLOCKSIZE, 1, fp);
+            SetBlockInfo(bid, filename, *it);
         }
     }
+#ifdef DEBUG
+    cout << "BufferManager::ReadFile2Block::99" << endl;
+#endif
     fclose(fp);
     return bids;
 }

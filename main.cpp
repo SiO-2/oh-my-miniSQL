@@ -18,15 +18,18 @@ string query = "insert into testtable values(\"chartest\", 10, 10.5)";
 // string query = "create index idname on tbname(asdkhfjabldkfjykugl)";
 // string query = "select a.attr b.attr from table1 as a, table2 as b where a.v1 = b.v2";
 
-int main(int argc, char* argv[]){
+int main(int argc, char *argv[])
+{
     // string text="abc";
     // cout<<text[ text.length() - 1]<<endl;
-    if(argc == 2){
+    if (argc == 2)
+    {
         query = argv[1];
     }
     Interpreter I(query);
     I.Parse();
     // cout<<stof("3.3")<<endl;
+    delete &I;
     system("pause");
     return 0;
 }
