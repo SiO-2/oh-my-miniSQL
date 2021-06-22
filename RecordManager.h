@@ -12,16 +12,6 @@
 // #include "IndexManager.h"
 using namespace std;
 
-//数据文件的存放目录
-const string TABLE_PATH = "./database/data/";
-const string INDEX_PATH = "./database/index/";
-const string META_PATH = "./database/meta/";
-
-//文件后缀名
-const string TABLE_SUFFIX = ".table";
-const string INDEX_SUFFIX = ".index";
-const string META_SUFFIX = ".meta";
-
 class RecordManager
 {
 private:

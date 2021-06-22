@@ -13,11 +13,12 @@ void RecordManager::CreateTableFile(const Table &table)
     string tablename = table.m_metadata.name;
     string filename_data = GetDataFileName(tablename);
     FILE *fp;
-
+    cout << "[Record Manager Debug]: tablename = " << tablename << endl;
+    cout << "[Record Manager Debug]: filename = " << filename_data << endl;
     //新建数据文件，但无需写入
     if ((fp = fopen(filename_data.c_str(), "wb+")) == NULL)
     {
-        cout<<"Can't create "<<tablename<<" by cannot open "<<filename_data<<endl;
+        cout << "Can't create " << tablename << " by cannot open " << filename_data << endl;
         // wyc: string 没法这么输出的
         // printf("Can't create %s by cannot open %s\n", tablename, filename_data);
         exit(EXIT_FAILURE);
@@ -43,7 +44,7 @@ void RecordManager::DropTableFile(const Table &table)
     返回值：没有返回值
 */
 void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
-{   
+{
     string tablename = table.m_metadata.name;
     // wyc: 写错了吧，我帮你改了
     // string tablename = GetDataFileName(table.m_metadata.name);
@@ -56,8 +57,8 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
     // wyc: 由于只能传catalog给我的table, 而这个没法获取tuple len暂时，我只能先强行注释掉了
     // if (toffset == 0 || (toffset + table.tuple_len > BLOCKSIZE)) //判断是否写得下
     // {
-        // boffset++;
-        // toffset = 0;
+    // boffset++;
+    // toffset = 0;
     // }
     vector<unsigned int> block_offset;
     vector<unsigned int> tuple_offset;
