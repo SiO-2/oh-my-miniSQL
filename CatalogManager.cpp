@@ -34,8 +34,7 @@ CatalogManager::CatalogManager()
         {
             I = new Index;
             readIndex(*I, index_file);
-            // m_index.push_back(*I);
-            m_index[i] = I;
+            m_index.push_back(I);
         }
         index_file.close();
     }
@@ -104,10 +103,11 @@ bool CatalogManager::DropTable(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_table[i]->m_metadata.name){
-            table_file.open(NameToTF(table_name), ios::out|ios::binary|ios::trunc);
+            table_file.open(NameToTF(table_name), ios::out|ios::binary);
             m_table.erase(m_table.begin()+i);
             writeallTable(table_file);
             table_file.close();
+            remove(NameToTF(name).c_str());
             return true;
         }
     }
@@ -122,10 +122,11 @@ bool CatalogManager::DropIndex(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_index[i]->index_name){
-            index_file.open(NameToIF(index_name), ios::out|ios::binary|ios::trunc);
+            index_file.open(NameToIF(index_name), ios::out|ios::binary);
             m_index.erase(m_index.begin()+i);
             writeallIndex(index_file);
             index_file.close();
+            remove(NameToIF(name).c_str());
             return true;
         }
     }
@@ -147,6 +148,13 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
         return false;
     t = m_table[i];
     n = t->m_metadata.attr_num;
+    // wyc test
+    // cout<<"[Catalog debug]:"<<endl;
+    // for(auto attr: t->m_attribute){
+    //     attr.Print();
+    // }
+    // cout<<"[Catalog debug]: end"<<endl;
+    // // end of wyc test
     for (i=0; i<n; i++)
     {
         if (!CheckAttr(t->m_attribute[i], data.tuple_value[i]))
