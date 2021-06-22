@@ -3,8 +3,8 @@
 # 	$(MAKE) -C main
 # 	g++ -o MiniSQL *.o main/*.o
 # wyc: …… I give up, I can not run makefile successfully in my computer
-main.o: main.cpp Interpreter.cpp Basicop.cpp SqlError.cpp MiniSQL.cpp CatalogManager.cpp
-	g++ -o main main.cpp Interpreter.cpp Basicop.cpp SqlError.cpp MiniSQL.cpp CatalogManager.cpp
+main.o: main.cpp Interpreter.cpp Basicop.cpp SqlError.cpp MiniSQL.cpp CatalogManager.cpp RecordManager.cpp BufferManager.cpp
+	g++ -o main main.cpp Interpreter.cpp Basicop.cpp SqlError.cpp MiniSQL.cpp CatalogManager.cpp RecordManager.cpp BufferManager.cpp
 
 Interpreter.o: SqlError.cpp Basicop.cpp Interpreter.cpp
 	g++ -c Interpreter.cpp Basicop.cpp SqlError.cpp

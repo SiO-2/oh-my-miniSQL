@@ -2,12 +2,14 @@
 #define _INTERPRETER_H_
 #include <string>
 #include "CatalogManager.h"
+#include "RecordManager.h"
 using namespace std;
 // sql解释器
 class Interpreter{
 public:
     string sql; // sql语句字符串
     CatalogManager Cata;
+    RecordManager Record;
     Interpreter(std::string sql); //构造函数
     void Parse(); // 解析sql的函数
     void CreateTable(std::string str); // 针对create table 场景的函数

@@ -7,7 +7,7 @@
 #include <fstream>
 //#include "API.h"
 #include "BPlusTree.h"
-
+#include "BufferManager.h"
 #define TYPE_FLOAT -1	//the type of the attribute,-1 represents float
 #define TYPE_INT 0		//0 represents int
 // other positive integer represents char and the value is the number of char
@@ -23,65 +23,61 @@ public:
 	IndexInfo(){}
 	IndexInfo(string name, string table, string attr, int type):indexName(name), tableName(table), Attribute(attr), type(type) {
 	}
-	string indexName;//indexÃû
-	string tableName;//±íÃû
-	string Attribute;//ÊôĞÔÃû
-	int type;//ÊôĞÔÀàĞÍ£¨ÈıÖÖÖ®Ò»£©
+	string indexName;//indexå
+	string tableName;//è¡¨å
+	string Attribute;//å±æ€§å
+	int type;//å±æ€§ç±»å‹ï¼ˆä¸‰ç§ä¹‹ä¸€ï¼‰
 };
 
-/*½¨ºÃµÄË÷ÒıÊÇÒÔ.indexÎÄ¼şµÄĞÎÊ½´æÔÚ´ÅÅÌÉÏµÄ
-Êı¾İ¿âÔËĞĞÊ±£¬IndexManagerÀà´´½¨ÊµÀı£¬½«´ÅÅÌÉÏµÄ.indexÎÄ¼ş¶ÁÈë£¬²¢½¨Á¢ÏàÓ¦µÄB+Ê÷£¬ÔÙÍ¨¹ımapÈİÆ÷Ó³ÉäÆğÀ´
-ÓÉÓÚB+Ê÷ºÍ.indexÎÄ¼şÒÑ½¨Á¢Ó³Éä£¬Òò´Ë±¾½Ó¿ÚµÄµ÷ÓÃÕß²»ĞèÒªÖªµÀB+Ê÷µÄÃû³ÆºÍÊµÏÖ£¬Ö»ĞèÖªµÀ.indexÎÄ¼şµÄÃû³ÆºÍË÷ÒıÀàĞÍ£¬¼´¿É¶ÔË÷Òı½øĞĞ²Ù×÷*/
+/*å»ºå¥½çš„ç´¢å¼•æ˜¯ä»¥.indexæ–‡ä»¶çš„å½¢å¼å­˜åœ¨ç£ç›˜ä¸Šçš„
+æ•°æ®åº“è¿è¡Œæ—¶ï¼ŒIndexManagerç±»åˆ›å»ºå®ä¾‹ï¼Œå°†ç£ç›˜ä¸Šçš„.indexæ–‡ä»¶è¯»å…¥ï¼Œå¹¶å»ºç«‹ç›¸åº”çš„B+æ ‘ï¼Œå†é€šè¿‡mapå®¹å™¨æ˜ å°„èµ·æ¥
+ç”±äºB+æ ‘å’Œ.indexæ–‡ä»¶å·²å»ºç«‹æ˜ å°„ï¼Œå› æ­¤æœ¬æ¥å£çš„è°ƒç”¨è€…ä¸éœ€è¦çŸ¥é“B+æ ‘çš„åç§°å’Œå®ç°ï¼Œåªéœ€çŸ¥é“.indexæ–‡ä»¶çš„åç§°å’Œç´¢å¼•ç±»å‹ï¼Œå³å¯å¯¹ç´¢å¼•è¿›è¡Œæ“ä½œ*/
 class IndexManager {
 private:
-	BufferManager buffer;//indexËùÊ¹ÓÃµÄbuffer
+	BufferManager buffer;//indexæ‰€ä½¿ç”¨çš„buffer
 
-	//ÈıÖÖÀàĞÍµÄmapÈİÆ÷£¬½«Ã¿¸öÎÄ¼şÃû£¨string£©ºÍÒ»ÖÖB+Ê÷£¨BPlusTree£©¶ÔÓ¦ÆğÀ´£¬ÓÃÓÚ±£´æºÍ¹ÜÀíindex
+	//ä¸‰ç§ç±»å‹çš„mapå®¹å™¨ï¼Œå°†æ¯ä¸ªæ–‡ä»¶åï¼ˆstringï¼‰å’Œä¸€ç§B+æ ‘ï¼ˆBPlusTreeï¼‰å¯¹åº”èµ·æ¥ï¼Œç”¨äºä¿å­˜å’Œç®¡ç†index
 	typedef map<string, BPlusTree<int> *> intMap;
 	typedef map<string, BPlusTree<string> *> stringMap;
 	typedef map<string, BPlusTree<float> *> floatMap;
 
 	API * api;
 
-	//ÈİÆ÷µÄ´´½¨
+	//å®¹å™¨çš„åˆ›å»º
 	/*static */intMap indexIntMap;
 	/*static */stringMap indexStringMap;
 	/*static */floatMap indexFloatMap;
 
-	//ÈıÖÖÀàĞÍµÄÁÙÊ±±äÁ¿£¬ÓÃÀ´±£´æÈıÖÖÀàĞÍµÄËÑË÷Âë
+	//ä¸‰ç§ç±»å‹çš„ä¸´æ—¶å˜é‡ï¼Œç”¨æ¥ä¿å­˜ä¸‰ç§ç±»å‹çš„æœç´¢ç 
 	int intTmp;
 	float floatTmp;
 	string stringTmp;
 
-	int getDegree(int type);//µÃµ½Ò»¸öblockÖĞËùÄÜ±£´æµÄindexÊıÁ¿
-	int getKeySize(int type);//µÃµ½µ±Ç°ËÑË÷ÂëµÄ´óĞ¡
-	void setKey(int type, string key);//ÉèÖÃµ±Ç°µÄËÑË÷Âë
+	int getDegree(int type);//å¾—åˆ°ä¸€ä¸ªblockä¸­æ‰€èƒ½ä¿å­˜çš„indexæ•°é‡
+	int getKeySize(int type);//å¾—åˆ°å½“å‰æœç´¢ç çš„å¤§å°
+	void setKey(int type, string key);//è®¾ç½®å½“å‰çš„æœç´¢ç 
 
 public:
-	IndexManager(API* ap);//¹¹Ôìº¯Êı£¬²ÎÊıÎªAPI£¬»áµ÷ÓÃAPIÀ´»ñÈ¡.indexÎÄ¼şÁĞ±í²¢µ¼ÈëindexĞÅÏ¢
-	~IndexManager();//Îö¹¹º¯Êı£¬Ïú»Ù¶ÔÏóÊ±»á½«ËùÓĞindexĞÅÏ¢Ğ´»Ø´ÅÅÌÖĞ
+	IndexManager(API* ap);//æ„é€ å‡½æ•°ï¼Œå‚æ•°ä¸ºAPIï¼Œä¼šè°ƒç”¨APIæ¥è·å–.indexæ–‡ä»¶åˆ—è¡¨å¹¶å¯¼å…¥indexä¿¡æ¯
+	~IndexManager();//ææ„å‡½æ•°ï¼Œé”€æ¯å¯¹è±¡æ—¶ä¼šå°†æ‰€æœ‰indexä¿¡æ¯å†™å›ç£ç›˜ä¸­
 
-	void createIndex(string filePath, int type);//´´½¨Ò»¸öÖ¸¶¨Ãû³Æ£¨filePath£©ºÍÀàĞÍ£¨type£©µÄ.indexÎÄ¼ş
-												//Àı£ºcreateIndex("salary_index.index",TYPE_INT);
-												//»á´´½¨Ò»¸öÃûÎª¡°salary_index¡±µÄ.indexÎÄ¼ş£¬ÀàĞÍÎªTYPE_INT
+	void createIndex(string filePath, int type);//åˆ›å»ºä¸€ä¸ªæŒ‡å®šåç§°ï¼ˆfilePathï¼‰å’Œç±»å‹ï¼ˆtypeï¼‰çš„.indexæ–‡ä»¶
+												//ä¾‹ï¼šcreateIndex("salary_index.index",TYPE_INT);
+												//ä¼šåˆ›å»ºä¸€ä¸ªåä¸ºâ€œsalary_indexâ€çš„.indexæ–‡ä»¶ï¼Œç±»å‹ä¸ºTYPE_INT
 
-	void dropIndex(string filePath, int type);//É¾³ıÒ»¸öÖ¸¶¨Ãû³Æ£¨filePath£©ºÍÀàĞÍ£¨type£©µÄ.indexÎÄ¼ş£¬ÓÃ·¨Í¬ÉÏ
+	void dropIndex(string filePath, int type);//åˆ é™¤ä¸€ä¸ªæŒ‡å®šåç§°ï¼ˆfilePathï¼‰å’Œç±»å‹ï¼ˆtypeï¼‰çš„.indexæ–‡ä»¶ï¼Œç”¨æ³•åŒä¸Š
 
-	offsetNumber searchIndex(string filePath, string key, int type);//»ñÈ¡Ö¸¶¨Ãû³Æ£¨filePath£©ºÍÀàĞÍ£¨type£©µÄ.indexÎÄ¼şÖĞËÑË÷ÂëÎªkeyµÄindexÎ»ÖÃ
-																	//.indexÎÄ¼şÖĞindexµÄÎ»ÖÃÊÇÓÃÆ«ÒÆÁ¿£¨Ò»¸öÕûÊı£©À´±íÊ¾µÄ£¬ÖªµÀÁËÆ«ÒÆÁ¿¾ÍÄÜºÜÈİÒ×µØ¶¨Î»µ½ÏàÓ¦µÄindex
-																	//Àı£ºsearchIndex("salary_index.index","10000",TYPE_INT);
-																	//»áËÑË÷ÃûÎª¡°salary_index¡±ÇÒÀàĞÍÎªTYPE_INTµÄ.indexÎÄ¼şÖĞËÑË÷ÂëÎª¡°10000¡±µÄindexËùÔÚÎ»ÖÃ
+	offsetNumber searchIndex(string filePath, string key, int type);//åœ¨B+æ ‘ä¸­æœç´¢ç ä¸ºkeyçš„indexï¼Œè¿”å›åç§»é‡
+																	
 
-	void insertIndex(string filePath, string key, offsetNumber blockOffset, int type);//ÔÚÒ»¸öÖ¸¶¨Ãû³Æ£¨filePath£©ºÍÀàĞÍ£¨type£©µÄ.indexÎÄ¼şÖĞ
-																					  //Î»ÓÚblockOffsetµÄÎ»ÖÃ²åÈëÒ»¸öËÑË÷ÂëÎªkeyµÄindex
-																					  //Àı£ºinsertIndex("salary_index.index","20000",88,TYPE_INT);
-																					  //»áÔÚÃûÎª¡°salary_index¡±ÇÒÀàĞÍÎªTYPE_INTµÄ.indexÎÄ¼şÖĞ88µÄÎ»ÖÃ²åÈëÒ»¸öËÑË÷ÂëÎª¡°20000¡±µÄindex
+	void insertIndex(string filePath, string key, offsetNumber blockOffset, int type);//åœ¨B+æ•°ä¸­æ’å…¥ä¸€ä¸ªæœç´¢ç ä¸ºkeyçš„index
+																					  
 
-	void deleteIndex(string filePath, string key, int type);//ÔÚÒ»¸öÖ¸¶¨Ãû³Æ£¨filePath£©ºÍÀàĞÍ£¨type£©µÄ.indexÎÄ¼şÖĞÉ¾³ıÒ»¸öËÑË÷ÂëÎªkeyµÄindex
-															//Àı£ºdeleteIndex("salary_index.index","20000",TYPE_INT);
-															//»áÔÚÃûÎª¡°salary_index¡±ÇÒÀàĞÍÎªTYPE_INTµÄ.indexÎÄ¼şÖĞÉ¾³ıËÑË÷ÂëÎª¡°20000¡±µÄindex
+	void deleteIndex(string filePath, string key, int type);//ä»B+æ•°ä¸­åˆ é™¤ä¸€ä¸ªæœç´¢ç ä¸ºkeyçš„index
+															//ä¾‹ï¼šdeleteIndex("salary_index.index","20000",TYPE_INT);
 
-	void readIndex(string filePath, int type);//´ÓÒ»¸öÖ¸¶¨Ãû³Æ£¨filePath£©ºÍÀàĞÍ£¨type£©µÄ.indexÎÄ¼şÖĞ¶ÁÈ¡indexĞÅÏ¢£¬½¨Á¢¶ÔÓ¦B+Ê÷£¬²¢ÔÚÏàÓ¦µÄmapÈİÆ÷ÖĞ½¨Á¢¶şÕßµÄÓ³Éä
+
+	void readIndex(string filePath, int type);//ä»ä¸€ä¸ªæŒ‡å®šåç§°ï¼ˆfilePathï¼‰å’Œç±»å‹ï¼ˆtypeï¼‰çš„.indexæ–‡ä»¶ä¸­è¯»å–indexä¿¡æ¯ï¼Œå»ºç«‹å¯¹åº”B+æ ‘ï¼Œå¹¶åœ¨ç›¸åº”çš„mapå®¹å™¨ä¸­å»ºç«‹äºŒè€…çš„æ˜ å°„
 };
 
 

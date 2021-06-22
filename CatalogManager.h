@@ -11,13 +11,11 @@ public:
 	CatalogManager();
 	~CatalogManager() {};
 
-	// bool CreateDatabase(string& db_name); //不知道需要不需要？
 	bool CreateTable(Table& table);	//创建包含Catalog的表，需要检查重复性，返回值true表示成功，false表示失败
 	bool CreateIndex(Index& index);	//创建索引，需要检查重复性，返回值true表示成功，false表示失败
 
 	bool DropTable(string& name);	//删除表，通过name判断删除哪张表，需要检查存在性，返回值true表示成功，false表示失败
 	bool DropIndex(string& name);	//删除索引，通过name判断删除哪个索引，需要检查存在性，返回值true表示成功，false表示失败
-	// bool DropDatabase(string& db_name); //需要吗？
 
 	bool CheckAttr(Attribute& attr, struct Unit& data); //这里实际上只能检测type,类型正确返回true
 	bool CheckCond(ConditionUnit& cond); //这个我没用到，不知道要不要调用
@@ -25,7 +23,7 @@ public:
 	//这里有table不需要传入attribute to：wyc, (wyc:get)
 	bool InsertTest(string& table_name, Tuple& data);	//判断是否可以插入：检查每个DataUnit中的数据类型是否与表定义的数据类型匹配
 	
-	pair<int, string> SelectTest(string& table_name, vector<ConditionUnit>& condition);	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
+	pair<int, string> SelectTest(string& table_name, vector<string>& Attr, vector<ConditionUnit>& condition);	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
 	//返回值：-2（表格不存在） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
 	//返回值危-1，-2时不需要考虑string的值, 0和1时返回文件名(我不知道文件名后缀怎么加，暂时返回表名)；
 
@@ -40,11 +38,8 @@ private:
 	vector<Table*> m_table;
 	vector<Index*> m_index;
 	
-    string table_name = "./data/head/table.tb";
-    string index_name = "./data/head/index.id";
-	string table_dir = "./data/table/";
-	string index_dir = "./data/index/";
-	string table_ex = ".mta";
+    string table_name = "./database/meta/table.meta";
+    string index_name = "./database/meta/index.meta";
 
 	string NameToTF(string& name);
 	string NameToIF(string& name);

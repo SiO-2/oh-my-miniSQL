@@ -11,28 +11,28 @@ typedef int offsetNumber;
 template <class ElementType>
 class TreeNode {
 private:
-	int degree;//½áµã¶ÈÊı£¬Ò²ÊÇÒ»¿éÖĞÄÜ´æ´¢keyµÄÊıÁ¿
+	int degree;//ç»“ç‚¹åº¦æ•°ï¼Œä¹Ÿæ˜¯ä¸€å—ä¸­èƒ½å­˜å‚¨keyçš„æ•°é‡
 
 public:
 	TreeNode(int degree, bool newLeaf = false);
 	~TreeNode();
 
-	int keycount;//keyµÄÊıÁ¿
-	TreeNode* parent;//¸¸½áµã
-	TreeNode* nextLeafNode;//ÏÂÒ»¸öÒ¶½áµã£¨µ±¸Ã½áµãÎªÒ¶½áµãÊ±ÓĞĞ§)
+	int keycount;//keyçš„æ•°é‡
+	TreeNode* parent;//çˆ¶ç»“ç‚¹
+	TreeNode* nextLeafNode;//ä¸‹ä¸€ä¸ªå¶ç»“ç‚¹ï¼ˆå½“è¯¥ç»“ç‚¹ä¸ºå¶ç»“ç‚¹æ—¶æœ‰æ•ˆ)
 
-	vector<ElementType> keys;//¸Ã½áµãµÄËùÓĞkey
-	vector<TreeNode*> childs;//Ö¸Ïò¸Ã½áµãËùÓĞ×Ó½áµãµÄÖ¸Õë
-	vector<offsetNumber> offset;//ÔÚ¿éÖĞµÄÆ«ÒÆÁ¿£¨µ±¸Ã½áµãÎªÒ¶½áµãÊ±>=0£¬·ñÔòÎª-1)
+	vector<ElementType> keys;//è¯¥ç»“ç‚¹çš„æ‰€æœ‰key
+	vector<TreeNode*> childs;//æŒ‡å‘è¯¥ç»“ç‚¹æ‰€æœ‰å­ç»“ç‚¹çš„æŒ‡é’ˆ
+	vector<offsetNumber> offset;//åœ¨å—ä¸­çš„åç§»é‡ï¼ˆå½“è¯¥ç»“ç‚¹ä¸ºå¶ç»“ç‚¹æ—¶>=0ï¼Œå¦åˆ™ä¸º-1)
 
-	bool isLeaf;//ÊÇ·ñÎªÒ¶½áµã
-	bool isRoot();//ÊÇ·ñÎª¸ù½áµã
-	bool search(ElementType key, int &index);//ÔÚ¸Ã½áµãÖĞËÑË÷key£¬ËÑµ½µÄÎ»ÖÃ´æ´¢ÔÚindexÖĞ
+	bool isLeaf;//æ˜¯å¦ä¸ºå¶ç»“ç‚¹
+	bool isRoot();//æ˜¯å¦ä¸ºæ ¹ç»“ç‚¹
+	bool search(ElementType key, int &index);//åœ¨è¯¥ç»“ç‚¹ä¸­æœç´¢keyï¼Œæœåˆ°çš„ä½ç½®å­˜å‚¨åœ¨indexä¸­
 
-	TreeNode* devide(ElementType &key, offsetNumber &offset);//·ÖÁÑ½áµã£¬²¢±£´æÓÒ±ß½áµã¶ÔÓ¦µÄkeyºÍÆ«ÒÆÁ¿
+	TreeNode* devide(ElementType &key, offsetNumber &offset);//åˆ†è£‚ç»“ç‚¹ï¼Œå¹¶ä¿å­˜å³è¾¹ç»“ç‚¹å¯¹åº”çš„keyå’Œåç§»é‡
 	
-	int insertKey(ElementType key, offsetNumber offset = -1);	//ÔÚ¸Ã½áµãÖĞÔö¼ÓÒ»¸ökey£¬²¢·µ»ØÎ»ÖÃ
-	bool deleteKey(int index);//¸ù¾İindexµÄÎ»ÖÃÉ¾³ı¸Ã½áµãµÄÒ»¸ökey
+	int insertKey(ElementType key, offsetNumber offset = -1);	//åœ¨è¯¥ç»“ç‚¹ä¸­å¢åŠ ä¸€ä¸ªkeyï¼Œå¹¶è¿”å›ä½ç½®
+	bool deleteKey(int index);//æ ¹æ®indexçš„ä½ç½®åˆ é™¤è¯¥ç»“ç‚¹çš„ä¸€ä¸ªkey
 };
 
 
@@ -47,8 +47,8 @@ TreeNode<ElementType>::TreeNode(int degree, bool newLeaf)
 	:keycount(0), parent(NULL), nextLeafNode(NULL), isLeaf(newLeaf), degree(degree) {
 	for(int i = 0; i < degree + 1; i++) {
 		childs.push_back(NULL);
-		keys.push_back(ElementType());		//´æÈë0
-		offset.push_back(offsetNumber());	//´æÈë0
+		keys.push_back(ElementType());		//å­˜å…¥0
+		offset.push_back(offsetNumber());	//å­˜å…¥0
 	}
 	childs.push_back(NULL);
 }
@@ -58,26 +58,26 @@ TreeNode<ElementType>::~TreeNode() {}
 
 template <class ElementType>
 bool TreeNode<ElementType>::isRoot() {
-	return parent == NULL;//Ã»ÓĞ¸¸½áµã£¬¼´Îª¸ù½áµã
+	return parent == NULL;//æ²¡æœ‰çˆ¶ç»“ç‚¹ï¼Œå³ä¸ºæ ¹ç»“ç‚¹
 }
 
 template <class ElementType>
-bool TreeNode<ElementType>::search(ElementType key, int &index) {//ËÑË÷keyµÄÎ»ÖÃ²¢±£´æÔÚindexÖĞ
-	if(!keycount) {//Ã»ÓĞkey
+bool TreeNode<ElementType>::search(ElementType key, int &index) {//æœç´¢keyçš„ä½ç½®å¹¶ä¿å­˜åœ¨indexä¸­
+	if(!keycount) {//æ²¡æœ‰key
 		index = 0;
 		return false;
 	}
-	else if(keys[0] > key) {//±È×îĞ¡key»¹Ğ¡
+	else if(keys[0] > key) {//æ¯”æœ€å°keyè¿˜å°
 		index = 0;
 		return false;
 	}
-	else if(keys[keycount - 1] < key) {//±È×î´ókey»¹´ó
+	else if(keys[keycount - 1] < key) {//æ¯”æœ€å¤§keyè¿˜å¤§
 		index = keycount;
 		return false;
 	}
 	else {
 		int left = 0, right = keycount - 1, pos = 0;
-		while(right > left + 1) {			//¶ş·Ö·¨ËõĞ¡·¶Î§£¬Ö±µ½Á½¸öÏàÁÚµÄkey
+		while(right > left + 1) {			//äºŒåˆ†æ³•ç¼©å°èŒƒå›´ï¼Œç›´åˆ°ä¸¤ä¸ªç›¸é‚»çš„key
 			pos = (right + left) / 2;
 			if(keys[pos] == key) {
 				index = pos;
@@ -90,7 +90,7 @@ bool TreeNode<ElementType>::search(ElementType key, int &index) {//ËÑË÷keyµÄÎ»ÖÃ
 				right = pos;
 			}
 		}
-		//ÅĞ¶ÏÊ£ÓàµÄÁ½¸ökeyÊÇ·ñ¾ÍÊÇÒªÕÒµÄkey
+		//åˆ¤æ–­å‰©ä½™çš„ä¸¤ä¸ªkeyæ˜¯å¦å°±æ˜¯è¦æ‰¾çš„key
 		if(keys[left] == key) {
 			index = left;
 			return true;
@@ -99,7 +99,7 @@ bool TreeNode<ElementType>::search(ElementType key, int &index) {//ËÑË÷keyµÄÎ»ÖÃ
 			index = right;
 			return true;
 		}
-		else {	//Ã»ÕÒµ½key
+		else {	//æ²¡æ‰¾åˆ°key
 			index = right;
 			return false;
 		}
@@ -109,7 +109,7 @@ bool TreeNode<ElementType>::search(ElementType key, int &index) {//ËÑË÷keyµÄÎ»ÖÃ
 
 
 template <class ElementType>
-TreeNode<ElementType>* TreeNode<ElementType>::devide(ElementType &key, offsetNumber &offset) {//½«Ò»¸ö½áµã·Ö³ÉÁ½¸ö£¬·µ»ØÓÒ±ßµÄ½áµã£¬¼°Æä×îĞ¡keyºÍÆ«ÒÆÁ¿
+TreeNode<ElementType>* TreeNode<ElementType>::devide(ElementType &key, offsetNumber &offset) {//å°†ä¸€ä¸ªç»“ç‚¹åˆ†æˆä¸¤ä¸ªï¼Œè¿”å›å³è¾¹çš„ç»“ç‚¹ï¼ŒåŠå…¶æœ€å°keyå’Œåç§»é‡
 	int midofNode = (degree - 1) / 2;
 	TreeNode* newNode = new TreeNode(this->degree, this->isLeaf);
 	if(newNode == NULL) {
@@ -117,10 +117,10 @@ TreeNode<ElementType>* TreeNode<ElementType>::devide(ElementType &key, offsetNum
 		return NULL;
 	}
 
-	if(isLeaf) {//Ò¶½áµã
-		key = keys[midofNode + 1];//±£´æĞÂ½áµãµÄkey
-		offset = this->offset[midofNode + 1];//±£´æĞÂ½áµãµÄÆ«ÒÆÁ¿	
-		for(int i = midofNode + 1; i < degree; i++) {//¸´ÖÆ½áµãĞÅÏ¢
+	if(isLeaf) {//å¶ç»“ç‚¹
+		key = keys[midofNode + 1];//ä¿å­˜æ–°ç»“ç‚¹çš„key
+		offset = this->offset[midofNode + 1];//ä¿å­˜æ–°ç»“ç‚¹çš„åç§»é‡	
+		for(int i = midofNode + 1; i < degree; i++) {//å¤åˆ¶ç»“ç‚¹ä¿¡æ¯
 			newNode->keys[i - midofNode - 1] = this->keys[i];
 			newNode->offset[i - midofNode - 1] = this->offset[i];
 			this->keys[i] = ElementType();
@@ -133,7 +133,7 @@ TreeNode<ElementType>* TreeNode<ElementType>::devide(ElementType &key, offsetNum
 		newNode->keycount = midofNode;
 		this->keycount = midofNode + 1;
 	}
-	else if(!isLeaf) {//·ÇÒ¶½áµã
+	else if(!isLeaf) {//éå¶ç»“ç‚¹
 		key = keys[midofNode];
 		for(int i = midofNode + 1; i < degree + 1; i++) {
 			newNode->childs[i - midofNode - 1] = this->childs[i];
@@ -155,10 +155,10 @@ TreeNode<ElementType>* TreeNode<ElementType>::devide(ElementType &key, offsetNum
 }
 
 template <class ElementType>
-int TreeNode<ElementType>::insertKey(ElementType key, offsetNumber offset) {	//Ä¬ÈÏµÄoffsetÎª-1£¬±íÊ¾·ÇÒ¶½áµã£¬>=0Ôò±íÊ¾Ò¶½áµã
+int TreeNode<ElementType>::insertKey(ElementType key, offsetNumber offset) {	//é»˜è®¤çš„offsetä¸º-1ï¼Œè¡¨ç¤ºéå¶ç»“ç‚¹ï¼Œ>=0åˆ™è¡¨ç¤ºå¶ç»“ç‚¹
 	int index;
 	bool ifexist = search(key, index);
-	//Æ«ÒÆÁ¿Óë½áµãĞÔÖÊ²»Æ¥Åä
+	//åç§»é‡ä¸ç»“ç‚¹æ€§è´¨ä¸åŒ¹é…
 	if(offset == -1 && isLeaf) {
 		cout << "Error: cannot do this on leaf node" << endl;
 		return -1;
@@ -167,12 +167,12 @@ int TreeNode<ElementType>::insertKey(ElementType key, offsetNumber offset) {	//Ä
 		cout << "Error: cannot do this on non-leaf node" << endl;
 		return -1;
 	}
-	//keyÒÑ¾­´æÔÚ
+	//keyå·²ç»å­˜åœ¨
 	if(ifexist) {
 		cout << "Error: one value cannot appear in the index twice, value (" << key << ")" << endl;
 		return -1;
 	}
-	else {//²åÈëĞÂµÄkey
+	else {//æ’å…¥æ–°çš„key
 		for(int i = keycount; i > index; i--) {
 			keys[i] = keys[i - 1];
 			if(offset != -1) this->offset[i] = this->offset[i - 1];
@@ -180,7 +180,7 @@ int TreeNode<ElementType>::insertKey(ElementType key, offsetNumber offset) {	//Ä
 		keys[index] = key;
 		if(offset != -1) this->offset[index] = offset;
 
-		if(offset == -1) {//·ÇÒ¶½áµãĞèÒªµ÷Õû×Ó½áµãĞÅÏ¢
+		if(offset == -1) {//éå¶ç»“ç‚¹éœ€è¦è°ƒæ•´å­ç»“ç‚¹ä¿¡æ¯
 			for(int i = keycount + 1; i > index + 1; i--)
 				childs[i] = childs[i - 1];
 		}
@@ -190,12 +190,12 @@ int TreeNode<ElementType>::insertKey(ElementType key, offsetNumber offset) {	//Ä
 }
 
 template <class ElementType>
-bool TreeNode<ElementType>::deleteKey(int index) {//É¾³ıindexÎ»ÖÃµÄkey
-	if(index >= keycount) {//Õâ¸öÎ»ÖÃ²»´æÔÚkey
+bool TreeNode<ElementType>::deleteKey(int index) {//åˆ é™¤indexä½ç½®çš„key
+	if(index >= keycount) {//è¿™ä¸ªä½ç½®ä¸å­˜åœ¨key
 		cout << "Error: cannot find the " << index << "-th element" << endl;
 		return false;
 	}
-	if(isLeaf) {//Ò¶½áµã
+	if(isLeaf) {//å¶ç»“ç‚¹
 		for(int i = index + 1; i < keycount; i++) {
 			keys[i - 1] = keys[i];
 			offset[i - 1] = offset[i];
@@ -204,7 +204,7 @@ bool TreeNode<ElementType>::deleteKey(int index) {//É¾³ıindexÎ»ÖÃµÄkey
 		offset[keycount - 1] = offsetNumber();
 		keycount--;
 	}
-	else {//·ÇÒ¶½áµã
+	else {//éå¶ç»“ç‚¹
 		for(int i = index + 1; i < keycount; i++) {
 			keys[i - 1] = keys[i];
 		}

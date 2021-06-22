@@ -11,7 +11,6 @@
 #include "SqlError.h"
 // #include "Attribute.h"
 #include "MiniSQL.h"
-#include "CatalogManager.h"
 
 // DEBUG INFO开关
 // #define DEBUG 0
@@ -116,7 +115,7 @@ void Interpreter::Select(string str){
         from_str = str.substr(from_pos + 4, str.length() - from_pos - 4 );
         where_str = "";
     }
-    cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<endl;
+    // cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<endl;
     vector<string> attr_vec;
     vector<string> table_vec;
     vector<string> temp;
@@ -242,10 +241,10 @@ void Interpreter::Select(string str){
         cond.Print();
     }
 
-    // cout<<"[debug]: select attr: "<<endl;
-    // for(auto iter:attr_vec){
-    //     cout<<(iter)<<endl;
-    // }
+    cout<<"[debug]: select attr: "<<endl;
+    for(auto iter:attr_vec){
+        cout<<(iter)<<endl;
+    }
 
     // 结果存储
     // where条件存储在 vector<ConditionUnit> cond_vec 里
@@ -253,8 +252,26 @@ void Interpreter::Select(string str){
     // Select的属性名在 vector<string> attr_vec里
     
     // 调用Catalog
-    
+    pair<int, string> response;
+    response = Cata.SelectTest(table_vec[0], attr_vec, cond_vec);
+    if( response.first == -2 ){
+        cout<<"[Catalog res]: select table does not exist"<<endl;
+    }else if(response.first == -1){
+        cout<<"[Catalog res]: select conditions error"<<endl;
+    }else if(response.first == 0){
+        cout<<"[Catalog res]: select without index,"<<response.second<<endl;
+    }else if(response.first == 1){
+        cout<<"[Catalog res]: select with index"<<response.second<<endl;
+    }
 
+    // Call Record Manager
+    Table* table = Cata.GetTableCatalog(table_vec[0]);
+    vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
+    cout<<"[Interpreter Select Res]:"<<endl;
+    for(auto tuple:Select_Res){
+        tuple.Print();
+    }
+    cout<<"[Interpreter Select Res End]:"<<endl;
 }
 
 void Interpreter::Insert(string str){
@@ -312,6 +329,13 @@ void Interpreter::Insert(string str){
     }else {
         cout<<"[Catalog res]: Insert validate"<<endl;
     }
+
+    // Call Record Manager
+    // Befor that call Catalog to get whole table info
+    Table * table = Cata.GetTableCatalog(targ_table_name);
+    table->Print();
+    tuple.Print();
+    Record.InsertTuple(*table, tuple);
 }
 
 void Interpreter::CreateIndex(string str){
@@ -471,8 +495,11 @@ void Interpreter::CreateTable(string str){
 
     // 调用Catalog
     if( Cata.CreateTable(table) ){
-        cout<<"[info]: Create Table Successfully"<<endl;
+        cout<<"[Catalog info]: Create Table Successfully"<<endl;
     }else{
-        cout<<"[info]: Create Table Failed"<<endl;
+        cout<<"[Catalog info]: Create Table Failed"<<endl;
     }
+
+    // Call Record Manager
+    Record.CreateTableFile(table);
 }

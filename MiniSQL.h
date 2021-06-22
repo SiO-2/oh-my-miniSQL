@@ -6,68 +6,83 @@
 // #include"IndexManager.h"
 using namespace std;
 
-typedef enum{
-    INT_UNIT,
-    CHAR_UNIT,
-    FLOAT_UNIT
+//数据文件的存放目录
+const string TABLE_PATH = "./database/data/";
+const string INDEX_PATH = "./database/index/";
+const string META_PATH = "./database/meta/";
+
+//文件后缀名
+const string TABLE_SUFFIX = ".table";
+const string INDEX_SUFFIX = ".index";
+const string META_SUFFIX = ".meta";
+
+typedef enum
+{
+	INT_UNIT,
+	CHAR_UNIT,
+	FLOAT_UNIT
 } DataType;
 
-typedef enum{
-    NO_OP_, // No Opeartion
-    EQ_, // = 
-    NE_, // <>
-    L_, // <
-    G_, // >
-    LE_, // <=
-    GE_ // >=
+typedef enum
+{
+	NO_OP_, // No Opeartion
+	EQ_,	// =
+	NE_,	// <>
+	L_,		// <
+	G_,		// >
+	LE_,	// <=
+	GE_		// >=
 } OpCode;
 
-class TableMetadata{
+class TableMetadata
+{
 public:
-	string name;	//表名
-	int attr_num;	//表中字段（列）数，属性attr的编号从0开始
-	int primary_key;	//主键，用attr的编号表示，若没有则为-1
-	int primary_index;	//主索引，用attr的编号表示，若没有则为-1
+	string name;	   //表名
+	int attr_num;	   //表中字段（列）数，属性attr的编号从1开始
+	int primary_key;   //主键，用attr的编号表示，若没有则为-1
+	int primary_index; //主索引，用attr的编号表示，若没有则为-1
 	TableMetadata();
-	TableMetadata(string name, int attr_num, int primary_key=-1, int primary_index=-1);
-	TableMetadata(TableMetadata& t);
+	TableMetadata(string name, int attr_num, int primary_key = -1, int primary_index = -1);
+	TableMetadata(TableMetadata &t);
 	void Print();
 };
 
 // 记录属性的类
-class Attribute{
-public: //直接都Public算了吧
-    string name;//属性名
-    int type;//属性的类型，实际上是DataType, 记成int保留可扩展性
-    int charlen;//如果是char类型，保存其最大长度 char(n)
-    bool notnull;//not null标记
-    bool unique;//unique 标记
-    bool primary_key;// primary key 标记
-public:
-    // name: Attribute constructor
-    // Function: init value in class
-    Attribute(string name, string typestr, bool notnull = false, bool unique = false, bool primary_key = false);
-    Attribute(){};
-	// name:set_pk
-    // Function: set primary key of attribute, becase "primary key(pk)" usually occurs in the end
-    void set_pk(bool pk);
-    // name: print
-    // Function: Print Attribute info
-    void Print();
-};
-
-class Table	//数据库中的一张表
+class Attribute
 {
+public:				  //直接都Public算了吧
+	string name;	  //属性名
+	int type;		  //属性的类型，实际上是DataType, 记成int保留可扩展性
+	int charlen;	  //如果是char类型，保存其最大长度 char(n)
+	bool notnull;	  //not null标记
+	bool unique;	  //unique 标记
+	bool primary_key; // primary key 标记
 public:
-	TableMetadata m_metadata;	//表的定义信息
-	vector<Attribute> m_attribute;	//表中字段的信息
-	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
-	Table(Table& table);
-	Table(){}
+	// name: Attribute constructor
+	// Function: init value in class
+	Attribute(string name, string typestr, bool notnull = false, bool unique = false, bool primary_key = false);
+	Attribute(){};
+	// name:set_pk
+	// Function: set primary key of attribute, becase "primary key(pk)" usually occurs in the end
+	void set_pk(bool pk);
+	// name: print
+	// Function: Print Attribute info
 	void Print();
 };
 
-class Index	//建立在表m_table中attr_num上的索引，名为m_index_name
+class Table //数据库中的一张表
+{
+public:
+	TableMetadata m_metadata;	   //表的定义信息
+	vector<Attribute> m_attribute; //表中字段的信息
+	unsigned int tuple_len;		   //tuple的长度，包括valid位
+	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
+	Table(Table &table);
+	Table() {}
+	void Print();
+};
+
+class Index //建立在表m_table中attr_num上的索引，名为m_index_name
 {
 public:
 	string index_name;
@@ -78,7 +93,6 @@ public:
 	Index();
 	void Print();
 };
-
 
 /*
 class DataUnit		//数据单元，里面包含了数据类型，值以及对应的属性编号，用于插入语句的输入以及选择语句的返回值
@@ -103,16 +117,18 @@ union Value
 {
 	int int_value;
 	char *char_n_value;
+	// string char_n_value;
 	float float_value;
 };
 
 //不这样写根本没法做检测啊kora！！
-class Unit {
+class Unit
+{
 public:
-	union Value value;
+	Value value;
 	DataType datatype;
 	Unit();
-	Unit(Value& value, DataType& datatype);
+	Unit(Value value, DataType datatype);
 	void Print();
 };
 
@@ -122,6 +138,7 @@ public:
 	vector<struct Unit> tuple_value;
 	bool valid;
 	Tuple();
+	void Print();
 };
 
 struct BPlusNode
@@ -130,17 +147,17 @@ struct BPlusNode
 	unsigned int tuple_offset;
 };
 
-class ConditionUnit		//条件单元，用于select中的where，格式：attr_name attr_num  op_code  value（列 op 值）
+class ConditionUnit //条件单元，用于select中的where，格式：attr_name attr_num  op_code  value（列 op 值）
 {
 public:
 	string attr_name;
-	int attr_num;//attr_num Interpreter调用的时候可能没法传值
+	int attr_num; //attr_num Interpreter调用的时候可能没法传值
 	OpCode op_code;
 	DataType data_type;
 	union Value
 	{
 		int int_value;
-		char* char_n_value; // 不能用string, union中的类型不能自带构造函数（by wyc: 不太确定 但确实改了就好了）
+		char *char_n_value; // 不能用string, union中的类型不能自带构造函数（by wyc: 不太确定 但确实改了就好了）
 		float float_value;
 		// Value(){};
 	} value;
@@ -148,8 +165,6 @@ public:
 	ConditionUnit(string attr_name, int attr_num, OpCode op_code, DataType data_type);
 	void Print();
 };
-
-
 
 // /*
 // * 创建表，表的信息由table提供
@@ -180,7 +195,6 @@ public:
 // * 返回值：table_name的表的信息
 // */
 // Table GetTableInfo(string& table_name);
-
 
 // /*
 // * 将数据data插入到表名为table_name的表中
