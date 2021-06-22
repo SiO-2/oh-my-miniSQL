@@ -40,11 +40,13 @@ int main()
     rmanager.InsertTuple(table, tuple);
     table.Print();
     cout << endl;
-    
+
     cout << "------select---------------" << endl;
     vector<Tuple> results(rmanager.SelectTuple(table));
     Tuple result(*results.begin());
-    result.Print();
+
+    cout << result.tuple_value.begin()->value.int_value << "  ";
+    cout << result.tuple_value.end()->value.float_value << endl;
     cout << endl;
     return 0;
 }

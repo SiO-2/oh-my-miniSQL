@@ -20,7 +20,10 @@ private:
 	Tuple ExtractTuple(const Table &table, const BID bid, const unsigned int tuple_offset) const;
 
 public:
-	RecordManager(){};
+	RecordManager()
+	{
+		bmanager = new BufferManager();
+	};
 	~RecordManager(){};
 
 	/*

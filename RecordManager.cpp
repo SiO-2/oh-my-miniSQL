@@ -64,7 +64,7 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
     vector<unsigned int> tuple_offset;
     block_offset.push_back(boffset);
     tuple_offset.push_back(toffset);
-    vector<BID> bids(bmanager->ReadFile2Block(filename_data, block_offset));
+    vector<BID> bids(bmanager->ReadFile2Block(filename_data, block_offset));//
     bmanager->blocks[*bids.begin()].SetDirty(); //设置为dirty
     //计算获得写入的地址，由于一次只能插入一条元组，所以不需要遍历
     char *data_addr = bmanager->blocks[*bids.begin()].data + *tuple_offset.begin();

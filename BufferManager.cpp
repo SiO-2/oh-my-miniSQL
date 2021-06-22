@@ -1,4 +1,5 @@
 #include "BufferManager.h"
+// #define DEBUG
 /*
     函数功能：获取文件的大小
     传入参数：带路径的文件名
@@ -23,6 +24,13 @@ BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) 
     BID empty = 0;
     for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
     {
+#ifdef DEBUG
+        // cout << "bid = " << bid << endl;
+        // cout << "blocks[bid].GetFilename() = " << blocks[bid].GetFilename() << endl;
+        // cout << "filename = " << filename << endl;
+        // cout << "blocks[bid].GetOffset() = " << blocks[bid].GetOffset() << endl;
+        // cout << "offset = " << offset << endl;
+#endif
         if (blocks[bid].GetFilename() == filename && blocks[bid].GetOffset() == offset)
             return bid;
         else if (blocks[bid].IsValid() == false)
@@ -54,14 +62,14 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
     vector<BID> bids;
     FILE *fp;
     vector<unsigned int> offsets(offset);
-    if ((fp = fopen(filename.c_str(), "rb")) == NULL)
+    if ((fp = fopen(filename.c_str(), "rb+")) == NULL)
     {
         if ((fp = fopen(filename.c_str(), "wb+")) == NULL)
         {
-            cout<<"[ReadFile2Block Fail]"<<endl;
+            cout << "[ReadFile2Block Fail]" << endl;
             // cout<<"[ReadFile2Block]: Can't open "<<filename<<endl;
             printf("Can't open %s\n", filename);
-            exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE); //be panic
         }
     }
     if (offsets.empty())
@@ -100,7 +108,7 @@ void BufferManager::WriteBlock2File(const BID &bid)
     {
         if ((fp = fopen(blocks[bid].GetFilename().c_str(), "wb")) == NULL)
         {
-            cout<<"[WriteBlock2File Fail]"<<endl;
+            cout << "[WriteBlock2File Fail]" << endl;
             // cout<<"[WriteBlock2File]: Can't open "<<blocks[bid].GetFilename()<<endl;
             printf("Can't open %s\n", blocks[bid].GetFilename());
             exit(EXIT_FAILURE);
