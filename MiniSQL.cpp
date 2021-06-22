@@ -105,6 +105,10 @@ Table::Table(Table& table)
     this->m_attribute.assign(table.m_attribute.begin(), table.m_attribute.end());
 }
 
+Table::Table(){
+    
+}
+
 void Table::Print(){
     cout<<"[Table Info]:\n";
     this->m_metadata.Print();

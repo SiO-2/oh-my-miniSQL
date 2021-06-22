@@ -77,13 +77,16 @@ public:
 		返回值：没有返回值
 	*/
 	// By wyc: 由于tuple len是新加的, catalog没适配，我这里获取不到，里面的那部分先注释掉了
+
 	void InsertTuple(const Table &table, const Tuple &tuple);
+	// void InsertTuple(const Table &table, const Tuple &tuple, Index & index);
 
 	bool ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
 
 	//数据查询，可以通过指定用and 连接的多个条件进行查询，支持等值查询和区间查询
 	// wyc：似乎所有写Select的人都忽略了还有Attr list这个东西，罢了，我在Interpreter里加吧
 	vector<Tuple> SelectTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
+	// vector<Tuple> SelectTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>(), Index& index) const;
 
 	//删除元组，支持每次一条或多条记录的删除操作
 	void DeleteTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>());

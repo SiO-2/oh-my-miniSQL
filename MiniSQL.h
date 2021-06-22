@@ -78,7 +78,7 @@ public:
 	unsigned int tuple_len;		   //tuple的长度，包括valid位
 	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
 	Table(Table &table);
-	Table() {}
+	Table();
 	void Print();
 };
 
