@@ -241,10 +241,10 @@ void Interpreter::Select(string str){
         cond.Print();
     }
 
-    // cout<<"[debug]: select attr: "<<endl;
-    // for(auto iter:attr_vec){
-    //     cout<<(iter)<<endl;
-    // }
+    cout<<"[debug]: select attr: "<<endl;
+    for(auto iter:attr_vec){
+        cout<<(iter)<<endl;
+    }
 
     // 结果存储
     // where条件存储在 vector<ConditionUnit> cond_vec 里
@@ -253,7 +253,7 @@ void Interpreter::Select(string str){
     
     // 调用Catalog
     pair<int, string> response;
-    response = Cata.SelectTest(table_vec[0], cond_vec);
+    response = Cata.SelectTest(table_vec[0], attr_vec, cond_vec);
     if( response.first == -2 ){
         cout<<"[Catalog res]: select table does not exist"<<endl;
     }else if(response.first == -1){

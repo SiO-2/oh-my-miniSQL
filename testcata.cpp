@@ -17,5 +17,10 @@ int main()
     vt.push_back(&t);
     t.m_attribute.push_back(s);
     catalog.CreateTable(t);
+    Index ind;
+    ind.attr_num = 1;
+    ind.index_name = "pfu";
+    ind.table_name = "fusing";
+    catalog.CreateIndex(ind);
     
 }

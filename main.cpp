@@ -11,7 +11,7 @@
 using namespace std;
 
 // string query = "create table testtable(charattr char(10), intattr int not null unique, floatattr float not null unique, primary key(intattr))";
-// string query = "Drop Table testtable";
+// string query = "Drop Table muring";
 string query = "insert into testtable values(\"chartest\", 10, 10.5)";
 // 上面三个都可以通过和Catalog的测试了
 // string query = "select intattr, floatattr from testtable";
