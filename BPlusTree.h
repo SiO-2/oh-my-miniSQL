@@ -11,43 +11,43 @@
 using namespace std;
 
 template <class ElementType>
-struct NodeInfo {//½áµãĞÅÏ¢Àà£¬ÓÃÓÚ¼ÇÂ¼½áµãĞÅÏ¢£¬±È½áµãÀàËùÕ¼¿Õ¼äĞ¡
-	TreeNode<ElementType>* pNode;//Ö¸Ïò¶ÔÓ¦½áµãµÄÖ¸Õë
-	int index;//ĞèÒªµÄkeyÔÚ¸Ã½ÚµãÖĞµÄÎ»ÖÃ
-	bool exist;//¸Ã½ÚµãÖĞÊÇ·ñ´æÔÚĞèÒªµÄkey
+struct NodeInfo {//ç»“ç‚¹ä¿¡æ¯ç±»ï¼Œç”¨äºè®°å½•ç»“ç‚¹ä¿¡æ¯ï¼Œæ¯”ç»“ç‚¹ç±»æ‰€å ç©ºé—´å°
+	TreeNode<ElementType>* pNode;//æŒ‡å‘å¯¹åº”ç»“ç‚¹çš„æŒ‡é’ˆ
+	int index;//éœ€è¦çš„keyåœ¨è¯¥èŠ‚ç‚¹ä¸­çš„ä½ç½®
+	bool exist;//è¯¥èŠ‚ç‚¹ä¸­æ˜¯å¦å­˜åœ¨éœ€è¦çš„key
 };
 
 template <class ElementType>
-class BPlusTree {//B+Ê÷Àà
+class BPlusTree {//B+æ ‘ç±»
 private:
-	BufferManager buffer;//»º³åÇø
-	typedef TreeNode<ElementType>* Node;//Ê÷½ÚµãÖ¸Õë¶¨ÒåÎªNode£¬·½±ãÊéĞ´
+	BufferManager buffer;//ç¼“å†²åŒº
+	typedef TreeNode<ElementType>* Node;//æ ‘èŠ‚ç‚¹æŒ‡é’ˆå®šä¹‰ä¸ºNodeï¼Œæ–¹ä¾¿ä¹¦å†™
 
-	string filename;//¶ÔÓ¦µÄË÷ÒıÎÄ¼şÃû
-	Node root;//Ê÷µÄ¸ù½Úµã
-	Node leafhead;//µÚÒ»¸öÒ¶½áµã
-	FileNode* file;//Ê÷µÄÎÄ¼ş½áµã
-	int degree;//Ê÷µÄ¶ÈÊı£¬Ò²ÊÇÒ»¿éÖĞÄÜ±£´ækeyµÄ¸öÊı
-	int keycount;//Ê÷ÖĞkeyµÄ¸öÊı
-	int level;//ÊıµÄ²ãÊı
-	int nodecount;//ÊıµÄ½áµãÊı
-	int keysize;//keyµÄ´óĞ¡
+	string filename;//å¯¹åº”çš„ç´¢å¼•æ–‡ä»¶å
+	Node root;//æ ‘çš„æ ¹èŠ‚ç‚¹
+	Node leafhead;//ç¬¬ä¸€ä¸ªå¶ç»“ç‚¹
+	FileNode* file;//æ ‘çš„æ–‡ä»¶ç»“ç‚¹
+	int degree;//æ ‘çš„åº¦æ•°ï¼Œä¹Ÿæ˜¯ä¸€å—ä¸­èƒ½ä¿å­˜keyçš„ä¸ªæ•°
+	int keycount;//æ ‘ä¸­keyçš„ä¸ªæ•°
+	int level;//æ•°çš„å±‚æ•°
+	int nodecount;//æ•°çš„ç»“ç‚¹æ•°
+	int keysize;//keyçš„å¤§å°
 
-	ElementType FindMin(Node pNode);//·µ»ØpNodeËù¶ÔÓ¦×ÓÊ÷ÖĞ×îĞ¡µÄkey
-	bool AfterInsert(Node pNode);//ÔÚpNodeÉÏÖ´ĞĞÍê²åÈëºóµÄµ÷Õû
-	bool AfterDelete(Node pNode);//ÔÚpNodeÉÏÖ´ĞĞÍêÉ¾³ıºóµÄµ÷Õû
-	void FindLeaf(Node pNode, ElementType key, NodeInfo<ElementType> &info);//ÔÚpNode¶ÔÓ¦×ÓÊ÷ÖĞ²éÕÒkeyËùÔÚÒ¶½áµã£¬²¢½«ÆäĞÅÏ¢±£´æÔÚinfoÖĞ
+	ElementType FindMin(Node pNode);//è¿”å›pNodeæ‰€å¯¹åº”å­æ ‘ä¸­æœ€å°çš„key
+	bool AfterInsert(Node pNode);//åœ¨pNodeä¸Šæ‰§è¡Œå®Œæ’å…¥åçš„è°ƒæ•´
+	bool AfterDelete(Node pNode);//åœ¨pNodeä¸Šæ‰§è¡Œå®Œåˆ é™¤åçš„è°ƒæ•´
+	void FindLeaf(Node pNode, ElementType key, NodeInfo<ElementType> &info);//åœ¨pNodeå¯¹åº”å­æ ‘ä¸­æŸ¥æ‰¾keyæ‰€åœ¨å¶ç»“ç‚¹ï¼Œå¹¶å°†å…¶ä¿¡æ¯ä¿å­˜åœ¨infoä¸­
 
 public:
 	BPlusTree(string filename, int keysize, int degree);
 	~BPlusTree();
-	void ReadTree();//´ÓÎÄ¼şÖĞ¶ÁÈëkeyĞÅÏ¢²¢Éú³É¶ÔÓ¦µÄÊ÷
-	void DropTree(Node pNode);//É¾³ıpNodeËù¶ÔÓ¦×ÓÊ÷
-	void WriteBack();//½«Ê÷ÖĞµÄkeyĞÅÏ¢Ğ´»Ø»º³åÇø
+	void ReadTree();//ä»æ–‡ä»¶ä¸­è¯»å…¥keyä¿¡æ¯å¹¶ç”Ÿæˆå¯¹åº”çš„æ ‘
+	void DropTree(Node pNode);//åˆ é™¤pNodeæ‰€å¯¹åº”å­æ ‘
+	void WriteBack();//å°†æ ‘ä¸­çš„keyä¿¡æ¯å†™å›ç¼“å†²åŒº
 
-	offsetNumber Search(ElementType key);//²éÕÒÒ»¸ökey£¬²¢·µ»ØÆäÆ«ÒÆÁ¿
-	bool Insert(ElementType key, offsetNumber offset);//ÔÚoffsetÎ»ÖÃ²åÈëÒ»¸ökey
-	bool Delete(ElementType key);//É¾³ıÒ»¸ökey
+	offsetNumber Search(ElementType key);//æŸ¥æ‰¾ä¸€ä¸ªkeyï¼Œå¹¶è¿”å›å…¶åç§»é‡
+	bool Insert(ElementType key, offsetNumber offset);//åœ¨offsetä½ç½®æ’å…¥ä¸€ä¸ªkey
+	bool Delete(ElementType key);//åˆ é™¤ä¸€ä¸ªkey
 
 };
 
@@ -69,11 +69,11 @@ BPlusTree<ElementType>:: ~BPlusTree() {
 }
 
 template <class ElementType>
-void BPlusTree<ElementType>::DropTree(Node pnode) {//É¾³ıÕû¿ÃÊ÷
+void BPlusTree<ElementType>::DropTree(Node pnode) {//åˆ é™¤æ•´æ£µæ ‘
 	if(!pnode) return;
 	if(!pnode->isLeaf) {
 		for(int i = 0; i <= pnode->keycount; i++) {
-			DropTree(pnode->childs[i]);//µİ¹éÉ¾³ı×ÓÊ÷
+			DropTree(pnode->childs[i]);//é€’å½’åˆ é™¤å­æ ‘
 			pnode->childs[i] = NULL;
 		}
 	}
@@ -92,8 +92,8 @@ void BPTree<T>::readBlock(Bid tempblock)
 	ElementType key;
 	offsetNumber offset;
 	
-	while(offsetbegin - indexbegin < 4096)  //ÕâÀï¹ØÓÚ¿ìµÄ´óĞ¡»¹ÓĞÎÊÌâ£¡
-	{//Ñ­»·¶ÁÈëkeyºÍoffset£¬²¢²åÈëÊ÷ÖĞ
+	while(offsetbegin - indexbegin < 4096)  //è¿™é‡Œå…³äºå¿«çš„å¤§å°è¿˜æœ‰é—®é¢˜ï¼
+	{//å¾ªç¯è¯»å…¥keyå’Œoffsetï¼Œå¹¶æ’å…¥æ ‘ä¸­
 		key = *(ElementType*)indexbegin;
 		offset = *(offsetNumber*)offsetbegin;
 		Insert(key, offset);
@@ -121,15 +121,15 @@ void BPlusTree<ElementType>::ReadTree() {
 
 
 template <class ElementType>
-void BPlusTree<ElementType>::WriteBack() {//½«keyºÍoffsetĞÅÏ¢Ğ´»ØÎÄ¼şÖĞ
+void BPlusTree<ElementType>::WriteBack() {//å°†keyå’Œoffsetä¿¡æ¯å†™å›æ–‡ä»¶ä¸­
     int i=0;
     vector <int> tempblocks = bufferManager.ReadFile2Block(filename);
-    Bid tempblock = tempblocks.at(i);  //µÚÒ»¸öblock 
+    Bid tempblock = tempblocks.at(i);  //ç¬¬ä¸€ä¸ªblock 
 	Node tempnode = leafhead;
 
 
 	int offsetsize = sizeof(offsetNumber);
-	while(tempnode != NULL) {//´ÓÒ¶½áµãÖĞ¶ÁÈ¡keyºÍoffsetĞÅÏ¢£¬²¢Ğ´»Ø¿éÖĞ
+	while(tempnode != NULL) {//ä»å¶ç»“ç‚¹ä¸­è¯»å–keyå’Œoffsetä¿¡æ¯ï¼Œå¹¶å†™å›å—ä¸­
 		char* contentAddr = bufferManager.blocks[tempblock].data;
 		char* baseAddr = contentAddr;
 		
@@ -141,7 +141,7 @@ void BPlusTree<ElementType>::WriteBack() {//½«keyºÍoffsetĞÅÏ¢Ğ´»ØÎÄ¼şÖĞ
 			memcpy(contentAddr, offset, offsetsize);
 			contentAddr += offsetsize;
 		}
-		i++;  //ÏÂÒ»¿éÀ²
+		i++;  //ä¸‹ä¸€å—å•¦
 		tempblock = tempblocks.at(i);
 		tempnode = tempnode->nextLeafNode;
 	}
@@ -149,11 +149,11 @@ void BPlusTree<ElementType>::WriteBack() {//½«keyºÍoffsetĞÅÏ¢Ğ´»ØÎÄ¼şÖĞ
 }
 
 template <class ElementType>
-offsetNumber BPlusTree<ElementType>::Search(ElementType key) {//ÔÚÊ÷ÖĞ²éÕÒkey²¢·µ»ØÆ«ÒÆÁ¿
+offsetNumber BPlusTree<ElementType>::Search(ElementType key) {//åœ¨æ ‘ä¸­æŸ¥æ‰¾keyå¹¶è¿”å›åç§»é‡
 	if(!root) return -1;
 	NodeInfo<ElementType> targetnode;
-	FindLeaf(root, key, targetnode);//ÔÚÒ¶½áµãÖĞ²éÕÒkey
-	if (!targetnode.exist) {//Ã»ÕÒµ½
+	FindLeaf(root, key, targetnode);//åœ¨å¶ç»“ç‚¹ä¸­æŸ¥æ‰¾key
+	if (!targetnode.exist) {//æ²¡æ‰¾åˆ°
 		return -1;
 	}else {
 		return targetnode.pNode->offset[targetnode.index];
@@ -161,20 +161,20 @@ offsetNumber BPlusTree<ElementType>::Search(ElementType key) {//ÔÚÊ÷ÖĞ²éÕÒkey²¢·
 }
 
 template <class ElementType>
-bool BPlusTree<ElementType>::Insert(ElementType key, offsetNumber offset) {//¸ù¾İÆ«ÒÆÁ¿²åÈëkey
+bool BPlusTree<ElementType>::Insert(ElementType key, offsetNumber offset) {//æ ¹æ®åç§»é‡æ’å…¥key
 	NodeInfo<ElementType> newnode;
-	if(!root) {//Ê÷Îª¿Õ£¬»¹Ã»ÓĞ¸ù½Úµã
+	if(!root) {//æ ‘ä¸ºç©ºï¼Œè¿˜æ²¡æœ‰æ ¹èŠ‚ç‚¹
 		root = new TreeNode<ElementType>(degree, true);
 		leafhead = root;
 	}
 	FindLeaf(root, key, newnode);
-	if(newnode.exist) {//Ê÷ÖĞÒÑ´æÔÚ¸Ãkey
+	if(newnode.exist) {//æ ‘ä¸­å·²å­˜åœ¨è¯¥key
 		cout << "Error:Cannot inserrt key to index: the duplicated key!" << endl;
 		return false;
 	}
 	else {
 		newnode.pNode->insertKey(key, offset);
-		if(newnode.pNode->keycount == degree)//²åÈëºó½áµãµÄkeyÊıÁ¿µÈÓÚ¶ÈÊı£¨¼´´óÓÚ¶ÈÊı-1£©£¬ĞèÒªµ÷Õû
+		if(newnode.pNode->keycount == degree)//æ’å…¥åç»“ç‚¹çš„keyæ•°é‡ç­‰äºåº¦æ•°ï¼ˆå³å¤§äºåº¦æ•°-1ï¼‰ï¼Œéœ€è¦è°ƒæ•´
 			AfterInsert(newnode.pNode);
 		keycount++;
 		return true;
@@ -182,27 +182,27 @@ bool BPlusTree<ElementType>::Insert(ElementType key, offsetNumber offset) {//¸ù¾
 }
 
 template <class ElementType>
-bool BPlusTree<ElementType>::Delete(ElementType key) {//´ÓÊ÷ÖĞÉ¾³ıkey
+bool BPlusTree<ElementType>::Delete(ElementType key) {//ä»æ ‘ä¸­åˆ é™¤key
 	NodeInfo<ElementType> newnode;
-	if(!root) {//Ê÷Îª¿Õ
+	if(!root) {//æ ‘ä¸ºç©º
 		cout << "Error:Cannot delete key from index: the tree not exist!" << endl;
 		return false;
 	}
 	FindLeaf(root, key, newnode);
-	if(!newnode.exist) {//Ê÷ÖĞÃ»ÓĞkey
+	if(!newnode.exist) {//æ ‘ä¸­æ²¡æœ‰key
 		cout << "Error:Cannot delete key from index: the key not exist!" << endl;
 		return false;
 	}
 	else {
-		if(newnode.pNode->isRoot()) {//¸ù½Úµã£¬Ö±½ÓÉ¾³ı
+		if(newnode.pNode->isRoot()) {//æ ¹èŠ‚ç‚¹ï¼Œç›´æ¥åˆ é™¤
 			newnode.pNode->deleteKey(newnode.index);
 			keycount--;
 		}
 		else {
-			if(newnode.index == 0 && leafhead != newnode.pNode) {//keyÔÚ·ÖÖ§ÖĞ£¬ÇÒÔÚµ±Ç°½áµã×ó±ß
+			if(newnode.index == 0 && leafhead != newnode.pNode) {//keyåœ¨åˆ†æ”¯ä¸­ï¼Œä¸”åœ¨å½“å‰ç»“ç‚¹å·¦è¾¹
 				int index = 0;
 
-				Node parent = newnode.pNode->parent;//ÔÚ¸ü¸ß²ãÀï²éÕÒkey
+				Node parent = newnode.pNode->parent;//åœ¨æ›´é«˜å±‚é‡ŒæŸ¥æ‰¾key
 				bool if_found_in_branch = parent->search(key, index);
 				while(!if_found_in_branch) {
 					if(parent->parent)
@@ -217,48 +217,48 @@ bool BPlusTree<ElementType>::Delete(ElementType key) {//´ÓÊ÷ÖĞÉ¾³ıkey
 				newnode.pNode->deleteKey(newnode.index);
 				keycount--;
 			}
-			else {//keyÔÚÒ¶½áµãÖĞ
+			else {//keyåœ¨å¶ç»“ç‚¹ä¸­
 				newnode.pNode->deleteKey(newnode.index);
 				keycount--;
 			}
 		}
-		if((newnode.pNode->keycount >= (degree - 1) / 2 - 1)||this->nodecount==1)//É¾³ıºó²»Ğèµ÷Õû
+		if((newnode.pNode->keycount >= (degree - 1) / 2 - 1)||this->nodecount==1)//åˆ é™¤åä¸éœ€è°ƒæ•´
 			return true;
-		else//·ñÔòµ÷ÕûÊ÷
+		else//å¦åˆ™è°ƒæ•´æ ‘
 			return AfterDelete(newnode.pNode);
 	}
 }
 
 template <class ElementType>
-bool BPlusTree<ElementType>::AfterInsert(Node pNode) {//²åÈëkeyºóµÄµ÷Õû
+bool BPlusTree<ElementType>::AfterInsert(Node pNode) {//æ’å…¥keyåçš„è°ƒæ•´
 	ElementType key;
 	offsetNumber offset;	
-	Node newnode = pNode->devide(key, offset);//µ±Ç°½áµã·ÖÁÑ
+	Node newnode = pNode->devide(key, offset);//å½“å‰ç»“ç‚¹åˆ†è£‚
 	nodecount++;
-	if(pNode->isRoot()) {//Ô­½áµãÎª¸ù½áµã£¬·ÖÁÑºóÓ¦´´½¨ĞÂµÄ¸ù½áµã
+	if(pNode->isRoot()) {//åŸç»“ç‚¹ä¸ºæ ¹ç»“ç‚¹ï¼Œåˆ†è£‚ååº”åˆ›å»ºæ–°çš„æ ¹ç»“ç‚¹
 		Node root = new TreeNode<ElementType>(degree, false);
-		if(root == NULL) {//´´½¨ĞÂ½áµãÊ§°Ü
+		if(root == NULL) {//åˆ›å»ºæ–°ç»“ç‚¹å¤±è´¥
 			cout << "Error: can not allocate memory for the new root after insert" << endl;
 			return false;
 		}
-		else {//½áµãĞÅÏ¢µ÷Õû
+		else {//ç»“ç‚¹ä¿¡æ¯è°ƒæ•´
 			this->root = root;
 			root->insertKey(key, -1);
 			root->childs[0] = pNode;
 			root->childs[1] = newnode;
 			pNode->parent = root;
 			newnode->parent = root;
-			level++;//Ê÷µÄ²ãÊıÔö¼Ó
+			level++;//æ ‘çš„å±‚æ•°å¢åŠ 
 			nodecount++;
 			return true;
 		}
 	}
-	else {//²»ÊÇ¸ù½áµã
+	else {//ä¸æ˜¯æ ¹ç»“ç‚¹
 		Node parent = pNode->parent;
-		int index = parent->insertKey(key);//¸¸½áµãÖĞ²åÈëĞÂ½áµã×îĞ¡µÄkey
-		parent->childs[index + 1] = newnode;//¸¸½áµãÔö¼ÓÒ»¸ö×Ó½áµã
+		int index = parent->insertKey(key);//çˆ¶ç»“ç‚¹ä¸­æ’å…¥æ–°ç»“ç‚¹æœ€å°çš„key
+		parent->childs[index + 1] = newnode;//çˆ¶ç»“ç‚¹å¢åŠ ä¸€ä¸ªå­ç»“ç‚¹
 		newnode->parent = parent;
-		if(parent->keycount == degree) {//¸¸½áµãµÄkeyÊıÒ²³¬¹ıÏŞÖÆ£¬ĞèÒªµ÷Õû
+		if(parent->keycount == degree) {//çˆ¶ç»“ç‚¹çš„keyæ•°ä¹Ÿè¶…è¿‡é™åˆ¶ï¼Œéœ€è¦è°ƒæ•´
 			return AfterInsert(parent);
 		}
 		return true;
@@ -266,28 +266,28 @@ bool BPlusTree<ElementType>::AfterInsert(Node pNode) {//²åÈëkeyºóµÄµ÷Õû
 }
 
 template <class ElementType>
-ElementType BPlusTree<ElementType>::FindMin(Node pNode) {//²éÕÒ×îĞ¡key
-	if(pNode->childs[0]) {//»¹ÓĞ¸üĞ¡×ÓÊ÷£¬Ôòµİ¹é²éÕÒ
+ElementType BPlusTree<ElementType>::FindMin(Node pNode) {//æŸ¥æ‰¾æœ€å°key
+	if(pNode->childs[0]) {//è¿˜æœ‰æ›´å°å­æ ‘ï¼Œåˆ™é€’å½’æŸ¥æ‰¾
 		return FindMin(pNode->childs[0]);
 	}
-	else {//·ñÔò·µ»Øµ±Ç°½áµã×îĞ¡µÄkey
+	else {//å¦åˆ™è¿”å›å½“å‰ç»“ç‚¹æœ€å°çš„key
 		return pNode->keys[0];
 	}
 }
 
 template <class ElementType>
-bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//É¾³ıkeyºóµ÷Õû
-	int half_of_degree = (degree - 1) / 2;//¶ÈÊıµÄÒ»°ë£¬ÓÃÓÚºâÁ¿½áµãµÄkeyÊıÊÇ·ñ×ã¹»
-	if(pNode->isRoot()) {//¸ù½Úµã
+bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//åˆ é™¤keyåè°ƒæ•´
+	int half_of_degree = (degree - 1) / 2;//åº¦æ•°çš„ä¸€åŠï¼Œç”¨äºè¡¡é‡ç»“ç‚¹çš„keyæ•°æ˜¯å¦è¶³å¤Ÿ
+	if(pNode->isRoot()) {//æ ¹èŠ‚ç‚¹
 		if(pNode->keycount == 0) {
 			return false;
 		}
-		else if(pNode->isLeaf) {//Èç¹ûÒ²ÊÇÒ¶½áµã£¬ÔòÇå¿ÕÕû¿ÅÊ÷
+		else if(pNode->isLeaf) {//å¦‚æœä¹Ÿæ˜¯å¶ç»“ç‚¹ï¼Œåˆ™æ¸…ç©ºæ•´é¢—æ ‘
 			delete pNode;
 			root = leafhead = NULL;
 			nodecount = level = 0;
 		}
-		else {//½«×îĞ¡×ÓÊ÷ÌáÉÏÀ´×÷Îª¸ù½Úµã
+		else {//å°†æœ€å°å­æ ‘æä¸Šæ¥ä½œä¸ºæ ¹èŠ‚ç‚¹
 			root = pNode->childs[0];
 			root->parent = NULL;
 			delete pNode;
@@ -295,14 +295,14 @@ bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//É¾³ıkeyºóµ÷Õû
 			level--;
 		}
 	}
-	else if(pNode->isLeaf) {//Ò¶½áµã
+	else if(pNode->isLeaf) {//å¶ç»“ç‚¹
 		Node parent = pNode->parent;
 		int index = 0;
-		parent->search(pNode->keys[0], index);//²éÕÒµ±Ç°½áµã×îĞ¡keyÔÚ¸¸½áµãÖĞÎ»ÖÃ
+		parent->search(pNode->keys[0], index);//æŸ¥æ‰¾å½“å‰ç»“ç‚¹æœ€å°keyåœ¨çˆ¶ç»“ç‚¹ä¸­ä½ç½®
 		Node brother = NULL;
-		if(index != 0) {//×îĞ¡key²»ÔÚ×î×ó±ß£¬ËµÃ÷µ±Ç°½áµãÓĞ×óĞÖµÜ
+		if(index != 0) {//æœ€å°keyä¸åœ¨æœ€å·¦è¾¹ï¼Œè¯´æ˜å½“å‰ç»“ç‚¹æœ‰å·¦å…„å¼Ÿ
 			brother = parent->childs[index];
-			if(brother->keycount > half_of_degree) {//×óĞÖµÜkeyÊı×ã¹»£¬´Ó×óĞÖµÜÖĞ°áÒ»¸ökey¹ıÀ´´Õ¹»keyÊı
+			if(brother->keycount > half_of_degree) {//å·¦å…„å¼Ÿkeyæ•°è¶³å¤Ÿï¼Œä»å·¦å…„å¼Ÿä¸­æ¬ä¸€ä¸ªkeyè¿‡æ¥å‡‘å¤Ÿkeyæ•°
 				typename vector<ElementType>::iterator v1 = pNode->keys.begin();
 				vector<offsetNumber>::iterator v2 = pNode->offset.begin();
 				pNode->keys.insert(v1, brother->keys[brother->keycount - 1]);
@@ -312,7 +312,7 @@ bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//É¾³ıkeyºóµ÷Õû
 				parent->keys[index] = pNode->keys[0];
 				return true;
 			}
-			else {//×óĞÖµÜkeyÊı²»¹»£¬½«µ±Ç°½áµãµÄkey²¢Èë×óĞÖµÜ£¬²¢É¾³ıµ±Ç°½áµã
+			else {//å·¦å…„å¼Ÿkeyæ•°ä¸å¤Ÿï¼Œå°†å½“å‰ç»“ç‚¹çš„keyå¹¶å…¥å·¦å…„å¼Ÿï¼Œå¹¶åˆ é™¤å½“å‰ç»“ç‚¹
 				for(int i = 0; i < pNode->keycount; i++) {
 					brother->keys[i + brother->keycount] = pNode->keys[i];
 					brother->offset[i + brother->keycount] = pNode->offset[i];
@@ -322,18 +322,18 @@ bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//É¾³ıkeyºóµ÷Õû
 				parent->deleteKey(index);
 				delete pNode;
 				nodecount--;
-				return AfterDelete(parent);//É¾³ıµ±Ç°½áµãºóÒ²Òªµ÷Õû¸¸½áµã
+				return AfterDelete(parent);//åˆ é™¤å½“å‰ç»“ç‚¹åä¹Ÿè¦è°ƒæ•´çˆ¶ç»“ç‚¹
 			}
 		}
-		else {//È¥ÓÒ±ß½áµãÖĞÕÒ¿ÉÓÃµÄkey
-			//µ±Ç°½áµã×îĞ¡keyÔÚ¸¸½áµãµÄ×î×ó±ß£¬Òò´Ë²»È·¶¨ÊÇ¸¸½áµãµÄÄÄ¸öº¢×Ó£¬ĞèÒª·ÖÇé¿ö
+		else {//å»å³è¾¹ç»“ç‚¹ä¸­æ‰¾å¯ç”¨çš„key
+			//å½“å‰ç»“ç‚¹æœ€å°keyåœ¨çˆ¶ç»“ç‚¹çš„æœ€å·¦è¾¹ï¼Œå› æ­¤ä¸ç¡®å®šæ˜¯çˆ¶ç»“ç‚¹çš„å“ªä¸ªå­©å­ï¼Œéœ€è¦åˆ†æƒ…å†µ
 			if(pNode == parent->childs[0]) {
 				brother = parent->childs[1];
 			}
 			else {
 				brother = parent->childs[index + 2];
 			}
-			if(brother->keycount > half_of_degree) {//ÓÒĞÖµÜkeyÊı×ã¹»£¬´ÓÓÒĞÖµÜÖĞ°áÒ»¸ökey¹ıÀ´´Õ¹»keyÊı
+			if(brother->keycount > half_of_degree) {//å³å…„å¼Ÿkeyæ•°è¶³å¤Ÿï¼Œä»å³å…„å¼Ÿä¸­æ¬ä¸€ä¸ªkeyè¿‡æ¥å‡‘å¤Ÿkeyæ•°
 				pNode->keys[pNode->keycount] = brother->keys[0];
 				pNode->offset[pNode->keycount] = brother->offset[0];
 				pNode->keycount++;
@@ -344,7 +344,7 @@ bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//É¾³ıkeyºóµ÷Õû
 					parent->keys[1] = brother->keys[0];
 				return true;
 			}
-			else {//ÓÒĞÖµÜkeyÊı²»¹»£¬½«ÓÒĞÖµÜµÄkey²¢Èëµ±Ç°½áµã
+			else {//å³å…„å¼Ÿkeyæ•°ä¸å¤Ÿï¼Œå°†å³å…„å¼Ÿçš„keyå¹¶å…¥å½“å‰ç»“ç‚¹
 				for(int i = 0; i < brother->keycount; i++) {
 					pNode->keys[i + pNode->keycount] = brother->keys[i];
 					pNode->offset[i + pNode->keycount] = brother->offset[i];
@@ -357,11 +357,11 @@ bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//É¾³ıkeyºóµ÷Õû
 					parent->deleteKey(1);
 				delete brother;
 				nodecount--;
-				return AfterDelete(parent);//É¾³ıÓÒĞÖµÜºó£¬¸¸½áµãÒ²Òªµ÷Õû
+				return AfterDelete(parent);//åˆ é™¤å³å…„å¼Ÿåï¼Œçˆ¶ç»“ç‚¹ä¹Ÿè¦è°ƒæ•´
 			}
 		}
 	}
-	else {//²»ÊÇÒ¶½áµã£¬ÀàËÆÒ¶½áµãµÄ´¦Àí£¬µ«²»ĞèÒª´¦Àíoffset£¬¶øÊÇÒª×¢Òâkey×ªÒÆÊ±×Ó½áµãµÄ´¦Àí
+	else {//ä¸æ˜¯å¶ç»“ç‚¹ï¼Œç±»ä¼¼å¶ç»“ç‚¹çš„å¤„ç†ï¼Œä½†ä¸éœ€è¦å¤„ç†offsetï¼Œè€Œæ˜¯è¦æ³¨æ„keyè½¬ç§»æ—¶å­ç»“ç‚¹çš„å¤„ç†
 		Node parent = pNode->parent;
 		int index = 0;
 		parent->search(pNode->keys[0], index);
@@ -439,15 +439,15 @@ bool BPlusTree<ElementType>::AfterDelete(Node pNode) {//É¾³ıkeyºóµ÷Õû
 }
 
 template <class ElementType>
-void BPlusTree<ElementType>::FindLeaf(Node pNode, ElementType key, NodeInfo<ElementType> &info) {//ÔÚÒ¶½áµãÖĞ²éÕÒkey£¬²¢½«ĞÅÏ¢±£´æÔÚinfoÖĞ
+void BPlusTree<ElementType>::FindLeaf(Node pNode, ElementType key, NodeInfo<ElementType> &info) {//åœ¨å¶ç»“ç‚¹ä¸­æŸ¥æ‰¾keyï¼Œå¹¶å°†ä¿¡æ¯ä¿å­˜åœ¨infoä¸­
 	int index = 0;
-	if(pNode->search(key, index)) {//pNode¶ÔÓ¦×ÓÊ÷ÖĞÄÜÕÒµ½key
-		if(pNode->isLeaf) {//Ò¶½áµã
+	if(pNode->search(key, index)) {//pNodeå¯¹åº”å­æ ‘ä¸­èƒ½æ‰¾åˆ°key
+		if(pNode->isLeaf) {//å¶ç»“ç‚¹
 			info.pNode = pNode;
 			info.exist = true;
 			info.index = index;
 		}
-		else {//·ÇÒ¶½áµã£¬¸ù¾İindexÕÒµ½¶ÔÓ¦Ò¶½áµã
+		else {//éå¶ç»“ç‚¹ï¼Œæ ¹æ®indexæ‰¾åˆ°å¯¹åº”å¶ç»“ç‚¹
 			pNode = pNode->childs[index + 1];
 			while(!pNode->isLeaf) {
 				pNode = pNode->childs[0];
@@ -455,10 +455,10 @@ void BPlusTree<ElementType>::FindLeaf(Node pNode, ElementType key, NodeInfo<Elem
 
 			info.pNode = pNode;
 			info.exist = true;
-			info.index = 0;//Ó¦¸ÃÎªÕâ¸öÒ¶½áµãµÄµÚÒ»¸ökey
+			info.index = 0;//åº”è¯¥ä¸ºè¿™ä¸ªå¶ç»“ç‚¹çš„ç¬¬ä¸€ä¸ªkey
 		}
 	}
-	else {//ÕÒ²»µ½key
+	else {//æ‰¾ä¸åˆ°key
 		if(pNode->isLeaf) {
 			info.pNode = pNode;
 			info.exist = false;

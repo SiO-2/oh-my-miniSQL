@@ -1,4 +1,5 @@
 #include "BufferManager.h"
+// #define DEBUG
 /*
     函数功能：获取文件的大小
     传入参数：带路径的文件名
@@ -23,6 +24,13 @@ BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) 
     BID empty = 0;
     for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
     {
+#ifdef DEBUG
+        // cout << "bid = " << bid << endl;
+        // cout << "blocks[bid].GetFilename() = " << blocks[bid].GetFilename() << endl;
+        // cout << "filename = " << filename << endl;
+        // cout << "blocks[bid].GetOffset() = " << blocks[bid].GetOffset() << endl;
+        // cout << "offset = " << offset << endl;
+#endif
         if (blocks[bid].GetFilename() == filename && blocks[bid].GetOffset() == offset)
             return bid;
         else if (blocks[bid].IsValid() == false)
@@ -49,39 +57,48 @@ void BufferManager::SetBlockInfo(const BID &bid, const string &filename, const u
     传入参数：文件名以及block在文件中的偏移量（偏移量可缺省）
     返回值：vector<BID> bids，即文件对应的所有的block的bid
 */
-vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &offset = vector<unsigned int>())
+vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &boffset)
 {
     vector<BID> bids;
     FILE *fp;
-    vector<unsigned int> offsets(offset);
-    if ((fp = fopen(filename.c_str(), "rb")) == NULL)
+    vector<unsigned int> boffsets(boffset);
+    if ((fp = fopen(filename.c_str(), "rb+")) == NULL)
     {
         if ((fp = fopen(filename.c_str(), "wb+")) == NULL)
         {
+            cout << "[ReadFile2Block Fail]" << endl;
+            // cout<<"[ReadFile2Block]: Can't open "<<filename<<endl;
             printf("Can't open %s\n", filename);
-            exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE); //be panic
         }
     }
-    if (offsets.empty())
+    if (boffsets.empty())
     {
-        unsigned int max_offset = GetFileSize(filename) / BLOCKSIZE;
-        for (int i = 0; i <= max_offset; i++)
+        unsigned int max_boffset = GetFileSize(filename) / BLOCKSIZE;
+        for (int i = 0; i < max_boffset; i++)
         {
-            offsets.push_back(i);
+            boffsets.push_back(i);
         }
     }
 
     vector<unsigned int>::iterator it;
-    for (it = offsets.begin(); it != offsets.end(); it++)
+    for (it = boffsets.begin(); it != boffsets.end(); it++)
     {
         fseek(fp, *it * BLOCKSIZE, SEEK_SET);
-        bids.push_back(GetBlock(filename, *it));
-        if (blocks[*bids.end()].IsValid() == false)
+        BID bid = GetBlock(filename, *it);
+        bids.push_back(bid);
+#ifdef DEBUG
+        cout << "BufferManager::ReadFile2Block::91:: get_bid = " << bid << endl;
+#endif
+        if (blocks[bid].IsValid() == false) //如果该block是空的，需要从文件中读取，并设置其特征值
         {
-            fread(blocks[*bids.end()].data, BLOCKSIZE, 1, fp);
-            SetBlockInfo(*bids.end(), filename, *it);
+            fread(blocks[bid].data, BLOCKSIZE, 1, fp);
+            SetBlockInfo(bid, filename, *it);
         }
     }
+#ifdef DEBUG
+    cout << "BufferManager::ReadFile2Block::99" << endl;
+#endif
     fclose(fp);
     return bids;
 }
@@ -93,11 +110,13 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
 */
 void BufferManager::WriteBlock2File(const BID &bid)
 {
-    FILE *fp;
     if (blocks[bid].IsDirty()) //没有修改就不用重新写回
     {
+        FILE *fp;
         if ((fp = fopen(blocks[bid].GetFilename().c_str(), "wb")) == NULL)
         {
+            cout << "[WriteBlock2File Fail]" << endl;
+            // cout<<"[WriteBlock2File]: Can't open "<<blocks[bid].GetFilename()<<endl;
             printf("Can't open %s\n", blocks[bid].GetFilename());
             exit(EXIT_FAILURE);
         }
