@@ -34,8 +34,7 @@ CatalogManager::CatalogManager()
         {
             I = new Index;
             readIndex(*I, index_file);
-            // m_index.push_back(*I);
-            m_index[i] = I;
+            m_index.push_back(I);
         }
         index_file.close();
     }
@@ -71,7 +70,7 @@ bool CatalogManager::CreateTable(Table& table)
     // writeTable(&table, table_file);
     writeallTable(table_file);
     table_file.close();
-    table_file.open(table.m_metadata.name, ios::out|ios::binary);
+    table_file.open(NameToTF(table.m_metadata.name), ios::out|ios::binary);
     table_file.close();
     return true;
 }
@@ -91,7 +90,7 @@ bool CatalogManager::CreateIndex(Index& index)
     writeallIndex(index_file);
     // m_index[n] = index;
     index_file.close();
-    index_file.open(index.index_name, ios::out|ios::binary);
+    index_file.open(NameToIF(index.index_name), ios::out|ios::binary);
     index_file.close();
     return true;
 }
@@ -104,10 +103,11 @@ bool CatalogManager::DropTable(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_table[i]->m_metadata.name){
-            table_file.open(table_name, ios::out|ios::binary|ios::trunc);
+            table_file.open(NameToTF(table_name), ios::out|ios::binary);
             m_table.erase(m_table.begin()+i);
             writeallTable(table_file);
             table_file.close();
+            remove(NameToTF(name).c_str());
             return true;
         }
     }
@@ -122,10 +122,11 @@ bool CatalogManager::DropIndex(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_index[i]->index_name){
-            index_file.open(index_name, ios::out|ios::binary|ios::trunc);
+            index_file.open(NameToIF(index_name), ios::out|ios::binary);
             m_index.erase(m_index.begin()+i);
             writeallIndex(index_file);
             index_file.close();
+            remove(NameToIF(name).c_str());
             return true;
         }
     }
@@ -164,7 +165,7 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
 
 //判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
 //返回值：-2（表格不存在） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
-pair<int, string> CatalogManager::SelectTest(string& table_name, vector<ConditionUnit>& condition)
+pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>& Attr, vector<ConditionUnit>& condition)
 {
     pair<int, string> ret;
     ret.first = 0;
@@ -175,8 +176,26 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<Conditio
         return ret;
     }
     Table *t = m_table[i];
-    int n = condition.size();
-    int m = t->m_attribute.size();
+    int m, n, flag;
+    n = t->m_attribute.size();
+    m = Attr.size();
+    for (i=0; i<m; i++)
+    {
+        flag = 0;
+        for (int j=0; j<n; j++)
+        {
+            if (Attr[i] == t->m_attribute[j].name)
+                flag = 1;
+        }
+        if (flag == 0)
+        {
+            ret.first = -1;
+            return ret;
+        }
+    }
+
+    n = condition.size();
+    m = t->m_attribute.size();
     ret.second = t->m_metadata.name;
     for (i=0; i<n; i++)
     {
@@ -200,6 +219,7 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<Conditio
             }
         }
     }
+
     return ret;
 }
 
@@ -417,4 +437,16 @@ void CatalogManager::writeallIndex(fstream& f)
     writeint(n, f);
     for (int i=0; i<n; i++)
         writeIndex(m_index[i], f);
+}
+
+string CatalogManager::NameToTF(string& name)
+{
+    string tf = TABLE_PATH + name + TABLE_SUFFIX;
+    return tf;
+}
+
+string CatalogManager::NameToIF(string& name)
+{
+    string inf = INDEX_PATH + name + INDEX_SUFFIX;
+    return inf;
 }

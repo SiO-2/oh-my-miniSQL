@@ -85,9 +85,10 @@ class Index //建立在表m_table中attr_num上的索引，名为m_index_name
 {
 public:
 	string index_name;
-	Table *table; //表   //这个没必要吧（要不要删掉，给个意见 (wyc:不太懂，或许先WORK再说)
-	int attr_num; //索引建立在该属性上
-	Index(Index &index);
+	Table* table;	//确实需要指向table，但是这里不能放指针，读出来每次都不一样，等index那边搞定再改
+	string table_name; //（zxy：这里应该存的是表名，然后从内存读出来的时候可以加载出表的指针（个人理解
+	int attr_num;	//索引建立在该属性上
+	Index(Index& index);
 	Index();
 	void Print();
 };
