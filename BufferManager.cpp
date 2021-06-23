@@ -57,11 +57,11 @@ void BufferManager::SetBlockInfo(const BID &bid, const string &filename, const u
     传入参数：文件名以及block在文件中的偏移量（偏移量可缺省）
     返回值：vector<BID> bids，即文件对应的所有的block的bid
 */
-vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &offset)
+vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &boffset)
 {
     vector<BID> bids;
     FILE *fp;
-    vector<unsigned int> offsets(offset);
+    vector<unsigned int> boffsets(boffset);
     if ((fp = fopen(filename.c_str(), "rb+")) == NULL)
     {
         if ((fp = fopen(filename.c_str(), "wb+")) == NULL)
@@ -72,26 +72,25 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
             exit(EXIT_FAILURE); //be panic
         }
     }
-    if (offsets.empty())
+    if (boffsets.empty())
     {
-        unsigned int max_offset = GetFileSize(filename) / BLOCKSIZE;
-        for (int i = 0; i <= max_offset; i++)
+        unsigned int max_boffset = GetFileSize(filename) / BLOCKSIZE;
+        for (int i = 0; i < max_boffset; i++)
         {
-            offsets.push_back(i);
+            boffsets.push_back(i);
         }
     }
 
     vector<unsigned int>::iterator it;
-    for (it = offsets.begin(); it != offsets.end(); it++)
+    for (it = boffsets.begin(); it != boffsets.end(); it++)
     {
         fseek(fp, *it * BLOCKSIZE, SEEK_SET);
         BID bid = GetBlock(filename, *it);
         bids.push_back(bid);
 #ifdef DEBUG
-        cout << "BufferManager::ReadFile2Block::90" << endl;
-        cout << "BufferManager::ReadFile2Block::bid" << bid << endl;
+        cout << "BufferManager::ReadFile2Block::91:: get_bid = " << bid << endl;
 #endif
-        if (blocks[bid].IsValid() == false)
+        if (blocks[bid].IsValid() == false) //如果该block是空的，需要从文件中读取，并设置其特征值
         {
             fread(blocks[bid].data, BLOCKSIZE, 1, fp);
             SetBlockInfo(bid, filename, *it);
@@ -111,9 +110,9 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
 */
 void BufferManager::WriteBlock2File(const BID &bid)
 {
-    FILE *fp;
     if (blocks[bid].IsDirty()) //没有修改就不用重新写回
     {
+        FILE *fp;
         if ((fp = fopen(blocks[bid].GetFilename().c_str(), "wb")) == NULL)
         {
             cout << "[WriteBlock2File Fail]" << endl;

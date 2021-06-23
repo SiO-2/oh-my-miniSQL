@@ -26,7 +26,7 @@ public:
 	};
 	~RecordManager()
 	{
-		this->bmanager->~BufferManager();
+		delete bmanager;
 	};
 
 	/*

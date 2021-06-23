@@ -30,6 +30,7 @@ public:
         valid = false;
         dirty = false;
     };
+    ~Block() {}
 
     //大量的读取和设置函数主要是为了保护Block的相关信息不被修改，保证block的分配完全由buffermanager管理
     string GetFilename() const
@@ -114,6 +115,8 @@ public:
         for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
             if (blocks[bid].IsDirty())
                 WriteBlock2File(bid);
+
+        cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;
     };
 
     /*

@@ -11,11 +11,13 @@ int main()
     TableMetadata metadata;
     vector<Attribute> attrs;
     metadata.name = "recordtest";
-    metadata.attr_num = 0;
+    metadata.attr_num = 3;
     Attribute attr1("attr1", "int");
     Attribute attr2("attr2", "float");
+    Attribute attr3("attr3", "char");
     attrs.push_back(attr1);
     attrs.push_back(attr2);
+    attrs.push_back(attr3);
     Table table(metadata, attrs);
     table.Print();
     cout << endl;
@@ -24,13 +26,16 @@ int main()
     cout << "待插入的元组信息" << endl;
     Tuple tuple;
     tuple.valid = 1;
-    Value value1, value2;
+    Value value1, value2, value3;
     value1.int_value = 10;
     value2.float_value = 5.0;
+    value3.char_n_value = "testrecord";
     Unit unit1(value1, INT_UNIT);
     Unit unit2(value2, FLOAT_UNIT);
+    Unit unit3(value3,CHAR_UNIT);
     tuple.tuple_value.push_back(unit1);
     tuple.tuple_value.push_back(unit2);
+    tuple.tuple_value.push_back(unit3);
     tuple.Print();
     cout << endl;
 
