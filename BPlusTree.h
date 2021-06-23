@@ -20,13 +20,13 @@ struct NodeInfo {//结点信息类，用于记录结点信息，比结点类所�
 template <class ElementType>
 class BPlusTree {//B+树类
 private:
-	BufferManager buffer;//缓冲区
+	
 	typedef TreeNode<ElementType>* Node;//树节点指针定义为Node，方便书写
 
 	string filename;//对应的索引文件名
 	Node root;//树的根节点
 	Node leafhead;//第一个叶结点
-	FileNode* file;//树的文件结点
+	//FileNode* file;//树的文件结点
 	int degree;//树的度数，也是一块中能保存key的个数
 	int keycount;//树中key的个数
 	int level;//数的层数
@@ -39,6 +39,7 @@ private:
 	void FindLeaf(Node pNode, ElementType key, NodeInfo<ElementType> &info);//在pNode对应子树中查找key所在叶结点，并将其信息保存在info中
 
 public:
+	BufferManager buffer;//缓冲区
 	BPlusTree(string filename, int keysize, int degree);
 	~BPlusTree();
 	void ReadTree();//从文件中读入key信息并生成对应的树
@@ -48,7 +49,7 @@ public:
 	offsetNumber Search(ElementType key);//查找一个key，并返回其偏移量
 	bool Insert(ElementType key, offsetNumber offset);//在offset位置插入一个key
 	bool Delete(ElementType key);//删除一个key
-
+    void readBlock(BID tempblock);
 };
 
 
@@ -56,11 +57,11 @@ public:
 
 template <class ElementType>
 BPlusTree<ElementType>::BPlusTree(string filename, int keysize, int degree)
-	:filename(filename), keycount(0), level(1), nodecount(1), root(NULL), leafhead(NULL), keysize(keysize), file(NULL), degree(degree) {
+	:filename(filename), keycount(0), level(1), nodecount(1), root(NULL), leafhead(NULL), keysize(keysize), degree(degree) {
 	root = new TreeNode<ElementType>(degree, true);
 
 	leafhead = root;
-	ReadTree();
+	//ReadTree();
 }
 
 template <class ElementType>
@@ -82,23 +83,27 @@ void BPlusTree<ElementType>::DropTree(Node pnode) {//删除整棵树
 }
 
 
-
-template<typename T>
-void BPTree<T>::readBlock(Bid tempblock)
+//读每一个块的还不是很清楚
+template <class ElementType>
+void BPlusTree<ElementType>::readBlock(BID tempblock)
 {
 	int offsetsize = sizeof(offsetNumber);
-	char* indexbegin = bufferManager.blocks[tempblock].data;
+	
+    ElementType a;
+	char* valid = buffer.blocks[tempblock].data;
+	char* indexbegin = valid + 1;
 	char* offsetbegin = indexbegin + keysize;
 	ElementType key;
 	offsetNumber offset;
 	
-	while(offsetbegin - indexbegin < 4096)  //这里关于快的大小还有问题！
+	while(*valid==1)  
 	{//循环读入key和offset，并插入树中
 		key = *(ElementType*)indexbegin;
 		offset = *(offsetNumber*)offsetbegin;
 		Insert(key, offset);
-		indexbegin += keysize + offsetsize;
-		offsetbegin += keysize + offsetsize;
+		valid += keysize + offsetsize + 1;
+		indexbegin += keysize + offsetsize + 1 ;
+		offsetbegin += keysize + offsetsize + 1;
 		} 
 }
 
@@ -109,8 +114,8 @@ void BPTree<T>::readBlock(Bid tempblock)
 template <class ElementType>
 void BPlusTree<ElementType>::ReadTree() {
 	
-	vector<int>tmp_bid = bufferManager.ReadFile2Block(filename);
-
+	vector<BID>tmp_bid = buffer.ReadFile2Block(filename);
+    ElementType a;
 	for (int i = 0; i < tmp_bid.size(); i++)
 	{
 		readBlock(tmp_bid.at(i));
@@ -122,29 +127,38 @@ void BPlusTree<ElementType>::ReadTree() {
 
 template <class ElementType>
 void BPlusTree<ElementType>::WriteBack() {//将key和offset信息写回文件中
+    vector<BID>vec;
     int i=0;
-    vector <int> tempblocks = bufferManager.ReadFile2Block(filename);
-    Bid tempblock = tempblocks.at(i);  //第一个block 
+    vec.push_back(i);
+	vector <BID> tempblocks;
+	BID tempblock;
 	Node tempnode = leafhead;
-
+	char vvalid = 1;
 
 	int offsetsize = sizeof(offsetNumber);
 	while(tempnode != NULL) {//从叶结点中读取key和offset信息，并写回块中
-		char* contentAddr = bufferManager.blocks[tempblock].data;
-		char* baseAddr = contentAddr;
+		tempblocks = buffer.ReadFile2Block(filename,vec);
+		tempblock = tempblocks[0];
+		char* contentAddr = buffer.blocks[tempblock].data;
 		
-		for(int i = 0; i < tempnode->keycount; i++) {
-			char * key = (char *)&(tempnode->keys[i]);
-			char * offset = (char *)&(tempnode->offset[i]);
+		for(int j = 0; j < tempnode->keycount; j++) {
+			char * valid = (char *)&vvalid;
+			char * key = (char *)&(tempnode->keys[j]);
+			char * offset = (char *)&(tempnode->offset[j]);
+			memcpy(contentAddr, valid, 1);
+			contentAddr += 1;
 			memcpy(contentAddr, key, keysize);
-			contentAddr += keySize;
+			contentAddr += keysize;
 			memcpy(contentAddr, offset, offsetsize);
 			contentAddr += offsetsize;
 		}
-		i++;  //下一块啦
-		tempblock = tempblocks.at(i);
+		buffer.WriteBlock2File(tempblock);
+		i++;
+		vec.pop_back();
+		vec.push_back(i);
 		tempnode = tempnode->nextLeafNode;
 	}
+	
 	
 }
 

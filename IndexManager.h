@@ -5,29 +5,12 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-//#include "API.h"
 #include "BPlusTree.h"
 #include "BufferManager.h"
 #define TYPE_FLOAT -1	//the type of the attribute,-1 represents float
 #define TYPE_INT 0		//0 represents int
 // other positive integer represents char and the value is the number of char
-
-
 using namespace std;
-class API;
-
-
-
-class IndexInfo {
-public:
-	IndexInfo(){}
-	IndexInfo(string name, string table, string attr, int type):indexName(name), tableName(table), Attribute(attr), type(type) {
-	}
-	string indexName;//index名
-	string tableName;//表名
-	string Attribute;//属性名
-	int type;//属性类型（三种之一）
-};
 
 /*建好的索引是以.index文件的形式存在磁盘上的
 数据库运行时，IndexManager类创建实例，将磁盘上的.index文件读入，并建立相应的B+树，再通过map容器映射起来
@@ -41,7 +24,7 @@ private:
 	typedef map<string, BPlusTree<string> *> stringMap;
 	typedef map<string, BPlusTree<float> *> floatMap;
 
-	API * api;
+	//API * api;
 
 	//容器的创建
 	/*static */intMap indexIntMap;
@@ -58,12 +41,13 @@ private:
 	void setKey(int type, string key);//设置当前的搜索码
 
 public:
-	IndexManager(API* ap);//构造函数，参数为API，会调用API来获取.index文件列表并导入index信息
+	IndexManager();//构造函数，参数为API，会调用API来获取.index文件列表并导入index信息
 	~IndexManager();//析构函数，销毁对象时会将所有index信息写回磁盘中
 
 	void createIndex(string filePath, int type);//创建一个指定名称（filePath）和类型（type）的.index文件
 												//例：createIndex("salary_index.index",TYPE_INT);
 												//会创建一个名为“salary_index”的.index文件，类型为TYPE_INT
+	void readIndexfromfile(string filePath, int type);
 
 	void dropIndex(string filePath, int type);//删除一个指定名称（filePath）和类型（type）的.index文件，用法同上
 
@@ -77,7 +61,7 @@ public:
 															//例：deleteIndex("salary_index.index","20000",TYPE_INT);
 
 
-	void readIndex(string filePath, int type);//从一个指定名称（filePath）和类型（type）的.index文件中读取index信息，建立对应B+树，并在相应的map容器中建立二者的映射
+	//void readIndex(string filePath, int type);//从一个指定名称（filePath）和类型（type）的.index文件中读取index信息，建立对应B+树，并在相应的map容器中建立二者的映射
 };
 
 
