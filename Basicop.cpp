@@ -1,6 +1,8 @@
 #include "Basicop.h"
 #include "MiniSQL.h"
+#include "SqlError.h"
 #include <algorithm>
+#include <cstring>
 
 using namespace std;
 void split(string& str, vector<string>& sv, char flag){
@@ -48,7 +50,7 @@ string get_token(string &s){
     s = lstrip(s);
     int pos = s.find_first_of(' ');
     string token = s.substr(0, pos);
-    transform(token.begin(), token.end(), token.begin(), ::toupper);
+    // transform(token.begin(), token.end(), token.begin(), ::toupper);
     s = s.erase(0, pos);
     return token;
 }
@@ -82,4 +84,27 @@ DataType ParseDataType(string& str){
         // }
     }
     return data_type;
+}
+
+Value ParseStringType(DataType type, string& str){
+    Value value;
+    switch(type){
+        case INT_UNIT:
+            try{
+                value.int_value = stoi(str);
+            }catch(...){
+                SyntaxError e("Wrong condition value syntax in " + str);
+                throw e;
+            }
+            break;
+        case FLOAT_UNIT:
+            value.float_value = stof(str);
+            break;
+        case CHAR_UNIT:
+            char* str_c = (char *)malloc(sizeof(char) * (str.length() + 1) );
+            strcpy(str_c, str.c_str());
+            value.char_n_value = str_c; 
+            break;
+    }
+    return value;
 }
