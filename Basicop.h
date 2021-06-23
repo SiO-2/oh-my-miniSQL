@@ -81,4 +81,7 @@ bool icasecompare(const string& a, const string& b);
 
 DataType ParseDataType(string& str);
 Value ParseStringType(DataType type, string& str);
+
+vector<ConditionUnit> ParseCondition(string where_str);
+
 #endif

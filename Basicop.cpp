@@ -108,3 +108,70 @@ Value ParseStringType(DataType type, string& str){
     }
     return value;
 }
+
+vector<ConditionUnit> ParseCondition(string where_str){
+    vector<ConditionUnit> cond_vec;
+    vector<string> temp;
+
+    split(where_str, temp, ',');
+    for(vector<string>::iterator iter= temp.begin(); iter != temp.end(); iter++){
+        string cond_str = *iter;
+        string attr_name, value;
+        DataType data_type; // where条件中的value类型
+        float float_value;
+        int int_value;
+        OpCode Op;
+        strip(cond_str);
+        vector<string> infield_vec;
+        split(cond_str, infield_vec, ' ');
+        if(infield_vec.size() == 3){
+            if(infield_vec[1] == "="){
+                Op = EQ_;
+            }else if(infield_vec[1] == "<"){
+                Op = L_;
+            }else if(infield_vec[1] == ">"){
+                Op = G_;
+            }else if(infield_vec[1] == "<="){
+                Op = LE_;
+            }else if(infield_vec[1] == ">="){
+                Op = GE_;
+            }else if(infield_vec[1] == "<>"){
+                Op = NE_;
+            }else{
+                SyntaxError e("Invalid Operation. must in (=, <, >, <=, >=, <>).\n");
+                throw e;
+            }
+            attr_name = infield_vec[0], value = infield_vec[2];
+        }else{
+            SyntaxError e("Invalid table name in from\n");
+            throw e;
+        }
+        strip(attr_name);
+        strip(value);
+        
+        data_type = ParseDataType(value);
+
+        ConditionUnit Cond(attr_name, -1, Op, data_type);
+        switch(data_type){
+            case INT_UNIT:
+                try{
+                    int_value = stoi(value);
+                }catch(...){
+                    SyntaxError e("Wrong condition value syntax");
+                    throw e;
+                }
+                Cond.value.int_value = int_value;break;
+            case FLOAT_UNIT:
+                float_value = stof(value);
+                Cond.value.float_value = float_value;break;
+            case CHAR_UNIT:
+                char* value_str_c = (char *)malloc(sizeof(char) * (value.length() + 1) );
+                strcpy(value_str_c, value.c_str());
+                // data_unit.value.char_n_value = value_str_c; break;
+                Cond.value.char_n_value = value_str_c; break;
+        }
+        cond_vec.push_back(Cond);
+    }
+
+    return cond_vec;
+}

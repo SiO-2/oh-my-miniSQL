@@ -13,8 +13,8 @@ void RecordManager::CreateTableFile(const Table &table)
     string tablename = table.m_metadata.name;
     string filename_data = GetDataFileName(tablename);
     FILE *fp;
-    cout << "[Record Manager Debug]: tablename = " << tablename << endl;
-    cout << "[Record Manager Debug]: filename = " << filename_data << endl;
+    // cout << "[Record Manager Debug]: tablename = " << tablename << endl;
+    // cout << "[Record Manager Debug]: filename = " << filename_data << endl;
     //新建数据文件，但无需写入
     if ((fp = fopen(filename_data.c_str(), "wb+")) == NULL)
     {

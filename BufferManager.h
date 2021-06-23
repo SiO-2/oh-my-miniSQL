@@ -1,6 +1,6 @@
 #ifndef MINISQL_BUFFERMANAGER_H
 #define MINISQL_BUFFERMANAGER_H
-#define DEBUG
+// #define DEBUG
 #include <iostream>
 #include <string>
 #include "MiniSQL.h"
@@ -116,7 +116,7 @@ public:
             if (blocks[bid].IsDirty())
                 WriteBlock2File(bid);
 
-        cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;
+        // cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;
     };
 
     /*

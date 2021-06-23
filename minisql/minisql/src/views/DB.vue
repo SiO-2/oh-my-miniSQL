@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     data(){
         return {
@@ -36,6 +37,31 @@ export default {
     },
     methods:{
         HandleExecute(){
+            var query = this.sqltext.replace(/[\r\n]/g,"");   
+            this.consoletext = 'running...';     
+            axios.get('http://127.0.0.1:15000/api/minisql?sql=' + query)
+            .then((response)=>{
+                console.log(response);
+                this.consoletext = response.data;
+                // if(response.data.status == 100){
+                //     sessionStorage.setItem('usr_id', response.data.usr_name);
+                //     sessionStorage.setItem('pwd_session', response.data.pwd_session);
+                //     sessionStorage.setItem('usr_access', response.data.access);
+                //     this.$message("登陆成功")
+                //     this.$router.go(-1);//返回上一层
+                // }else if(response.data.status == 210){
+                //     this.$message("用户名错误");
+                // }else if(response.data.status == 220){
+                //     this.$message("密码错误");
+                // }else if(response.data.status == 310){
+                //     this.$message("数据库操作错误："+ response.data.info);
+                // }else{
+                //     this.$message("未知的登录错误" + response.data.info)
+                // }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
             console.log("Handle Execute");
         },
         HandleClear(){
