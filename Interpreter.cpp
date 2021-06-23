@@ -24,7 +24,7 @@ void Interpreter::Parse(string sql){
     string t = sql;
     strip(t);
     string token = get_token(t);
-    // cout<<"token = "<<token<<endl;
+    // cout<<"token = "<<token<<"\n";
     try{
         if( icasecompare(token, "CREATE") ){
             // pos = t.find_first_of(' ');
@@ -37,7 +37,7 @@ void Interpreter::Parse(string sql){
             }else if( icasecompare(token, "INDEX") ){
                 this->CreateIndex(t); 
             }else{
-                cout<<"[Syntax Error]: "<<"you can only create table or index"<<endl;
+                cout<<"[Syntax Error]: "<<"you can only create table or index"<<"\n";
             }
 
         }else if( icasecompare(token, "INSERT") ){
@@ -45,7 +45,7 @@ void Interpreter::Parse(string sql){
             if(  icasecompare(token, "INTO") ){
                 this->Insert(t);
             }else{
-                cout<<"[Syntax Error]: "<<"Insert must be followed by \"into\""<<endl;
+                cout<<"[Syntax Error]: "<<"Insert must be followed by \"into\""<<"\n";
             }
         }else if( icasecompare(token, "SELECT") ){
             this->Select(t);
@@ -56,23 +56,23 @@ void Interpreter::Parse(string sql){
             }else if( icasecompare(token, "INDEX") ){
                 this->DropIndex(t);
             }else{
-                cout<<"[Syntax Error]: "<<"you can only drop table or index"<<endl;
+                cout<<"[Syntax Error]: "<<"you can only drop table or index"<<"\n";
             }
         }else if( icasecompare(token, "DELETE") ){
             token = get_token(t);
             if( icasecompare(token, "FROM") ){
                 this->Delete(t);
             }else{
-                cout<<"[Syntax Error]: "<<"Delete must be followed by \"from\""<<endl;
+                cout<<"[Syntax Error]: "<<"Delete must be followed by \"from\""<<"\n";
             }
         }else{
-            cout<<"[Error]: Wrong command can not interpret "<<token<<endl;
+            cout<<"[Error]: Wrong command can not interpret "<<token<<"\n";
         }
     }catch(SyntaxError e){
-        cout<<"[Syntax Error]: "<<e.msg<<endl;
+        cout<<"[Syntax Error]: "<<e.msg<<"\n";
         // throw e;
     }catch(DBError e){
-        cout<<"[Runtime Error]: "<<e.msg<<endl;
+        cout<<"[Runtime Error]: "<<e.msg<<"\n";
         // throw e;
     }
    
@@ -93,11 +93,11 @@ void Interpreter::Delete(string str){
     }
 
     // debug 信息
-    // cout<<"[Interpreter Delete Debug]:"<<endl;
+    // cout<<"[Interpreter Delete Debug]:"<<"\n";
     // for(auto cond:cond_vec){
     //     cond.Print();
     // }
-    // cout<<"[Interpreter Delete Debug End]"<<endl;
+    // cout<<"[Interpreter Delete Debug End]"<<"\n";
 
     // 数据存储
     // 表名 tablename
@@ -117,8 +117,8 @@ void Interpreter::Delete(string str){
     }else if(response.first == 1){
         // 索引删除
         string index_name = response.second; 
-        cout<<"[Interpreter Delete]: by index "<<index_name<<endl;
-        cout<<"not supported yet"<<endl;
+        cout<<"[Interpreter Delete]: by index "<<index_name<<"\n";
+        cout<<"not supported yet"<<"\n";
     }else{
         SyntaxError e("Wrong catalog return value " + to_string(response.first));
         throw e;
@@ -133,13 +133,13 @@ void Interpreter::DropTable(string str){
         throw e;
     }
     // Here Table Name to Drop is 'str'
-    cout<<"[info]: Drop Table Name=\""<<str<<"\""<<endl;
+    cout<<"[info]: Drop Table Name=\""<<str<<"\""<<"\n";
 
     // 调用Catalog的部分
     if( Cata.DropTable(str) ){
-        cout<<"[Catalog res]: Drop Table "<<str<<" succussfully"<<endl;
+        cout<<"[Catalog res]: Drop Table "<<str<<" succussfully"<<"\n";
     }else{
-        cout<<"[Catalog res]: Drop Table "<<str<<" failed"<<endl;
+        cout<<"[Catalog res]: Drop Table "<<str<<" failed"<<"\n";
     }
 }
 
@@ -150,7 +150,7 @@ void Interpreter::DropIndex(string str){
         throw e;
     }
     // Here Index Name to Drop is 'str'
-    cout<<"[info]: Drop Index Name=\""<<str<<"\""<<endl;
+    cout<<"[info]: Drop Index Name=\""<<str<<"\""<<"\n";
 }
 
 void Interpreter::Select(string str){
@@ -178,7 +178,7 @@ void Interpreter::Select(string str){
         from_str = str.substr(from_pos + 4, str.length() - from_pos - 4 );
         where_str = "";
     }
-    // cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<endl;
+    // cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<"\n";
     vector<string> attr_vec;
     vector<string> table_vec;
     vector<string> temp;
@@ -237,9 +237,9 @@ void Interpreter::Select(string str){
     //     cond.Print();
     // }
 
-    // cout<<"[debug]: select attr: "<<endl;
+    // cout<<"[debug]: select attr: "<<"\n";
     // for(auto iter:attr_vec){
-    //     cout<<(iter)<<endl;
+    //     cout<<(iter)<<"\n";
     // }
 
     // 结果存储
@@ -257,17 +257,17 @@ void Interpreter::Select(string str){
         DBError e("select conditions error");
         throw e;
     }else if(response.first == 0){
-        // cout<<"[Catalog res]: select without index,"<<response.second<<endl;
+        // cout<<"[Catalog res]: select without index,"<<response.second<<"\n";
         // Call Record Manager
         Table* table = Cata.GetTableCatalog(table_vec[0]);
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
-        cout<<"[Interpreter Select Res without index]:"<<endl;
+        cout<<"[Interpreter Select Res without index]:"<<"\n";
         for(auto tuple:Select_Res){
             tuple.Print();
         }
-        cout<<"[Interpreter Select Res End]:"<<endl;
+        cout<<"[Interpreter Select Res End]:"<<"\n";
     }else if(response.first == 1){
-        cout<<"[Catalog res]: select with index"<<response.second<<endl;
+        cout<<"[Catalog res]: select with index"<<response.second<<"\n";
     }
 
 }
@@ -280,12 +280,12 @@ void Interpreter::Insert(string str){
     string s1 = str.substr(0, pos);
     strip(s1);
     if( ! icasecompare(s1, "VALUES") || str[ str.length() - 1] != ')'){
-        cout<<"[debug]: insert query="<<s1<<endl;
+        cout<<"[debug]: insert query="<<s1<<"\n";
         SyntaxError e("Invalid Syntax please insert value by: insert into tablename values(values...)\n");
         throw e;
     }
     str = str.substr(pos+1, str.length() - 2 - pos);
-    // cout<<"[debug]: insert in () = \""<<str<<"\""<<endl;
+    // cout<<"[debug]: insert in () = \""<<str<<"\""<<"\n";
 
     vector<string> value_vec;
     split(str, value_vec, ',');
@@ -313,7 +313,7 @@ void Interpreter::Insert(string str){
         tuple.tuple_value.push_back(unit);
     }
 
-    cout<<"[Insert Info]:"<<endl;
+    cout<<"[Insert Info]:"<<"\n";
     for(auto tunit:tuple.tuple_value){
 
         tunit.Print();
@@ -324,11 +324,11 @@ void Interpreter::Insert(string str){
 
     // 调用catalog
     if( !Cata.InsertTest(targ_table_name, tuple) ){
-        // cout<<"[Catalog res]: Insert invalid"<<endl;
+        // cout<<"[Catalog res]: Insert invalid"<<"\n";
         DBError e("Insert invalid");
         throw e;
     }else {
-        cout<<"[Catalog res]: Insert validate"<<endl;
+        cout<<"[Catalog res]: Insert validate"<<"\n";
     }
 
     // Call Record Manager
@@ -341,7 +341,7 @@ void Interpreter::Insert(string str){
 
 void Interpreter::CreateIndex(string str){
     string ostr = str;
-    // // cout<<"create index function now"<<endl;
+    // // cout<<"create index function now"<<"\n";
     vector<string> sv;
     int pos = str.find_first_of('(');
     if( pos == string::npos){
@@ -352,7 +352,7 @@ void Interpreter::CreateIndex(string str){
     strip(s1);
     split(s1, sv, ' ');
     if(sv.size() != 3  || (!icasecompare(sv[1], "on")) ){
-        cout<<"[debug]: parse string="<<s1<<sv.size()<<endl;
+        cout<<"[debug]: parse string="<<s1<<sv.size()<<"\n";
         SyntaxError e("Invalid Syntax please create index by: create index index_name on table_name(attributes)\n");
         throw e;
     }
@@ -369,20 +369,20 @@ void Interpreter::CreateIndex(string str){
         SyntaxError e("Invalide attribute name in create index");
         throw e;
     }
-    // cout<<"[debug]: create index in () attrs = "<<str<<endl;
+    // cout<<"[debug]: create index in () attrs = "<<str<<"\n";
 
     // 结果存储
     // 索引属性的名字在 attr_name中
     // 索引名字在 index_name中
     // 对象表格在 targ_table_name中
-    cout<<"[debug create index]:"<<index_name<<" on "<<targ_table_name<<"("<<attr_name<<")"<<endl;
+    cout<<"[debug create index]:"<<index_name<<" on "<<targ_table_name<<"("<<attr_name<<")"<<"\n";
 
 
 }
 
 void Interpreter::CreateTable(string str){
     string ostr = str;
-    // cout<<"create table function now"<<endl;
+    // cout<<"create table function now"<<"\n";
     int pos = str.find_first_of('(');
     if( pos == string::npos){
         SyntaxError e("No ( after tablename");
@@ -410,15 +410,15 @@ void Interpreter::CreateTable(string str){
     }
     str = str.substr(0, str.length() - 1);
 
-    // cout<<"[debug]: create string ="<<str<<endl;
+    // cout<<"[debug]: create string ="<<str<<"\n";
     // 分析括号内的
     vector<string> sv;
     vector<Attribute> Attributes;
     split(str, sv, ',');
     #ifdef DEBUG
-        cout<<"[debug]: in () string = \""<<str<<"\""<<endl;
+        cout<<"[debug]: in () string = \""<<str<<"\""<<"\n";
         for(auto iter: sv){
-            cout<<"[debug]: each attr = \""<<(iter)<<"\""<<endl;
+            cout<<"[debug]: each attr = \""<<(iter)<<"\""<<"\n";
         }
     #endif
 
@@ -433,7 +433,7 @@ void Interpreter::CreateTable(string str){
         if( std::regex_match(line, re_pk) ){
             int p = line.find_first_of(')');
             string pk_name = line.substr(12, p-12);
-            // cout<<"[debug]: pk line = "<<line<<", pkname = \""<<pk_name<<"\""<<endl;
+            // cout<<"[debug]: pk line = "<<line<<", pkname = \""<<pk_name<<"\""<<"\n";
             int flag = 0;
             int count = 0;
             if(pk_mark != -1){
@@ -441,10 +441,10 @@ void Interpreter::CreateTable(string str){
                 throw e;
             }
             for(vector<Attribute>::iterator Attr = Attributes.begin(); Attr != Attributes.end(); Attr++ ){
-                // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<endl;
+                // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<"\n";
                 if( (*Attr).name == pk_name ){
                     (*Attr).set_pk(true);
-                    cout<<"[debug]: set pk of "<< pk_name<<endl;
+                    cout<<"[debug]: set pk of "<< pk_name<<"\n";
                     flag = 1;
                     pk_mark = count;
                     main_index = count;
@@ -462,7 +462,7 @@ void Interpreter::CreateTable(string str){
 
         #ifdef DEBUG
             for(auto iterunit: attrvec){
-                cout<<"[debug]: each unit in attr = \""<<(iterunit)<<"\""<<endl;
+                cout<<"[debug]: each unit in attr = \""<<(iterunit)<<"\""<<"\n";
             }
         #endif
 
@@ -488,7 +488,7 @@ void Interpreter::CreateTable(string str){
                 throw e; 
             }
         }
-        // cout<<"[debug]: attrname = \""<<attrname<<"\""<<endl;
+        // cout<<"[debug]: attrname = \""<<attrname<<"\""<<"\n";
         try{
             Attribute A(attrname, typestr, notnull=notnull, unique=unique);
             Attributes.push_back(A);    
@@ -508,9 +508,9 @@ void Interpreter::CreateTable(string str){
 
     // 调用Catalog
     if( Cata.CreateTable(table) ){
-        cout<<"[Catalog info]: Create Table Successfully"<<endl;
+        cout<<"[Catalog info]: Create Table Successfully"<<"\n";
     }else{
-        // cout<<"[Catalog info]: Create Table Failed"<<endl;
+        // cout<<"[Catalog info]: Create Table Failed"<<"\n";s
         DBError e("Create Table Failed because of duplicated table name");
         throw e;
     }
