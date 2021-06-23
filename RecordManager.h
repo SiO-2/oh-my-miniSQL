@@ -24,7 +24,10 @@ public:
 	{
 		bmanager = new BufferManager();
 	};
-	~RecordManager(){};
+	~RecordManager()
+	{
+		this->bmanager->~BufferManager();
+	};
 
 	/*
 		函数功能：根据表名得到存储表数据的文件名
@@ -87,6 +90,8 @@ public:
 
 	//删除元组，支持每次一条或多条记录的删除操作
 	void DeleteTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>());
+
+	unsigned int GetTuplelen(const Table &table) const;
 };
 
 #endif //MINISQL_RECORDMANAGER_H
