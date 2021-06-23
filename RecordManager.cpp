@@ -1,47 +1,48 @@
 #include "RecordManager.h"
 // #define DEBUG
-/*
-    函数功能：创建一个表元数据文件以及一个表数据文件
-    传入参数：Table类变量
-    返回值：没有返回值
-*/
-void RecordManager::CreateTableFile(const Table &table)
-{
-    // cout<<"[Record Manager Debug]: tablename = "<<table.m_metadata.name<<endl;
-    // string tablename = GetDataFileName(table.m_metadata.name);
-    // wyc: 上面这个是不是写错了
-    string tablename = table.m_metadata.name;
-    string filename_data = GetDataFileName(tablename);
-    FILE *fp;
-    // cout << "[Record Manager Debug]: tablename = " << tablename << endl;
-    // cout << "[Record Manager Debug]: filename = " << filename_data << endl;
-    //新建数据文件，但无需写入
-    if ((fp = fopen(filename_data.c_str(), "wb+")) == NULL)
-    {
-        cout << "Can't create " << tablename << " by cannot open " << filename_data << endl;
-        // wyc: string 没法这么输出的
-        // printf("Can't create %s by cannot open %s\n", tablename, filename_data);
-        exit(EXIT_FAILURE);
-    }
-    fclose(fp);
-}
+// /**
+// *@brief 创建一个表元数据文件以及一个表数据文件
+// *@param table 需要创建文件的Table类变量
+// *@return 没有返回值
+// */
+// void RecordManager::CreateTableFile(const Table &table)
+// {
+//     // cout<<"[Record Manager Debug]: tablename = "<<table.m_metadata.name<<endl;
+//     // string tablename = GetDataFileName(table.m_metadata.name);
+//     // wyc: 上面这个是不是写错了
+//     string tablename = table.m_metadata.name;
+//     string filename_data = GetDataFileName(tablename);
+//     FILE *fp;
+//     cout << "[Record Manager Debug]: tablename = " << tablename << endl;
+//     cout << "[Record Manager Debug]: filename = " << filename_data << endl;
+//     //新建数据文件，但无需写入
+//     if ((fp = fopen(filename_data.c_str(), "wb+")) == NULL)
+//     {
+//         cout << "Can't create " << tablename << " by cannot open " << filename_data << endl;
+//         // wyc: string 没法这么输出的
+//         // printf("Can't create %s by cannot open %s\n", tablename, filename_data);
+//         exit(EXIT_FAILURE);
+//     }
+//     fclose(fp);
+// }
 
-/*
-    函数功能：清空被删除文件的block
-    传入参数：Table类变量
-    返回值：没有返回值
-*/
-void RecordManager::DropTableFile(const Table &table)
-{
-    string tablename = table.m_metadata.name;
-    string filename_data = GetDataFileName(tablename);
-    bmanager->FlushBlock(filename_data);
-}
+// /**
+// *@brief 清空被删除文件的block
+// *@param table 需要被删除的Table类变量
+// *@return 没有返回值
+// */
+// void RecordManager::DropTableFile(const Table &table)
+// {
+//     string tablename = table.m_metadata.name;
+//     string filename_data = GetDataFileName(tablename);
+//     bmanager->FlushBlock(filename_data);
+// }
 
-/*
-    函数功能：向表文件中插入元组，支持每次一条元组的插入操作，并调用index的函数更新index
-    传入参数：Table类变量，Tuple类变量
-    返回值：没有返回值
+/**
+*@brief 向表文件中插入元组，支持每次一条元组的插入操作，并调用index的函数更新index
+*@param table 待插入的表
+*@param tuple 待插入的元组
+*@return 没有返回值
 */
 void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
 {
@@ -149,10 +150,12 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
     // vector<char> tuple_data;
 }
 
-/*
-    函数功能：从一个block中抽取单条Tuple
-    传入参数：Table类变量，bid，tuple_offset
-    返回值：一个Tuple类变量
+/**
+*@brief 从一个block中抽取单条Tuple
+*@param table Table类变量
+*@param bid block对应的bid
+*@param tuple_offset 代取元组在block->data中的偏移量
+*@return 一个Tuple类变量
 */
 Tuple RecordManager::ExtractTuple(const Table &table, const BID bid, const unsigned int tuple_offset) const
 {
@@ -197,10 +200,11 @@ Tuple RecordManager::ExtractTuple(const Table &table, const BID bid, const unsig
     return tuple;
 }
 
-/*
-    函数功能：判断tuple是否满足条件
-    传入参数：Tuple类变量，条件
-    返回值：bool型变量
+/**
+*@brief 判断tuple是否满足条件
+*@param tuple Tuple类变量
+*@param condition 判断的条件【缺省时为无条件，返回true】
+*@return bool型变量
 */
 bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition) const
 {
@@ -240,10 +244,11 @@ bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit
     return true;
 }
 
-/*
-    函数功能：数据查询，可以通过指定用and 连接的多个条件进行查询，支持等值查询和区间查询
-    传入参数：Table类变量，查找条件
-    返回值：vector<Tuple>，即符合条件的元组
+/**
+*@brief 数据查询，可以通过指定用 and 连接的多个条件进行查询，支持等值查询和区间查询
+*@param table Table类变量
+*@param condition 查找条件
+*@return vector<Tuple>，即符合条件的元组
 */
 vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<ConditionUnit> &condition) const
 {
@@ -275,8 +280,11 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     return result;
 }
 
-/*
-    函数功能：删除元组，支持每次一条或多条记录的删除操作
+/**
+*@brief 删除元组，支持每次一条或多条记录的删除操作
+*@param table Table类变量
+*@param condition 查找条件
+*@return 没有返回值
 */
 void RecordManager::DeleteTuple(const Table &table, const vector<ConditionUnit> &condition)
 {
@@ -303,10 +311,10 @@ void RecordManager::DeleteTuple(const Table &table, const vector<ConditionUnit> 
     //注意，需要将offset传给index建立索引
 }
 
-/*
-    函数功能：得到Table类中一条Tuple的存储字节数
-    传入参数：Table类变量
-    返回值：返回tuple的长度
+/**
+*@brief 得到Table类中一条Tuple的存储字节数
+*@param table Table类变量
+*@return 返回tuple的长度
 */
 unsigned int RecordManager::GetTuplelen(const Table &table) const
 {
