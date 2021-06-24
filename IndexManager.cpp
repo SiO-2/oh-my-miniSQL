@@ -23,6 +23,9 @@ void:: IndexManager::setindexIntMap(vector<Index>& indexList){
 //函数功能：在已经存在索引文件的情况下，读入索引文件，并创建B+树
 void IndexManager::readIndexfromfile(const Index& index) {//
 	
+	cout<<"[Index DEBUG]: here read Index from file"<<endl;
+	index.Print();
+	cout<<"[Index DEBUG end]:"<<endl;
 	int len;
 	string filename_index = INDEX_PATH + index.index_name + ".index";
 
@@ -39,8 +42,8 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 		newfile_in.close();
 	}
 	else {
-		newfile_out.open(filename_index.c_str());
-		newfile_out.close();
+		// newfile_out.open(filename_index.c_str());
+		// newfile_out.close();
 	}
 
 
@@ -53,6 +56,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 		BPlusTree<int>* tree = new BPlusTree<int>(filename_index, keysize, degree);
 		tree->ReadTree();
+		cout<<"[Index DEBUG]:"<<endl;
+		tree->printleaf();
+		cout<<"[Index DEBUG end]:"<<endl;
 		indexIntMap.insert(intMap::value_type(filename_index, tree));
 	}
 	else if (data_type == FLOAT_UNIT) {
@@ -60,6 +66,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 		degree = getDegree(keysize);
 		BPlusTree<float>* tree = new BPlusTree<float>(filename_index, keysize, degree);
 		tree->ReadTree();
+		cout<<"[Index DEBUG]:"<<endl;
+		tree->printleaf();
+		cout<<"[Index DEBUG end]:"<<endl;
 		indexFloatMap.insert(floatMap::value_type(filename_index, tree));
 	}
 	else if (data_type == CHAR_UNIT) {
@@ -67,6 +76,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 		degree = getDegree(keysize);
 		BPlusTree<string>* tree = new BPlusTree<string>(filename_index, keysize, degree);
 		tree->ReadTree();
+		cout<<"[Index DEBUG]:"<<endl;
+		tree->printleaf();
+		cout<<"[Index DEBUG end]:"<<endl;
 		indexStringMap.insert(stringMap::value_type(filename_index, tree));
 	}
 	else {
@@ -83,7 +95,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
 
-	// cout<<"[Index Debug]: intTmp"<<intTmp<<endl;
+	// cout<<"[Index Debug]: here insert "<<endl;
 	// cout<<"[Index Debug]: datatype "<<data_type<<endl;
 
 	if (data_type == INT_UNIT) //int 
@@ -99,6 +111,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 		}
 		else {
 			itInt->second->Insert(intTmp, Offset);
+			cout<<"[Idx debug]: here writeback [end]\n";
 			itInt->second->WriteBack();
 			return;
 		}
@@ -366,6 +379,9 @@ offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_ke
 			return -1;
 		}
 		else {
+			cout<<"[Index Manager debug]:"<<endl;
+			itInt->second->printleaf();
+			cout<<"[Index Manager debug end]:"<<endl;
 			return itInt->second->Search(intTmp);
 		}
 	}
