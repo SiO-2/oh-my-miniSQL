@@ -3,3 +3,5 @@ database
 database/data
 *.exe
 database
+database
+.vscode

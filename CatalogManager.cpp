@@ -139,16 +139,11 @@ bool CatalogManager::DropIndex(string& name)
             index_file.open(index_name, ios::out|ios::binary);
             // m_index.erase(m_index.begin()+i);
             swap(*(std::begin(m_index)+i),*(std::end(m_index)-1));
-            cout << name << "    " << m_index[m_index.size()-1]->index_name << endl;
-            cout << m_index.size() << endl;
             m_index.pop_back();
-            cout << m_table.size() << endl;
             writeallIndex(index_file);
             index_file.close();
             remove(NameToIF(name).c_str());
-            cout<<table_name;
             index_file.open(table_name, ios::out|ios::binary);
-            cout << m_table[k]->Index_name.size() << endl;
             for (int j = 0; j<m_table[k]->Index_name.size(); j++)
                 if (m_table[k]->Index_name[j]->index_name==name)
                 {
@@ -157,7 +152,6 @@ bool CatalogManager::DropIndex(string& name)
                     m_table[k]->Index_name.pop_back();
                     break;
                 }
-            cout << m_table[k]->Index_name.size() << endl;
             writeallTable(index_file);
             index_file.close();
             return true;
@@ -180,8 +174,11 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
         if (table_name == m_table[i]->m_metadata.name)
             break;
     }
-    if (i==n) // 表不存在
+    if (i==n){
+    // 表不存在
+        cout<<"[Catalog Debug]: invalid table name \""<<table_name<<"\""<<"\n";
         return false;
+    } 
     t = m_table[i];
     n = t->m_metadata.attr_num;
     // wyc test
@@ -194,7 +191,7 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     for (i=0; i<n; i++)
     {
         if (!CheckAttr(t->m_attribute[i], data.tuple_value[i])){
-            cout<<"[Catalog Debug]: Check Attr Wrong for attribute " << t->m_attribute[i].name<<endl;
+            cout<<"[Catalog Debug]: Check Attr Wrong for attribute \"" << t->m_attribute[i].name<<"\"\n";
             return false;
         }
     }
@@ -530,7 +527,6 @@ void CatalogManager::writeallTable(fstream& f)
 void CatalogManager::writeallIndex(fstream& f)
 {
     int n = m_index.size();
-    cout << "[index]:" << n;
     writeint(n, f);
     for (int i=0; i<n; i++)
         writeIndex(m_index[i], f);
@@ -553,7 +549,6 @@ void CatalogManager::readallIndex(fstream& f)
 {
     int index_n;
     readint(index_n, f);
-        cout << "[all index]" << index_n;
     m_index.clear();
     Index* I;
     for (int i= 0; i<index_n; i++)
