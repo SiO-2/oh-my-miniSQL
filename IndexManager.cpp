@@ -68,20 +68,17 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber Offset)
 {
-	int len, intTmp;
+	int len;
 	string filename_index = INDEX_PATH + index.index_name + ".index";
 	
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
 
-	// cout<<"[Index Debug]: intTmp"<<intTmp<<endl;
-	cout<<"[Index Debug]: datatype "<<data_type<<endl;
 
 	if (data_type == INT_UNIT) //int 
 	{
-		cout<<"[Index Debug]: value.int_value "<<value.int_value<<endl;
 		len = sizeof(int);
-		this->intTmp = value.int_value;
+		intTmp = value.int_value;
 
 		intMap::iterator itInt = indexIntMap.find(filename_index);
 		if (itInt == indexIntMap.end()) {
@@ -245,6 +242,19 @@ void IndexManager::createIndex(const Index& index) {//
 
     int data_type = index.table->m_attribute[index.attr_num].type;
 
+
+	ifstream newfile_in(filename_index.c_str());
+	ofstream newfile_out;
+
+
+	if (newfile_in) {
+		cout << "in Create index: file " << filename_index << "already exist" << endl;
+		newfile_in.close();
+	}
+	else {
+		newfile_out.open(filename_index.c_str());
+		newfile_out.close();
+	}
 
 
 

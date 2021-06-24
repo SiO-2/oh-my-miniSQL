@@ -124,6 +124,7 @@ bool CatalogManager::DropTable(string& name)
 //删除索引，通过name判断删除哪个索引，需要检查存在性，返回值true表示成功，false表示失败
 bool CatalogManager::DropIndex(string& name)
 {
+    cout << "[Drop in]"<<endl;
     int n = m_index.size();
     fstream index_file;
     for (int i=0; i<n; i++)
