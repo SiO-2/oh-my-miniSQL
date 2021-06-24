@@ -243,10 +243,12 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
 //获取表名为table_name的Catalog信息，如果不存在则返回空的Table
 Table* CatalogManager::GetTableCatalog(string& table_name)
 {
+    // cout<<"[Cata debug]: get table catalog for "<< table_name<<endl;
     int i = FindTable(table_name);
     if (i == -1)
         return NULL;
     Table *t = m_table[i];
+    // cout<<"[Cata debug end]"<<endl;
     return t;
 }
 

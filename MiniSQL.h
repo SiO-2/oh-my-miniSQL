@@ -92,6 +92,7 @@ public:
 	int attr_num;	//索引建立在该属性上
 	Index(Index& index);
 	Index();
+	Index(string index_name, Table* table, string table_name, int attr_num);
 	void Print();
 };
 

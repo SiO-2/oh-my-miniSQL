@@ -90,6 +90,8 @@ void Interpreter::Parse(string sql){
     }catch(DBError e){
         cout<<"[Runtime Error]: "<<e.msg<<"\n";
         // throw e;
+    }catch(InternalError e){
+        cout<<"[Internal Error]: "<<e.msg<<"\n";
     }
    
 }
@@ -446,8 +448,41 @@ void Interpreter::CreateIndex(string str){
     // 索引属性的名字在 attr_name中
     // 索引名字在 index_name中
     // 对象表格在 targ_table_name中
-    cout<<"[debug create index]:"<<index_name<<" on "<<targ_table_name<<"("<<attr_name<<")"<<"\n";
+    // cout<<"[debug create index]:"<<index_name<<" on "<<targ_table_name<<"("<<attr_name<<")"<<"\n";
+    Table *table = Cata.GetTableCatalog(targ_table_name);
 
+    // cout<<"[Interpreter Debug]: got table from cata"<<endl;
+
+    if(table == NULL){
+        DBError e("Invalid Table \"" + targ_table_name + "\"");
+        throw e;
+    }
+    
+    int count = 0, attr_num = -1;
+    for(auto attr:table->m_attribute){
+        if( attr_name == attr.name ){
+            attr_num = count;
+            break;
+        }else{
+            count ++;
+        }
+    }
+    if(attr_num == -1){
+        DBError e("Invalid attribute name \"" + attr_name + "\"");
+        throw e;
+    }
+
+    // cout<<"[Interpreter Debug]: begin create index"<<endl;
+    Index index(index_name, table, targ_table_name, attr_num);
+
+    // cout<<"[Interpreter Debug]: begin create index into cata"<<endl;
+    if( !Cata.CreateIndex(index) ){
+        InternalError e("Create index \"" + index_name + "\" failed");
+        throw e;
+    }
+    cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+    Record.CreateIndex(index);
+    cout<<"Create index successfully"<<"\n";
 
 }
 

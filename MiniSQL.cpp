@@ -140,6 +140,11 @@ Index::Index()
 {
 }
 
+Index::Index(string index_name, Table* table, string table_name, int attr_num):index_name(index_name), table(table), table_name(table_name), attr_num(attr_num){
+
+}
+
+
 void Index::Print()
 {
     cout << "[Index Info]: index name = " << this->index_name << endl;
