@@ -14,12 +14,10 @@ size_t BufferManager::GetFileSize(const std::string &filename) const
     return size; //单位是：byte
 }
 
-/**
-*@brief 根据输入的filename与offset，返回与之匹配的block的bid;
-*       如果没有匹配的block就返回一个可用的空block的bid        
-*@param filename 带路径的文件名
-*@param offset block在文件中的偏移量
-*@return 分配好的block的bid
+/*
+    函数功能：进行BID的分配
+    传入参数：带路径的文件名，以及地址偏移
+    返回值：分配好的block的bid
 */
 BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) const
 {
@@ -41,12 +39,10 @@ BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) 
     return empty;
 }
 
-/**
-*@brief 根据输入将block初始化
-*@param bid block的bid
-*@param filename 带路径的文件名
-*@param offset block在文件中的偏移量
-*@return 没有返回值
+/*
+    函数功能：将block初始化
+    传入参数：block的bid，带路径的文件名，block在文件中的偏移
+    返回值：没有返回值
 */
 void BufferManager::SetBlockInfo(const BID &bid, const string &filename, const unsigned int &offset)
 {
@@ -56,11 +52,10 @@ void BufferManager::SetBlockInfo(const BID &bid, const string &filename, const u
     blocks[bid].SetValid();
 }
 
-/**
-*@brief 将文件读入到blocks中
-*@param filename 带路径的文件名
-*@param boffset 所有需要读取的block在文件中的偏移量【缺省则将整个文件读入】
-*@return vector<BID>，即文件对应的所有的block的bid
+/*
+    函数功能：将文件读入到blocks中
+    传入参数：文件名以及block在文件中的偏移量（偏移量可缺省）
+    返回值：vector<BID> bids，即文件对应的所有的block的bid
 */
 vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<unsigned int> &boffset)
 {
@@ -73,7 +68,7 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
         {
             cout << "[ReadFile2Block Fail]" << endl;
             // cout<<"[ReadFile2Block]: Can't open "<<filename<<endl;
-            printf("Can't open %s\n", filename);
+            printf("Can't open %s\n", filename.c_str());
             exit(EXIT_FAILURE); //be panic
         }
     }
@@ -108,11 +103,10 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
     return bids;
 }
 
-
-/**
-*@brief 将指定的block写回file
-*@param bid 需要写回文件的block的bid
-*@return 没有返回值
+/*
+    函数功能：将块写回文件
+    传入参数：传入参数为需要写回的块的bid
+    返回值：没有返回值
 */
 void BufferManager::WriteBlock2File(const BID &bid)
 {
@@ -123,7 +117,7 @@ void BufferManager::WriteBlock2File(const BID &bid)
         {
             cout << "[WriteBlock2File Fail]" << endl;
             // cout<<"[WriteBlock2File]: Can't open "<<blocks[bid].GetFilename()<<endl;
-            printf("Can't open %s\n", blocks[bid].GetFilename());
+            printf("Can't open %s\n", blocks[bid].GetFilename().c_str());
             exit(EXIT_FAILURE);
         }
         fseek(fp, blocks[bid].GetOffset() * BLOCKSIZE, SEEK_SET);
@@ -133,10 +127,10 @@ void BufferManager::WriteBlock2File(const BID &bid)
     blocks[bid].SetUnValid();
 }
 
-/**
-*@brief 当表被删除时，将其表文件对应的block清空
-*@param filename 带路径的文件名
-*@return 没有返回值
+/*
+    函数功能：当表被删除时，将对应的block清空
+    传入参数：被删除文件的带路径文件名
+    返回值：没有返回值
 */
 void BufferManager::FlushBlock(const string &filename)
 {

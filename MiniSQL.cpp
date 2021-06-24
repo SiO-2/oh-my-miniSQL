@@ -1,6 +1,5 @@
 #include <regex>
 #include "MiniSQL.h"
-#include "SqlError.h"
 
 TableMetadata::TableMetadata()
 {
@@ -60,9 +59,6 @@ Attribute::Attribute(string name, string typestr, bool notnull, bool unique, boo
             break;
             // cout << itr->str() << endl;
         }
-    }else{
-        SyntaxError e("Invalid type \"" + typestr + "\"");
-        throw e;
     }
     this->name = name;
     this->charlen = charlen;
