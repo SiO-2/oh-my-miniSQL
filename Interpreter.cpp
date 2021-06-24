@@ -575,7 +575,7 @@ void Interpreter::CreateTable(string str){
         cout<<"[Catalog info]: Create Table Successfully"<<"\n";
     }else{
         // cout<<"[Catalog info]: Create Table Failed"<<"\n";s
-        DBError e("Create Table Failed because of duplicated table name");
+        DBError e("Create Table Failed because of duplicated table name" + tablename);
         throw e;
     }
 
