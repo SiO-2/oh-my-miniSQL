@@ -537,5 +537,7 @@ void CatalogManager::replace()
     {
         int j = FindTable(m_index[i]->table_name);
         m_table[j]->Index_name.push_back(m_index[i]);
+        m_index[i]->table = m_table[j];
+        // cout << m_index[i]->index_name << endl;
     }
 }
