@@ -105,8 +105,23 @@ void Interpreter::Parse(string sql){
 }
 
 void Interpreter::ShowDatabase(std::string str){
-
+    strip(str);
+    if(!str.empty()){
+        SyntaxError e("Show database can not be followed by other characters");
+        throw e;
+    }
+    vector<Table *> table_pointer_vec = Cata.GetAllTable();
+    vector<Index *> index_pointer_vec = Cata.GetAllIndex();
+    cout<<"[All Table Info]:"<<"\n";
+    for(auto table: table_pointer_vec){
+        table->Print();
+    }
+    cout<<"[All Index Info]:"<<"\n";
+    for(auto index: index_pointer_vec){
+        index->Print();
+    }
 }
+
 void Interpreter::ShowTable(string str){
     string &tablename = str;
     strip(tablename);
@@ -573,7 +588,7 @@ void Interpreter::CreateTable(string str){
                 // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<"\n";
                 if( (*Attr).name == pk_name ){
                     (*Attr).set_pk(true);
-                    cout<<"[debug]: set pk of "<< pk_name<<"\n";
+                    // cout<<"[debug]: set pk of "<< pk_name<<"\n";
                     flag = 1;
                     pk_mark = count;
                     main_index = count;
