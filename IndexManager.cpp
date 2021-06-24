@@ -15,7 +15,7 @@ IndexManager::IndexManager(vector<Index> indexList) {//构造函数，需要读�
 void IndexManager::readIndexfromfile(const Index& index) {//
 	
 	int len;
-	string filename_index = index.index_name + ".index";
+	string filename_index = INDEX_PATH + index.index_name + ".index";
 
 	int data_type = index.table->m_attribute[index.attr_num].type;
 
@@ -69,7 +69,7 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber Offset)
 {
 	int len;
-	string filename_index = index.index_name + ".index";
+	string filename_index = INDEX_PATH + index.index_name + ".index";
 	
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
@@ -137,7 +137,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 void IndexManager::deleteIndex(const Index& index, Unit unit_key)
 {
 	int len;
-	string filename_index = index.index_name + ".index";
+	string filename_index = INDEX_PATH + index.index_name + ".index";
 
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
@@ -238,7 +238,7 @@ int IndexManager::getDegree(int len) {//获取块能存储的key数量
 void IndexManager::createIndex(const Index& index) {//
 
 	int len;
-	string filename_index = index.index_name + ".index";
+	string filename_index = INDEX_PATH + index.index_name + ".index";
 
     int data_type = index.table->m_attribute[index.attr_num].type;
 
@@ -293,7 +293,7 @@ void IndexManager::createIndex(const Index& index) {//
 void IndexManager::dropIndex(const Index& index) {//删除索引
 
 
-	string filename_index = index.index_name + ".index";
+	string filename_index = INDEX_PATH + index.index_name + ".index";
 
     int data_type = index.table->m_attribute[index.attr_num].type;
 
@@ -352,7 +352,7 @@ void IndexManager::dropIndex(const Index& index) {//删除索引
 offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_key) {//查找索引，并返回偏移量
 
 	int len;
-	string filename_index = index.index_name + ".index";
+	string filename_index = INDEX_PATH + index.index_name + ".index";
 
 	ConditionUnit::Value value = unit_key.value;
 	DataType data_type = unit_key.data_type;
