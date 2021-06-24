@@ -130,11 +130,15 @@ bool CatalogManager::DropIndex(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_index[i]->index_name){
-            int i = FindTable(m_index[i]->table_name);
+            string tname = m_index[i]->table_name;
+            // cout << tname;
+            int i = FindTable(tname);
             if (i==-1)
                 return false;
             index_file.open(NameToIF(index_name), ios::out|ios::binary);
-            m_index.erase(m_index.begin()+i);
+            // m_index.erase(m_index.begin()+i);
+            swap(*(std::begin(m_index)+1),*(std::end(m_index)-1));
+            m_index.pop_back();
             writeallIndex(index_file);
             index_file.close();
             remove(NameToIF(name).c_str());

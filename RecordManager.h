@@ -16,17 +16,19 @@ class RecordManager
 {
 private:
 	BufferManager *bmanager;
-	IndexManager *imanager;
 	Tuple ExtractTuple(const Table &table, const BID bid, const unsigned int tuple_offset) const;
-
+public:
+	IndexManager *imanager;
 public:
 	RecordManager()
 	{
 		bmanager = new BufferManager();
+		imanager = new IndexManager();
 	};
 	~RecordManager()
 	{
 		delete bmanager;
+		delete imanager;
 	};
 
 	string GetDataFileName(const string tablename) const
