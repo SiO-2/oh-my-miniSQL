@@ -38,7 +38,7 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 
 	if (!newfile_in) {
-		cout << "in Create index: file " << filename_index << "not exist" << endl;
+		// cout << "in Create index: file " << filename_index << "not exist" << endl;
 		newfile_in.close();
 	}
 	else {

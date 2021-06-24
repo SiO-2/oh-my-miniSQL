@@ -233,6 +233,7 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
             Tuple tuple = ExtractTuple(table, *bids.begin(), tuple_offset);
             result.push_back(tuple);
         }catch(DBError e){
+            cout<<"Empty Result"<<"\n";
         }
     }
     else
