@@ -477,7 +477,7 @@ void Interpreter::Insert(string str){
     // table->Print();
     // tuple.Print();
     Record.InsertTuple(*table, tuple);
-    // cout<<"Insert successfully"<<endl;
+    cout<<"Insert successfully"<<endl;
 }
 
 void Interpreter::CreateIndex(string str){
