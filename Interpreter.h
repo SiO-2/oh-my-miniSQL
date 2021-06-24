@@ -28,6 +28,7 @@ public:
     void DropIndex(std::string str);
     void ShowTable(std::string str);
     void ShowIndex(std::string str);
+    void ShowDatabase(std::string str);
 };
 
 #endif

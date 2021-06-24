@@ -71,8 +71,10 @@ void Interpreter::Parse(string sql){
                 this->ShowTable(t);
             }else if( icasecompare(token, "index") ){
                 this->ShowIndex(t);
+            }else if(icasecompare(token,"database")){
+                this->ShowDatabase(t);
             }else{
-                cout<<"[Syntax Error]: "<<"Show must be followed by \"table\" or \"index\""<<"\n";
+                cout<<"[Syntax Error]: "<<"Show must be followed by \"table\" or \"index\" or \"database\""<<"\n";
             }
         }else{
             cout<<"[Error]: Wrong command can not interpret "<<token<<"\n";
@@ -87,6 +89,9 @@ void Interpreter::Parse(string sql){
    
 }
 
+void Interpreter::ShowDatabase(std::string str){
+
+}
 void Interpreter::ShowTable(string str){
     string &tablename = str;
     strip(tablename);

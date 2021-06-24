@@ -116,7 +116,7 @@ public:
             if (blocks[bid].IsDirty())
                 WriteBlock2File(bid);
 
-        cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;
+        // cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;
     };
 
     /*
