@@ -110,6 +110,7 @@ void BufferManager::WriteBlock2File(const BID &bid)
         fwrite(blocks[bid].data, BLOCKSIZE, 1, fp);
         fclose(fp);
     }
+    memset(blocks[bid].data, 0, BLOCKSIZE);
     blocks[bid].SetUnValid();
 }
 
@@ -123,6 +124,9 @@ void BufferManager::FlushBlock(const string &filename)
     for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
     {
         if (blocks[bid].IsValid() && blocks[bid].GetFilename() == filename)
+        {
+            memset(blocks[bid].data, 0, BLOCKSIZE);
             blocks[bid].SetUnValid();
+        }
     }
 }

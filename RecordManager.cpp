@@ -222,8 +222,10 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     if (flag)
     {
         //有对应的index时
-        cout<<"[Select with index]"<<"\n";
-        try{
+        cout << "[Select with index]"
+             << "\n";
+        try
+        {
             unsigned int offset = imanager->searchIndex(*table.Index_name[index_num], *condition.begin());
             unsigned int block_offset = offset / BLOCKSIZE;
             unsigned int tuple_offset = offset % BLOCKSIZE;
@@ -232,8 +234,9 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
             bids = bmanager->ReadFile2Block(filename_data, block_offsets);
             Tuple tuple = ExtractTuple(table, *bids.begin(), tuple_offset);
             result.push_back(tuple);
-        }catch(DBError e){
-            cout<<"Empty Result"<<"\n";
+        }
+        catch (DBError e)
+        {
         }
     }
     else
@@ -350,6 +353,7 @@ void RecordManager::CreateIndex(const Index &index)
                 // tuple.Print();
                 // cout<<"[Record Debug end]:"<<endl;
                 unit = tuple.tuple_value[index.attr_num];
+                offset = bmanager->blocks[bid].GetOffset() * BLOCKSIZE + tuple_offset;
                 if (ConditionTest(tuple) && tuple.valid == true)
                     imanager->insertIndex(index, unit, offset);
             }
