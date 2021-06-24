@@ -1,5 +1,4 @@
 #include "BufferManager.h"
-// #define DEBUG
 /*
     函数功能：获取文件的大小
     传入参数：带路径的文件名
@@ -24,13 +23,6 @@ BID BufferManager::GetBlock(const string &filename, const unsigned int &offset) 
     BID empty = 0;
     for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
     {
-#ifdef DEBUG
-        // cout << "bid = " << bid << endl;
-        // cout << "blocks[bid].GetFilename() = " << blocks[bid].GetFilename() << endl;
-        // cout << "filename = " << filename << endl;
-        // cout << "blocks[bid].GetOffset() = " << blocks[bid].GetOffset() << endl;
-        // cout << "offset = " << offset << endl;
-#endif
         if (blocks[bid].GetFilename() == filename && blocks[bid].GetOffset() == offset)
             return bid;
         else if (blocks[bid].IsValid() == false)
@@ -87,18 +79,12 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
         fseek(fp, *it * BLOCKSIZE, SEEK_SET);
         BID bid = GetBlock(filename, *it);
         bids.push_back(bid);
-#ifdef DEBUG
-        cout << "BufferManager::ReadFile2Block::91:: get_bid = " << bid << endl;
-#endif
         if (blocks[bid].IsValid() == false) //如果该block是空的，需要从文件中读取，并设置其特征值
         {
             fread(blocks[bid].data, BLOCKSIZE, 1, fp);
             SetBlockInfo(bid, filename, *it);
         }
     }
-#ifdef DEBUG
-    cout << "BufferManager::ReadFile2Block::99" << endl;
-#endif
     fclose(fp);
     return bids;
 }

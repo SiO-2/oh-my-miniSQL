@@ -9,14 +9,14 @@
 #include <iterator>
 #include "MiniSQL.h"
 #include "BufferManager.h"
-// #include "IndexManager.h"
+#include "IndexManager.h"
 using namespace std;
 
 class RecordManager
 {
 private:
 	BufferManager *bmanager;
-	// IndexManager *imanager;
+	IndexManager *imanager;
 	Tuple ExtractTuple(const Table &table, const BID bid, const unsigned int tuple_offset) const;
 
 public:
@@ -49,7 +49,7 @@ public:
 
 	// void DropTableFile(const Table &table);
 
-	void InsertTuple(const Table &table, const Tuple &tuple);
+	void InsertTuple(const Table &table, const Tuple &tuple, const vector<Index> &indexs = vector<Index>());
 	// void InsertTuple(const Table &table, const Tuple &tuple, Index & index);
 
 	bool ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;
@@ -60,6 +60,8 @@ public:
 	void DeleteTuple(const Table &table, const vector<ConditionUnit> &condition = vector<ConditionUnit>());
 
 	unsigned int GetTuplelen(const Table &table) const;
+
+	void CreateIndex(const Index &index);
 };
 
 #endif //MINISQL_RECORDMANAGER_H
