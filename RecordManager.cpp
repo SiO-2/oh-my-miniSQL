@@ -241,7 +241,7 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     }
     else
     {
-        cout<<"[Select with out index]"<<"\n";
+        cout<<"[Select without index]"<<"\n";
         //没有对应的index时
         bids = bmanager->ReadFile2Block(filename_data);
         vector<BID>::iterator it;

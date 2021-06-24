@@ -165,8 +165,11 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
         if (table_name == m_table[i]->m_metadata.name)
             break;
     }
-    if (i==n) // 表不存在
+    if (i==n){
+    // 表不存在
+        cout<<"[Catalog Debug]: invalid table name \""<<table_name<<"\""<<"\n";
         return false;
+    } 
     t = m_table[i];
     n = t->m_metadata.attr_num;
     // wyc test
@@ -179,7 +182,7 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     for (i=0; i<n; i++)
     {
         if (!CheckAttr(t->m_attribute[i], data.tuple_value[i])){
-            cout<<"[Catalog Debug]: Check Attr Wrong for attribute " << t->m_attribute[i].name<<endl;
+            cout<<"[Catalog Debug]: Check Attr Wrong for attribute \"" << t->m_attribute[i].name<<"\"\n";
             return false;
         }
     }

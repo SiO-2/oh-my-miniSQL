@@ -477,7 +477,7 @@ void Interpreter::Insert(string str){
     // table->Print();
     // tuple.Print();
     Record.InsertTuple(*table, tuple);
-    cout<<"Insert successfully"<<endl;
+    // cout<<"Insert successfully"<<endl;
 }
 
 void Interpreter::CreateIndex(string str){
@@ -690,7 +690,7 @@ void Interpreter::CreateTable(string str){
         cout<<"[Catalog info]: Create Table Successfully"<<"\n";
     }else{
         // cout<<"[Catalog info]: Create Table Failed"<<"\n";s
-        DBError e("Create Table Failed because of duplicated table name" + tablename);
+        DBError e("Create Table Failed because of duplicated table name \"" + tablename + "\"");
         throw e;
     }
 

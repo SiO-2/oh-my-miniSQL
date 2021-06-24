@@ -285,3 +285,8 @@ Value ParseStringType(DataType type, string& str){
 
 <img src="../src/sketch/select.png" style="width:90%"/>
 
+select命令被分为三个部分
+
++ attribute array: 为选择的列
++ from table: 来自表的数据（暂时只支持单表查询）
++ condition array
