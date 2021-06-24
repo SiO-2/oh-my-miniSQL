@@ -1,6 +1,6 @@
 #ifndef MINISQL_BUFFERMANAGER_H
 #define MINISQL_BUFFERMANAGER_H
-#define DEBUG
+// #define DEBUG
 #include <iostream>
 #include <string>
 #include "MiniSQL.h"

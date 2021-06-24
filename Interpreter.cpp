@@ -65,6 +65,17 @@ void Interpreter::Parse(string sql){
             }else{
                 cout<<"[Syntax Error]: "<<"Delete must be followed by \"from\""<<"\n";
             }
+        } else if( icasecompare(token, "SHOW") ){
+            token = get_token(t);
+            if( icasecompare(token, "table") ){
+                this->ShowTable(t);
+            }else if( icasecompare(token, "index") ){
+                this->ShowIndex(t);
+            }else if(icasecompare(token,"database")){
+                this->ShowDatabase(t);
+            }else{
+                cout<<"[Syntax Error]: "<<"Show must be followed by \"table\" or \"index\" or \"database\""<<"\n";
+            }
         }else{
             cout<<"[Error]: Wrong command can not interpret "<<token<<"\n";
         }
@@ -76,6 +87,31 @@ void Interpreter::Parse(string sql){
         // throw e;
     }
    
+}
+
+void Interpreter::ShowDatabase(std::string str){
+
+}
+void Interpreter::ShowTable(string str){
+    string &tablename = str;
+    strip(tablename);
+    Table *table = Cata.GetTableCatalog(tablename);
+    if(table==NULL){
+        DBError e("Invalid table name " + tablename);
+        throw e;
+    }
+    table->Print();
+}
+
+void Interpreter::ShowIndex(string str){
+    // string &indexname = str;
+    // strip(indexname);
+    // Table *table = Cata.GetTableCatalog(indexname);
+    // if(table==NULL){
+    //     DBError e("Invalid index name " + indexname);
+    //     throw e;
+    // }
+    // table->Print();
 }
 
 void Interpreter::Delete(string str){
@@ -247,6 +283,12 @@ void Interpreter::Select(string str){
     // from唯一的table名在 table_vec[0]
     // Select的属性名在 vector<string> attr_vec里
     
+    // 对 select *的支持
+    if( attr_vec.size() == 1 && attr_vec[0] == "*" ){
+        attr_vec.clear();
+    }
+
+
     // 调用Catalog
     pair<int, string> response;
     response = Cata.SelectTest(table_vec[0], attr_vec, cond_vec);
@@ -262,9 +304,30 @@ void Interpreter::Select(string str){
         Table* table = Cata.GetTableCatalog(table_vec[0]);
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
         cout<<"[Interpreter Select Res without index]:"<<"\n";
-        for(auto tuple:Select_Res){
-            tuple.Print();
+
+
+        // 这里还需要做一下筛选属性
+        if(attr_vec.empty()){
+            for(auto tuple:Select_Res){
+                tuple.Print();
+            }
+        }else{
+            vector<int> int_vec;
+            map<string, int> attr2idx;
+            int idx = 0;
+            for(auto attr: table->m_attribute){
+                attr2idx[attr.name] = idx;
+                idx ++;
+            }
+
+            for(auto attr_name: attr_vec){
+                int_vec.push_back( attr2idx[attr_name] );
+            }
+            for(auto tuple:Select_Res){
+                tuple.Print(int_vec);
+            }
         }
+
         cout<<"[Interpreter Select Res End]:"<<"\n";
     }else if(response.first == 1){
         cout<<"[Catalog res]: select with index"<<response.second<<"\n";
@@ -512,7 +575,7 @@ void Interpreter::CreateTable(string str){
         cout<<"[Catalog info]: Create Table Successfully"<<"\n";
     }else{
         // cout<<"[Catalog info]: Create Table Failed"<<"\n";s
-        DBError e("Create Table Failed because of duplicated table name");
+        DBError e("Create Table Failed because of duplicated table name" + tablename);
         throw e;
     }
 
