@@ -148,7 +148,6 @@ bool CatalogManager::DropIndex(string& name)
                 if (m_table[k]->Index_name[j]->index_name==name)
                 {
                     swap(*(std::begin(m_table[k]->Index_name)+j),*(std::end( m_table[k]->Index_name)-1));
-                    cout << name << "    " << m_table[k]->Index_name[m_table[k]->Index_name.size()-1] << endl;
                     m_table[k]->Index_name.pop_back();
                     break;
                 }
