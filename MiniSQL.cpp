@@ -147,7 +147,12 @@ Index::Index(string index_name, Table* table, string table_name, int attr_num):i
 
 void Index::Print()
 {
-    cout << "[Index Info]: index name = " << this->index_name << endl;
+    cout << "[Index Info]: index name = " << this->index_name <<" on table \"" << this->table_name << "\" attribute \"";
+    Table *table = this->table;
+    table->Print();
+    cout<<this->attr_num;
+    // this->table->m_attribute[this->attr_num].name;
+    cout<<"\""<< endl;
 }
 
 Unit::Unit()

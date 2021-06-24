@@ -68,15 +68,18 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber Offset)
 {
-	int len;
+	int len, intTmp;
 	string filename_index = INDEX_PATH + index.index_name + ".index";
 	
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
 
+	// cout<<"[Index Debug]: intTmp"<<intTmp<<endl;
+	cout<<"[Index Debug]: datatype "<<data_type<<endl;
 
 	if (data_type == INT_UNIT) //int 
 	{
+		cout<<"[Index Debug]: value.int_value "<<value.int_value<<endl;
 		len = sizeof(int);
 		intTmp = value.int_value;
 
