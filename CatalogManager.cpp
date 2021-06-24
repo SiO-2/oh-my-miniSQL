@@ -32,6 +32,7 @@ CatalogManager::CatalogManager()
         writeint(n, index_file);
         index_file.close();
     }
+    replace();
     // by wyc print to debug:
     // cout<<"[Catalog]: table list"<<endl;
     // for(auto table:this->m_table){
@@ -84,7 +85,10 @@ bool CatalogManager::CreateIndex(Index& index)
         if (index.index_name == m_index[i]->index_name)
             return false;
     }
-
+    int i = FindTable(index.table_name);
+    if (i == -1)
+        return false;
+    index.table = m_table[i];
     Index* t = new Index(index);
     m_index.push_back(t);
     index_file.open(index_name, ios::out|ios::binary);
@@ -93,6 +97,7 @@ bool CatalogManager::CreateIndex(Index& index)
     index_file.close();
     index_file.open(NameToIF(index.index_name), ios::out|ios::binary);
     index_file.close();
+    m_table[i]->Index_name.push_back(t);
     return true;
 }
 
@@ -123,11 +128,17 @@ bool CatalogManager::DropIndex(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_index[i]->index_name){
+            int i = FindTable(m_index[i]->table_name);
+            if (i==-1)
+                return false;
             index_file.open(NameToIF(index_name), ios::out|ios::binary);
             m_index.erase(m_index.begin()+i);
             writeallIndex(index_file);
             index_file.close();
             remove(NameToIF(name).c_str());
+            for (int j = 0; j<m_table[i]->Index_name.size(); j++)
+                if (m_table[i]->Index_name[j]->index_name==name)
+                    m_table[i]->Index_name.erase(m_table[i]->Index_name.begin()+j);
             return true;
         }
     }
@@ -419,6 +430,7 @@ Table* CatalogManager::readTable(fstream& f)
     Attribute* attr;
     Table* t;
     string tname;
+    Index* index = new Index;
     int num;
     readstring(tname, f);
     m_metadata.name = tname;
@@ -504,4 +516,14 @@ string CatalogManager::NameToIF(string& name)
 {
     string inf = INDEX_PATH + name + INDEX_SUFFIX;
     return inf;
+}
+
+void CatalogManager::replace()
+{
+    int it = m_index.size();
+    for (int i=0; i<it; i++)
+    {
+        int j = FindTable(m_index[i]->table_name);
+        m_table[j]->Index_name.push_back(m_index[i]);
+    }
 }
