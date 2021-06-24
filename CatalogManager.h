@@ -60,6 +60,8 @@ private:
 	void writeIndex(Index* i, fstream& f);
 	void writeallTable(fstream& f);
 	void writeallIndex(fstream& f);
+	void readallTable(fstream& f);
+	void readallIndex(fstream& f);
 	Table* readTable(fstream& f);
 };
 

@@ -10,13 +10,7 @@ CatalogManager::CatalogManager()
     int table_n, index_n;
     if (table_file)
     {
-        readint(table_n, table_file);
-        Table* t;
-        for (int i=0; i<table_n; i++)
-        {
-            t = readTable(table_file);
-            m_table.push_back(t);
-        }
+        readallTable(table_file);
         table_file.close();
     }
     else
@@ -28,14 +22,7 @@ CatalogManager::CatalogManager()
     }
     if (index_file)
     {
-        readint(index_n, index_file);
-        Index* I;
-        for (int i= 0; i<index_n; i++)
-        {
-            I = new Index;
-            readIndex(*I, index_file);
-            m_index.push_back(I);
-        }
+        readallIndex(index_file);
         index_file.close();
     }
     else
@@ -69,6 +56,7 @@ bool CatalogManager::CreateTable(Table& table)
     m_table.push_back(&table);
     // writeTable(&table, table_file);
     writeallTable(table_file);
+
     table_file.close();
     table_file.open(NameToTF(table.m_metadata.name), ios::out|ios::binary);
     table_file.close();
@@ -437,6 +425,33 @@ void CatalogManager::writeallIndex(fstream& f)
     writeint(n, f);
     for (int i=0; i<n; i++)
         writeIndex(m_index[i], f);
+}
+
+void CatalogManager::readallTable(fstream& f)
+{
+    int table_n;
+    m_table.clear();
+    readint(table_n, f);
+    Table* t;
+    for (int i=0; i<table_n; i++)
+    {
+        t = readTable(f);
+        m_table.push_back(t);
+    }
+}
+
+void CatalogManager::readallIndex(fstream& f)
+{
+    int index_n;
+    readint(index_n, f);
+    m_index.clear();
+    Index* I;
+    for (int i= 0; i<index_n; i++)
+    {
+        I = new Index;
+        readIndex(*I, f);
+        m_index.push_back(I);
+    }
 }
 
 string CatalogManager::NameToTF(string& name)
