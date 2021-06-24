@@ -158,7 +158,7 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     for (i=0; i<n; i++)
     {
         if (!CheckAttr(t->m_attribute[i], data.tuple_value[i])){
-            cout<<"[Catalog Debug]: Check Attr Wrong."<<endl;
+            cout<<"[Catalog Debug]: Check Attr Wrong for attribute " << t->m_attribute[i].name<<endl;
             return false;
         }
     }
