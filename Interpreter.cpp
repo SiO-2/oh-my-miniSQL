@@ -105,21 +105,6 @@ void Interpreter::Parse(string sql){
 }
 
 void Interpreter::ShowDatabase(std::string str){
-    strip(str);
-    if(!str.empty()){
-        SyntaxError e("Show database can not be followed by other characters");
-        throw e;
-    }
-    vector<Table *> table_pointer_vec = Cata.GetAllTable();
-    vector<Index *> index_pointer_vec = Cata.GetAllIndex();
-    cout<<"[All Table Info]:"<<"\n";
-    for(auto table: table_pointer_vec){
-        table->Print();
-    }
-    cout<<"[All Index Info]:"<<"\n";
-    for(auto index: index_pointer_vec){
-        index->Print();
-    }
 
 }
 void Interpreter::ShowTable(string str){
@@ -517,13 +502,10 @@ void Interpreter::CreateIndex(string str){
     if( !Cata.CreateIndex(index) ){
         InternalError e("Create index \"" + index_name + "\" failed");
         throw e;
-    }else{
-        cout<<"Create index in Record now"<<"\n";
-
-        // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
-        Record.CreateIndex(index);
-        cout<<"Create index successfully"<<"\n";
     }
+    // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+    Record.CreateIndex(index);
+    cout<<"Create index successfully"<<"\n";
 
 }
 
