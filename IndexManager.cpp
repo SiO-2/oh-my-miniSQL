@@ -6,19 +6,18 @@
 
 IndexManager::IndexManager(vector<Index> indexList) {//构造函数，需要读取index文件并建立对应B+树
 	for(auto i = indexList.begin(); i != indexList.end(); i++) {
-		readIndexfromfile(i);
+		readIndexfromfile(*i);
 	}
 }
 
 
 //函数功能：在已经存在索引文件的情况下，读入索引文件，并创建B+树
-void IndexManager::readIndexfromfile(Index& index) {//
+void IndexManager::readIndexfromfile(const Index& index) {//
 	
 	int len;
-	string filename_index = index->index_name + ".index";
+	string filename_index = index.index_name + ".index";
 
-	Value value = unit_key.value;
-	DataType data_type = unit_key.datatype;
+	int data_type = index.table->m_attribute[index.attr_num].type;
 
 
 	
@@ -37,6 +36,7 @@ void IndexManager::readIndexfromfile(Index& index) {//
 
 
 	int keysize;
+	int degree; 
 	//根据文件名创建不同类型的B+数，并在map容器中建立映射
 	if (data_type == INT_UNIT) {
 		keysize = sizeof(int);
@@ -46,7 +46,7 @@ void IndexManager::readIndexfromfile(Index& index) {//
 		tree->ReadTree();
 		indexIntMap.insert(intMap::value_type(filename_index, tree));
 	}
-	else if (type == TYPE_FLOAT) {
+	else if (data_type == FLOAT_UNIT) {
 		keysize = sizeof(float);
 		degree = getDegree(keysize);
 		BPlusTree<float>* tree = new BPlusTree<float>(filename_index, keysize, degree);
@@ -54,7 +54,7 @@ void IndexManager::readIndexfromfile(Index& index) {//
 		indexFloatMap.insert(floatMap::value_type(filename_index, tree));
 	}
 	else if (data_type == CHAR_UNIT) {
-		keysize = index->table->m_attribute[index.attr_num].charlen;
+		keysize = index.table->m_attribute[index.attr_num].charlen;
 		degree = getDegree(keysize);
 		BPlusTree<string>* tree = new BPlusTree<string>(filename_index, keysize, degree);
 		tree->ReadTree();
@@ -66,10 +66,10 @@ void IndexManager::readIndexfromfile(Index& index) {//
 }
 
 
-void IndexManager::insertIndex(Index& index, Unit unit_key, offsetNumber Offset)
+void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber Offset)
 {
 	int len;
-	string filename_index = index->index_name + ".index";
+	string filename_index = index.index_name + ".index";
 	
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
@@ -111,7 +111,7 @@ void IndexManager::insertIndex(Index& index, Unit unit_key, offsetNumber Offset)
 	
 
 	else if (data_type == CHAR_UNIT) {
-		len = index->table->m_attribute[index.attr_num].charlen;
+		len = index.table->m_attribute[index.attr_num].charlen;
 		stringTmp = value.char_n_value;
 		stringMap::iterator itString = indexStringMap.find(filename_index);
 		if (itString == indexStringMap.end()) {
@@ -134,10 +134,10 @@ void IndexManager::insertIndex(Index& index, Unit unit_key, offsetNumber Offset)
 
 
 
-void IndexManager::deleteIndex(Index& index, Unit unit_key)
+void IndexManager::deleteIndex(const Index& index, Unit unit_key)
 {
 	int len;
-	string filename_index = index->index_name + ".index";
+	string filename_index = index.index_name + ".index";
 
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
@@ -179,7 +179,7 @@ void IndexManager::deleteIndex(Index& index, Unit unit_key)
 
 
 	else if (data_type == CHAR_UNIT) {
-		len = index->table->m_attribute[index.attr_num].charlen;
+		len = index.table->m_attribute[index.attr_num].charlen;
 		stringTmp = value.char_n_value;
 		stringMap::iterator itString = indexStringMap.find(filename_index);
 		if (itString == indexStringMap.end()) {
@@ -235,14 +235,12 @@ int IndexManager::getDegree(int len) {//获取块能存储的key数量
 }
 
 
-void IndexManager::createIndex(Index& index) {//
+void IndexManager::createIndex(const Index& index) {//
 
 	int len;
-	string filename_index = index->index_name + ".index";
+	string filename_index = index.index_name + ".index";
 
-	Value value = unit_key.value;
-	DataType data_type = unit_key.datatype;
-
+    int data_type = index.table->m_attribute[index.attr_num].type;
 
 
 	ifstream newfile_in(filename_index.c_str());
@@ -262,6 +260,7 @@ void IndexManager::createIndex(Index& index) {//
 
 
 	int keysize;
+	int degree;
 	//根据文件名创建不同类型的B+数，并在map容器中建立映射
 	if (data_type == INT_UNIT) {
 		keysize = sizeof(int);
@@ -270,14 +269,14 @@ void IndexManager::createIndex(Index& index) {//
 		BPlusTree<int>* tree = new BPlusTree<int>(filename_index, keysize, degree);
 		indexIntMap.insert(intMap::value_type(filename_index, tree));
 	}
-	else if (type == TYPE_FLOAT) {
+	else if (data_type == FLOAT_UNIT) {
 		keysize = sizeof(float);
 		degree = getDegree(keysize);
 		BPlusTree<float>* tree = new BPlusTree<float>(filename_index, keysize, degree);
 		indexFloatMap.insert(floatMap::value_type(filename_index, tree));
 	}
 	else if (data_type == CHAR_UNIT) {
-		keysize = index->table->m_attribute[index.attr_num].charlen;
+		keysize = index.table->m_attribute[index.attr_num].charlen;
 		degree = getDegree(keysize);
 		BPlusTree<string>* tree = new BPlusTree<string>(filename_index, keysize, degree);
 		indexStringMap.insert(stringMap::value_type(filename_index, tree));
@@ -291,14 +290,12 @@ void IndexManager::createIndex(Index& index) {//
 
 
 
-void IndexManager::dropIndex(Index& index) {//删除索引
+void IndexManager::dropIndex(const Index& index) {//删除索引
 
 
-	string filename_index = index->index_name + ".index";
+	string filename_index = index.index_name + ".index";
 
-	Value value = unit_key.value;
-	DataType data_type = unit_key.datatype;
-
+    int data_type = index.table->m_attribute[index.attr_num].type;
 
 
 	ifstream oldfile(filename_index.c_str());
@@ -321,7 +318,7 @@ void IndexManager::dropIndex(Index& index) {//删除索引
 			indexIntMap.erase(itInt);
 		}
 	}
-	else if(data_type == TYPE_FLOAT) {
+	else if(data_type == FLOAT_UNIT) {
 		floatMap::iterator itFloat = indexFloatMap.find(filename_index);
 		if(itFloat == indexFloatMap.end()) {
 			cout << "Error:in drop index: index not exits" << endl;
@@ -352,10 +349,10 @@ void IndexManager::dropIndex(Index& index) {//删除索引
 
 
 
-offsetNumber IndexManager::searchIndex(Index &index, Unit unit_key) {//查找索引，并返回偏移量
+offsetNumber IndexManager::searchIndex(const Index &index, Unit unit_key) {//查找索引，并返回偏移量
 
 	int len;
-	string filename_index = index->index_name + ".index";
+	string filename_index = index.index_name + ".index";
 
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
