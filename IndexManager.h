@@ -38,8 +38,10 @@ public:
 
 
 public:
-	IndexManager(vector<Index> indexList);//构造函数，参数为API，会调用API来获取.index文件列表并导入index信息
+	// IndexManager(vector<Index> indexList);//构造函数，参数为API，会调用API来获取.index文件列表并导入index信息
+	IndexManager();
 	~IndexManager();//析构函数，销毁对象时会将所有index信息写回磁盘中
+	void setindexIntMap(vector<Index>& indexList);
 	void readIndexfromfile(const Index& index);
 
 	void insertIndex(const Index& index, Unit unit_key, offsetNumber Offset);

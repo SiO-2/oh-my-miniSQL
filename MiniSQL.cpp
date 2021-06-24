@@ -129,12 +129,13 @@ void Table::Print()
     }
 }
 
-Index::Index(Index &index)
-{
-    this->attr_num = index.attr_num;
-    this->index_name = index.index_name;
-    this->table = index.table;
-}
+// Index::Index(Index &index)
+// {
+//     this->attr_num = index.attr_num;
+//     this->index_name = index.index_name;
+//     this->table = index.table;
+//     this->table_name = index.table_name;
+// }
 
 Index::Index()
 {

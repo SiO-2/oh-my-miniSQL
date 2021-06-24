@@ -18,6 +18,14 @@ using namespace std;
 
 
 Interpreter::Interpreter():Cata(), Record(){
+    vector<Index*> pindex_list = Cata.GetAllIndex();
+    vector<Index> index_list;
+    for(auto pindex: pindex_list){
+        index_list.push_back(*pindex);
+        pindex->Print();
+    }
+    cout<<"[Interpreter debug]: begin set index int map"<<endl;
+    Record.imanager->setindexIntMap(index_list);
 }
 
 Interpreter::~Interpreter(){
@@ -128,12 +136,6 @@ void Interpreter::ShowTable(string str){
 void Interpreter::ShowIndex(string str){
     string &indexname = str;
     strip(indexname);
-    bool b = Cata.DropIndex(indexname);
-    if(!b){
-        DBError e("Drop index \"" + indexname + "\" failed");
-        throw e;
-    }
-    cout<<"Drop index successfully"<<"\n";
 }
 
 void Interpreter::Delete(string str){
@@ -209,7 +211,14 @@ void Interpreter::DropIndex(string str){
         throw e;
     }
     // Here Index Name to Drop is 'str'
-    cout<<"[info]: Drop Index Name=\""<<str<<"\""<<"\n";
+    // cout<<"[info]: Drop Index Name=\""<<str<<"\""<<"\n";
+    
+    bool b = Cata.DropIndex(str);
+    if(!b){
+        DBError e("Drop index \"" + str + "\" failed");
+        throw e;
+    }
+    cout<<"Drop index successfully"<<"\n";
 }
 
 void Interpreter::Select(string str){

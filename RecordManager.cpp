@@ -286,6 +286,8 @@ unsigned int RecordManager::GetTuplelen(const Table &table) const
 */
 void RecordManager::CreateIndex(const Index &index)
 {
+    this->imanager->readIndexfromfile(index);
+    // this->imanager->indexIntMap.pushback(index);
     unsigned int offset = 0;
     Table table(*(index.table));
     Unit unit;
