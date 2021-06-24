@@ -126,14 +126,14 @@ void Interpreter::ShowTable(string str){
 }
 
 void Interpreter::ShowIndex(string str){
-    // string &indexname = str;
-    // strip(indexname);
-    // Table *table = Cata.GetTableCatalog(indexname);
-    // if(table==NULL){
-    //     DBError e("Invalid index name " + indexname);
-    //     throw e;
-    // }
-    // table->Print();
+    string &indexname = str;
+    strip(indexname);
+    bool b = Cata.DropIndex(indexname);
+    if(!b){
+        DBError e("Drop index \"" + indexname + "\" failed");
+        throw e;
+    }
+    cout<<"Drop index successfully"<<"\n";
 }
 
 void Interpreter::Delete(string str){
