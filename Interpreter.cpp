@@ -11,7 +11,7 @@
 #include "SqlError.h"
 // #include "Attribute.h"
 #include "MiniSQL.h"
-
+// #define DEBUG
 // DEBUG INFO开关
 // #define DEBUG 0
 using namespace std;
@@ -315,6 +315,9 @@ void Interpreter::Select(string str){
     Table* table = Cata.GetTableCatalog(table_vec[0]);
     cond_vec = ParseCondition(where_str);
 
+#ifdef DEBUG
+                    printf("Interpreter::Select::314:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
+#endif    
     // debug 打印 condition 信息
     // for(auto cond:cond_vec){
     //     cond.Print();
@@ -349,6 +352,9 @@ void Interpreter::Select(string str){
         // cout<<"[Catalog res]: select with or without index,"<<response.second<<"\n";
         // Call Record Manager
         Table* table = Cata.GetTableCatalog(table_vec[0]);
+#ifdef DEBUG
+                    printf("Interpreter::Select::348:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
+#endif
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
         cout<<"[Interpreter Select Res without index]:"<<"\n";
 
