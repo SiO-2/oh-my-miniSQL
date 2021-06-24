@@ -208,7 +208,7 @@ void RecordManager::DeleteTuple(const Table &table, const vector<ConditionUnit> 
         for (unsigned int tuple_offset = 0; tuple_offset < BLOCKSIZE; tuple_offset += tuple_len)
         {
             Tuple tuple = ExtractTuple(table, *it, tuple_offset);
-            if (ConditionTest(tuple))
+            if (ConditionTest(tuple, condition) && tuple.valid == true)
             {
                 memcpy((bmanager->blocks[*it]).data + tuple_offset, &unvalid, sizeof(unvalid) * sizeof(char)); //设置valid为0
                 bmanager->blocks[*bids.begin()].SetDirty();                                                    //将该tuple所在的block设置为dirty
