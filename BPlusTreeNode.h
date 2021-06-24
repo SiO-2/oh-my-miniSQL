@@ -33,6 +33,7 @@ public:
 	
 	int insertKey(ElementType key, offsetNumber offset = -1);	//在该结点中增加一个key，并返回位置
 	bool deleteKey(int index);//根据index的位置删除该结点的一个key
+	void printl();
 };
 
 
@@ -218,6 +219,15 @@ bool TreeNode<ElementType>::deleteKey(int index) {//删除index位置的key
 	return true;
 }
 
+
+template <class ElementType>
+void TreeNode<ElementType>::printl()
+{
+    for (int i = 0; i < keycount; i++)
+        std::cout << "->" << keys[i];
+    std::cout<<std::endl;
+    
+}
 
 
 #endif
