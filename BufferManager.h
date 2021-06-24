@@ -3,6 +3,7 @@
 // #define DEBUG
 #include <iostream>
 #include <string>
+#include <string.h>
 #include "MiniSQL.h"
 
 using namespace std;

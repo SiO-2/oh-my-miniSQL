@@ -7,6 +7,7 @@
 #include <vector>
 #include <fstream>
 #include <iterator>
+#include <math.h>
 #include "MiniSQL.h"
 #include "BufferManager.h"
 #include "IndexManager.h"
@@ -17,8 +18,10 @@ class RecordManager
 private:
 	BufferManager *bmanager;
 	Tuple ExtractTuple(const Table &table, const BID bid, const unsigned int tuple_offset) const;
+
 public:
 	IndexManager *imanager;
+
 public:
 	RecordManager()
 	{

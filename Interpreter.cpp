@@ -357,11 +357,19 @@ void Interpreter::Select(string str){
     // 调用Catalog
     pair<int, string> response;
     response = Cata.SelectTest(table_vec[0], attr_vec, cond_vec);
-    if( response.first == -2 ){
+    if(response.first == -4){
+        vector<string> tmp;
+        split(response.second, tmp, ',');
+        DBError e("condition type does not match attribute \"" + tmp[0] + "\" shoule be of type \"" + tmp[2] + "\" but given \"" + tmp[1] + "\"" );
+        throw e;
+    }else if(response.first == -3){
         DBError e("select table does not exist");
         throw e;
+    }else if( response.first == -2 ){
+        DBError e("selected attribute \"" + response.second + "\" does not exist");
+        throw e;
     }else if(response.first == -1){
-        DBError e("select conditions error");
+        DBError e("condition attribute \"" + response.second + "\" does not exist");
         throw e;
     }else{
         // cout<<"[Catalog res]: select with or without index,"<<response.second<<"\n";
@@ -371,7 +379,7 @@ void Interpreter::Select(string str){
             printf("Interpreter::Select::348:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
     #endif
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
-        cout<<"[Interpreter Select Res without index]:"<<"\n";
+        // cout<<"[Interpreter Select Res without index]:"<<"\n";
 
 
         // 这里还需要做一下筛选属性
