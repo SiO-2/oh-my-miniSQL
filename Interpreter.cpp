@@ -22,9 +22,9 @@ Interpreter::Interpreter():Cata(), Record(){
     vector<Index> index_list;
     for(auto pindex: pindex_list){
         index_list.push_back(*pindex);
-        pindex->Print();
+        // pindex->Print();
     }
-    cout<<"[Interpreter debug]: begin set index int map"<<endl;
+    // cout<<"[Interpreter debug]: begin set index int map"<<endl;
     Record.imanager->setindexIntMap(index_list);
 }
 
@@ -131,11 +131,20 @@ void Interpreter::ShowTable(string str){
         throw e;
     }
     table->Print();
+    for(auto index: table->Index_name){
+        index->Print();
+    }
 }
 
 void Interpreter::ShowIndex(string str){
     string &indexname = str;
     strip(indexname);
+    Index* index = Cata.GetIndexCatalog(indexname);
+    if(index == NULL){
+        DBError e("Invalid index name " + indexname);
+        throw e;
+    }
+    index->Print();
 }
 
 void Interpreter::Delete(string str){
@@ -246,7 +255,7 @@ void Interpreter::Select(string str){
         from_str = str.substr(from_pos + 4, str.length() - from_pos - 4 );
         where_str = "";
     }
-    cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<"\n";
+    // cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<"\n";
     vector<string> attr_vec;
     vector<string> table_vec;
     vector<string> temp;
@@ -331,8 +340,8 @@ void Interpreter::Select(string str){
     }else if(response.first == -1){
         DBError e("select conditions error");
         throw e;
-    }else if(response.first == 0){
-        // cout<<"[Catalog res]: select without index,"<<response.second<<"\n";
+    }else{
+        // cout<<"[Catalog res]: select with or without index,"<<response.second<<"\n";
         // Call Record Manager
         Table* table = Cata.GetTableCatalog(table_vec[0]);
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
@@ -362,9 +371,10 @@ void Interpreter::Select(string str){
         }
 
         cout<<"[Interpreter Select Res End]:"<<"\n";
-    }else if(response.first == 1){
-        cout<<"[Catalog res]: select with index"<<response.second<<"\n";
     }
+    // else if(response.first == 1){
+    //     cout<<"[Catalog res]: select with index"<<response.second<<"\n";
+    // }
 
 }
 

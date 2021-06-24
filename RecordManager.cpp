@@ -188,6 +188,7 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     if (flag)
     {
         //有对应的index时
+        cout<<"[Select with index]"<<"\n";
         unsigned int offset = imanager->searchIndex(*table.Index_name[index_num], *condition.begin());
         unsigned int block_offset = offset / BLOCKSIZE;
         unsigned int tuple_offset = offset % BLOCKSIZE;
