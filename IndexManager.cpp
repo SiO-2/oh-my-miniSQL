@@ -23,9 +23,9 @@ void:: IndexManager::setindexIntMap(vector<Index>& indexList){
 //函数功能：在已经存在索引文件的情况下，读入索引文件，并创建B+树
 void IndexManager::readIndexfromfile(const Index& index) {//
 	
-	cout<<"[Index DEBUG]: here read Index from file"<<endl;
-	index.Print();
-	cout<<"[Index DEBUG end]:"<<endl;
+	// cout<<"[Index DEBUG]: here read Index from file"<<endl;
+	// index.Print();
+	// cout<<"[Index DEBUG end]:"<<endl;
 	int len;
 	string filename_index = INDEX_PATH + index.index_name + ".index";
 
@@ -56,9 +56,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 		BPlusTree<int>* tree = new BPlusTree<int>(filename_index, keysize, degree);
 		tree->ReadTree();
-		cout<<"[Index DEBUG]:"<<endl;
-		tree->printleaf();
-		cout<<"[Index DEBUG end]:"<<endl;
+		// cout<<"[Index DEBUG]:"<<endl;
+		// tree->printleaf();
+		// cout<<"[Index DEBUG end]:"<<endl;
 		indexIntMap.insert(intMap::value_type(filename_index, tree));
 	}
 	else if (data_type == FLOAT_UNIT) {
@@ -66,9 +66,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 		degree = getDegree(keysize);
 		BPlusTree<float>* tree = new BPlusTree<float>(filename_index, keysize, degree);
 		tree->ReadTree();
-		cout<<"[Index DEBUG]:"<<endl;
-		tree->printleaf();
-		cout<<"[Index DEBUG end]:"<<endl;
+		// cout<<"[Index DEBUG]:"<<endl;
+		// tree->printleaf();
+		// cout<<"[Index DEBUG end]:"<<endl;
 		indexFloatMap.insert(floatMap::value_type(filename_index, tree));
 	}
 	else if (data_type == CHAR_UNIT) {
@@ -76,9 +76,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 		degree = getDegree(keysize);
 		BPlusTree<string>* tree = new BPlusTree<string>(filename_index, keysize, degree);
 		tree->ReadTree();
-		cout<<"[Index DEBUG]:"<<endl;
-		tree->printleaf();
-		cout<<"[Index DEBUG end]:"<<endl;
+		// cout<<"[Index DEBUG]:"<<endl;
+		// tree->printleaf();
+		// cout<<"[Index DEBUG end]:"<<endl;
 		indexStringMap.insert(stringMap::value_type(filename_index, tree));
 	}
 	else {
