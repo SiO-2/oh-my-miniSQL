@@ -93,7 +93,7 @@ public:
 	// Index(Index& index);
 	Index();
 	Index(string index_name, Table* table, string table_name, int attr_num);
-	void Print();
+	void Print() const;
 };
 
 /*

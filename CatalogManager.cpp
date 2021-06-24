@@ -174,7 +174,7 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     // for(auto attr: t->m_attribute){
     //     attr.Print();
     // }
-    cout<<"[Catalog debug]: end"<<endl;
+    // cout<<"[Catalog debug]: end"<<endl;
     // // end of wyc test
     for (i=0; i<n; i++)
     {
