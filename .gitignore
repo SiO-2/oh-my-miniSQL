@@ -8,3 +8,6 @@
 .vscode
 main.exe
 *.exe
+database/data
+database/meta
+database
