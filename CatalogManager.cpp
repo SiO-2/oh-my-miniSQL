@@ -367,7 +367,7 @@ int CatalogManager::FindIndex(string& index_name)
     int n = m_index.size(), i;
     for (i=0; i<n; i++)
     {
-        if (index_name == m_table[i]->m_metadata.name)
+        if (index_name == m_index[i]->index_name)
             return i;
     }
     return -1;
