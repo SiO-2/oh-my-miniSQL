@@ -36,6 +36,7 @@ public:
 
 	//获取表名为table_name的Catalog信息，如果不存在则返回空的Table
 	Table* GetTableCatalog(string& table_name);	
+	Index* GetIndexCatalog(string& index_name);
 		
 	//返回table_name表中的Index指针集合，如果不存在则返回空的Index
 	vector<Index*> TableToIndex(string& table_name);

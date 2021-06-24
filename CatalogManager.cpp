@@ -253,6 +253,15 @@ Table* CatalogManager::GetTableCatalog(string& table_name)
     return t;
 }
 
+Index* CatalogManager::GetIndexCatalog(string& index_name)
+{
+    int i = FindIndex(index_name);
+    if (i==-1)
+        return NULL;
+    Index *I = m_index[i];
+    return I;
+}
+
 //返回table_name表中的Index，如果不存在则返回空的Index
 vector<Index*> CatalogManager::TableToIndex(string& table_name)
 {
