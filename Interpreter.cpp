@@ -356,7 +356,7 @@ void Interpreter::Select(string str){
                     printf("Interpreter::Select::348:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
 #endif
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
-        cout<<"[Interpreter Select Res without index]:"<<"\n";
+        // cout<<"[Interpreter Select Res without index]:"<<"\n";
 
 
         // 这里还需要做一下筛选属性
