@@ -132,19 +132,34 @@ bool CatalogManager::DropIndex(string& name)
         if (name == m_index[i]->index_name){
             string tname = m_index[i]->table_name;
             // cout << tname;
-            int i = FindTable(tname);
-            if (i==-1)
+            int k = FindTable(tname);
+            if (k==-1)
                 return false;
+            cout << index_name << endl;
             index_file.open(NameToIF(index_name), ios::out|ios::binary);
             // m_index.erase(m_index.begin()+i);
-            swap(*(std::begin(m_index)+1),*(std::end(m_index)-1));
+            swap(*(std::begin(m_index)+i),*(std::end(m_index)-1));
+            cout << name << "    " << m_index[m_index.size()-1]->index_name << endl;
+            cout << m_index.size() << endl;
             m_index.pop_back();
+            cout << m_table.size() << endl;
             writeallIndex(index_file);
             index_file.close();
             remove(NameToIF(name).c_str());
-            for (int j = 0; j<m_table[i]->Index_name.size(); j++)
-                if (m_table[i]->Index_name[j]->index_name==name)
-                    m_table[i]->Index_name.erase(m_table[i]->Index_name.begin()+j);
+            cout<<table_name;
+            index_file.open(table_name, ios::out|ios::binary);
+            cout << m_table[k]->Index_name.size() << endl;
+            for (int j = 0; j<m_table[k]->Index_name.size(); j++)
+                if (m_table[k]->Index_name[j]->index_name==name)
+                {
+                    swap(*(std::begin(m_table[k]->Index_name)+j),*(std::end( m_table[k]->Index_name)-1));
+                    cout << name << "    " << m_table[k]->Index_name[m_table[k]->Index_name.size()-1] << endl;
+                    m_table[k]->Index_name.pop_back();
+                    break;
+                }
+            cout << m_table[k]->Index_name.size() << endl;
+            writeallTable(index_file);
+            index_file.close();
             return true;
         }
     }
@@ -201,6 +216,7 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
     }
     Table *t = m_table[i];
     int m, n, flag;
+    float va;
     n = t->m_attribute.size();
     m = Attr.size();
     for (i=0; i<m; i++)
@@ -231,6 +247,13 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
             {
                 if (condition[i].data_type == t->m_attribute[j].type)
                     condition[i].attr_num = j;
+                else if(condition[i].data_type == DataType::INT_UNIT && t->m_attribute[j].type == DataType::FLOAT_UNIT) //int到float隐式转换
+                {
+                    condition[i].data_type = DataType::FLOAT_UNIT;
+                    va = (float)condition[i].value.int_value;
+                    condition[i].value.float_value = va;
+                    condition[i].attr_num = j;
+                }
                 else
                 {
                     ret.first = -4;
@@ -340,6 +363,12 @@ pair<int, string> CatalogManager::DeleteTest(string& table_name, vector<Conditio
 //检测attr， 未定，根据需求改
 bool CatalogManager::CheckAttr(Attribute& attr, struct Unit& data)
 {
+    if (data.datatype == DataType::INT_UNIT && attr.type == DataType::FLOAT_UNIT)
+    {
+        data.datatype = DataType::FLOAT_UNIT;
+        float va = (float)data.value.int_value;
+        data.value.float_value = va;
+    }
     return attr.type == data.datatype;
 }
 
@@ -501,6 +530,7 @@ void CatalogManager::writeallTable(fstream& f)
 void CatalogManager::writeallIndex(fstream& f)
 {
     int n = m_index.size();
+    cout << "[index]:" << n;
     writeint(n, f);
     for (int i=0; i<n; i++)
         writeIndex(m_index[i], f);
@@ -523,6 +553,7 @@ void CatalogManager::readallIndex(fstream& f)
 {
     int index_n;
     readint(index_n, f);
+        cout << "[all index]" << index_n;
     m_index.clear();
     Index* I;
     for (int i= 0; i<index_n; i++)
