@@ -211,10 +211,24 @@ void Interpreter::DropTable(string str){
     // cout<<"[Debug info]: Drop Table Name=\""<<str<<"\""<<"\n";
 
     // 调用Catalog的部分
+    string tablename = str;
+    Table *table = Cata.GetTableCatalog(tablename);
+    if(table == NULL){
+        DBError e("Invalid table name \"" + tablename + "\"");
+        throw e;
+    }
+
+    for(auto index: table->Index_name){
+        this->DropIndex(index->index_name);
+        // if( !(this->DropIndex(index->index_name)) ){
+        //     cout<<"Drop index \"" + index->index_name + "\" of table \"" + tablename + "\" fail"<<"\n";
+        // }
+    }
+
     if( Cata.DropTable(str) ){
-        cout<<"Drop Table "<<str<<" succussfully"<<"\n";
+        cout<<"Drop Table \""<<str<<"\" succussfully"<<"\n";
     }else{
-        cout<<"Drop Table "<<str<<" failed"<<"\n";
+        cout<<"Drop Table \""<<str<<"\" failed"<<"\n";
     }
 }
 
@@ -232,7 +246,7 @@ void Interpreter::DropIndex(string str){
         DBError e("Drop index \"" + str + "\" failed");
         throw e;
     }
-    cout<<"Drop index successfully"<<"\n";
+    cout<<"Drop index \""<<str<<"\" successfully"<<"\n";
 }
 
 void Interpreter::Select(string str){
@@ -313,11 +327,12 @@ void Interpreter::Select(string str){
         throw e;
     }
     Table* table = Cata.GetTableCatalog(table_vec[0]);
+    if(table == NULL){
+        DBError e("Invalid table name \"" + table_vec[0] + "\"");
+        throw e;
+    }
     cond_vec = ParseCondition(where_str);
 
-#ifdef DEBUG
-                    printf("Interpreter::Select::314:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
-#endif    
     // debug 打印 condition 信息
     // for(auto cond:cond_vec){
     //     cond.Print();
@@ -352,9 +367,9 @@ void Interpreter::Select(string str){
         // cout<<"[Catalog res]: select with or without index,"<<response.second<<"\n";
         // Call Record Manager
         Table* table = Cata.GetTableCatalog(table_vec[0]);
-#ifdef DEBUG
-                    printf("Interpreter::Select::348:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
-#endif
+    #ifdef DEBUG
+            printf("Interpreter::Select::348:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
+    #endif
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
         // cout<<"[Interpreter Select Res without index]:"<<"\n";
 
@@ -669,6 +684,27 @@ void Interpreter::CreateTable(string str){
         // cout<<"[Catalog info]: Create Table Failed"<<"\n";s
         DBError e("Create Table Failed because of duplicated table name" + tablename);
         throw e;
+    }
+
+    // 创建索引
+    int attrcount = 0;
+    for(auto attr:Attributes){
+        if(attr.unique){
+            // 为unique自动创建索引
+            cout<<"Automatic build index for unique attribute \"" + attr.name + "\""<<"\n";
+            string index_name = attr.name + "_autoindex_" + tablename; 
+            Index index(index_name, &table, tablename, attrcount);
+
+            if( !Cata.CreateIndex(index) ){
+                InternalError e("Create index \"" + index_name + "\" failed");
+                throw e;
+            }
+            // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+            Record.CreateIndex(index);
+            cout<<"Create index \"" + index_name + "\" successfully"<<"\n";
+
+        }
+        attrcount ++;
     }
 
     // Call Record Manager
