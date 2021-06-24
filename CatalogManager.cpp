@@ -110,7 +110,7 @@ bool CatalogManager::DropTable(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_table[i]->m_metadata.name){
-            table_file.open(NameToTF(table_name), ios::out|ios::binary);
+            table_file.open(table_name, ios::out|ios::binary);
             m_table.erase(m_table.begin()+i);
             writeallTable(table_file);
             table_file.close();
@@ -136,7 +136,7 @@ bool CatalogManager::DropIndex(string& name)
             if (k==-1)
                 return false;
             cout << index_name << endl;
-            index_file.open(NameToIF(index_name), ios::out|ios::binary);
+            index_file.open(index_name, ios::out|ios::binary);
             // m_index.erase(m_index.begin()+i);
             swap(*(std::begin(m_index)+i),*(std::end(m_index)-1));
             cout << name << "    " << m_index[m_index.size()-1]->index_name << endl;
