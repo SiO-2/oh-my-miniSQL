@@ -76,7 +76,7 @@ class Table //数据库中的一张表
 public:
 	TableMetadata m_metadata;	   //表的定义信息
 	vector<Attribute> m_attribute; //表中字段的信息
-	vector<Index*> Index_ptr;  //对应的index的name
+	vector<Index*> Index_name;  //对应的index的name
 	Table(TableMetadata m_metadata, vector<Attribute> m_attribute);
 	Table(Table &table);
 	Table();
