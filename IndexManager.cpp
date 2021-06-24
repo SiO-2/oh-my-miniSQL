@@ -392,9 +392,9 @@ offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_ke
 			return -1;
 		}
 		else {
-			cout<<"[Index Manager debug]:"<<endl;
-			itInt->second->printleaf();
-			cout<<"[Index Manager debug end]:"<<endl;
+			// cout<<"[Index Manager debug]:"<<endl;
+			// itInt->second->printleaf();
+			// cout<<"[Index Manager debug end]:"<<endl;
 			return itInt->second->Search(intTmp);
 		}
 	}
