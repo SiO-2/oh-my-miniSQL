@@ -21,6 +21,7 @@ using namespace std;
 // Decription: 
 //      Implement by istringstream
 void split(string& str, vector<string>& sv, char flag);
+void split_string(string& str, vector<string>& sv, string& flag);
 
 
 // Name: get_token

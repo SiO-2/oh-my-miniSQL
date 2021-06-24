@@ -150,6 +150,7 @@ void Interpreter::Delete(string str){
         // 使用Record删除
         Table *table_pointer = Cata.GetTableCatalog(tablename);
         Record.DeleteTuple(*table_pointer, cond_vec);
+        cout<<"Delete successfully"<<"\n";
     }else if(response.first == 1){
         // 索引删除
         string index_name = response.second; 
@@ -214,7 +215,7 @@ void Interpreter::Select(string str){
         from_str = str.substr(from_pos + 4, str.length() - from_pos - 4 );
         where_str = "";
     }
-    // cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<"\n";
+    cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<"\n";
     vector<string> attr_vec;
     vector<string> table_vec;
     vector<string> temp;
@@ -251,7 +252,8 @@ void Interpreter::Select(string str){
             table_name_map[infield_vec[2]] = infield_vec[0];
             table_vec.push_back(infield_vec[0]);
         }else{
-            SyntaxError e("Invalid table name in from\n");
+            cout<<"[Interpreter debug]: "<<infield_vec.size()<<endl;
+            SyntaxError e("Invalid table name  \"" + table_str + "\"");
             throw e;
         }
     }
