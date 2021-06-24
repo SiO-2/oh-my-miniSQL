@@ -4,14 +4,14 @@
 //函数功能：index manager的构造函数
 //传入参数：已经存在的index的vector
 
-IndexManager::IndexManager(const vector<Index> indexList) {//构造函数，需要读取index文件并建立对应B+树
+IndexManager::IndexManager() {//构造函数，需要读取index文件并建立对应B+树
 	//vector<Index> indexList;
 	
-	string filepath;
-	for(auto i = indexList.begin(); i != indexList.end(); i++) {
-		filepath = INDEX_PATH + i->index_name + ".index";
-		readIndexfromfile(filepath, i->type);
-	}
+	//string filepath;
+//	for(auto i = indexList.begin(); i != indexList.end(); i++) {
+	//	filepath = INDEX_PATH + i->indexName + ".index";
+	//	readIndexfromfile(filepath, i->type);
+	//}
 }
 
 
