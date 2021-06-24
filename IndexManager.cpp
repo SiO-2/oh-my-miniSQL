@@ -81,7 +81,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 	{
 		cout<<"[Index Debug]: value.int_value "<<value.int_value<<endl;
 		len = sizeof(int);
-		intTmp = value.int_value;
+		this->intTmp = value.int_value;
 
 		intMap::iterator itInt = indexIntMap.find(filename_index);
 		if (itInt == indexIntMap.end()) {

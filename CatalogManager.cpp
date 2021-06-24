@@ -74,19 +74,19 @@ bool CatalogManager::CreateTable(Table& table)
     return true;
 }
 
-//创建索引，需要检查重复性，返回值true表示成功，false表示失败
-bool CatalogManager::CreateIndex(Index& index)
+//创建索引，需要检查重复性，返回值1表示成功，0表示名称重复， -1表示对应的表不存在
+int CatalogManager::CreateIndex(Index& index)
 {
     fstream index_file;
     int n = m_index.size();
     for (int i=0; i<n; i++)
     {
         if (index.index_name == m_index[i]->index_name)
-            return false;
+            return 0;
     }
     int i = FindTable(index.table_name);
     if (i == -1)
-        return false;
+        return -1;
     index.table = m_table[i];
     index.table_name = m_table[i]->m_metadata.name;
     Index* t = new Index(index);
@@ -99,7 +99,7 @@ bool CatalogManager::CreateIndex(Index& index)
     index_file.open(NameToIF(index.index_name), ios::out|ios::binary);
     index_file.close();
     m_table[i]->Index_name.push_back(t);
-    return true;
+    return 1;
 }
 
 //删除表，通过name判断删除哪张表，需要检查存在性，返回值true表示成功，false表示失败
@@ -251,6 +251,15 @@ Table* CatalogManager::GetTableCatalog(string& table_name)
     Table *t = m_table[i];
     // cout<<"[Cata debug end]"<<endl;
     return t;
+}
+
+Index* CatalogManager::GetIndexCatalog(string& index_name)
+{
+    int i = FindIndex(index_name);
+    if (i==-1)
+        return NULL;
+    Index *I = m_index[i];
+    return I;
 }
 
 //返回table_name表中的Index，如果不存在则返回空的Index

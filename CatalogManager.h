@@ -13,8 +13,8 @@ public:
 
 	//创建包含Catalog的表，需要检查重复性，返回值true表示成功，false表示失败
 	bool CreateTable(Table& table);	
-	//创建索引，需要检查重复性，返回值true表示成功，false表示失败
-	bool CreateIndex(Index& index);	
+	//创建索引，需要检查重复性，返回值1表示成功，0表示名称重复， -1表示对应的表不存在
+	int CreateIndex(Index& index);	
 
 	//删除表，通过name判断删除哪张表，需要检查存在性，返回值true表示成功，false表示失败
 	bool DropTable(string& name);	
@@ -36,6 +36,7 @@ public:
 
 	//获取表名为table_name的Catalog信息，如果不存在则返回空的Table
 	Table* GetTableCatalog(string& table_name);	
+	Index* GetIndexCatalog(string& index_name);
 		
 	//返回table_name表中的Index指针集合，如果不存在则返回空的Index
 	vector<Index*> TableToIndex(string& table_name);
