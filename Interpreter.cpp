@@ -18,6 +18,14 @@ using namespace std;
 
 
 Interpreter::Interpreter():Cata(), Record(){
+    vector<Index*> pindex_list = Cata.GetAllIndex();
+    vector<Index> index_list;
+    for(auto pindex: pindex_list){
+        index_list.push_back(*pindex);
+        // pindex->Print();
+    }
+    // cout<<"[Interpreter debug]: begin set index int map"<<endl;
+    Record.imanager->setindexIntMap(index_list);
 }
 
 Interpreter::~Interpreter(){
@@ -97,6 +105,21 @@ void Interpreter::Parse(string sql){
 }
 
 void Interpreter::ShowDatabase(std::string str){
+    strip(str);
+    if(!str.empty()){
+        SyntaxError e("Show database can not be followed by other characters");
+        throw e;
+    }
+    vector<Table *> table_pointer_vec = Cata.GetAllTable();
+    vector<Index *> index_pointer_vec = Cata.GetAllIndex();
+    cout<<"[All Table Info]:"<<"\n";
+    for(auto table: table_pointer_vec){
+        table->Print();
+    }
+    cout<<"[All Index Info]:"<<"\n";
+    for(auto index: index_pointer_vec){
+        index->Print();
+    }
 
 }
 void Interpreter::ShowTable(string str){
@@ -108,17 +131,20 @@ void Interpreter::ShowTable(string str){
         throw e;
     }
     table->Print();
+    for(auto index: table->Index_name){
+        index->Print();
+    }
 }
 
 void Interpreter::ShowIndex(string str){
-    // string &indexname = str;
-    // strip(indexname);
-    // Table *table = Cata.GetTableCatalog(indexname);
-    // if(table==NULL){
-    //     DBError e("Invalid index name " + indexname);
-    //     throw e;
-    // }
-    // table->Print();
+    string &indexname = str;
+    strip(indexname);
+    Index* index = Cata.GetIndexCatalog(indexname);
+    if(index == NULL){
+        DBError e("Invalid index name " + indexname);
+        throw e;
+    }
+    index->Print();
 }
 
 void Interpreter::Delete(string str){
@@ -194,7 +220,14 @@ void Interpreter::DropIndex(string str){
         throw e;
     }
     // Here Index Name to Drop is 'str'
-    cout<<"[info]: Drop Index Name=\""<<str<<"\""<<"\n";
+    // cout<<"[info]: Drop Index Name=\""<<str<<"\""<<"\n";
+    
+    bool b = Cata.DropIndex(str);
+    if(!b){
+        DBError e("Drop index \"" + str + "\" failed");
+        throw e;
+    }
+    cout<<"Drop index successfully"<<"\n";
 }
 
 void Interpreter::Select(string str){
@@ -222,7 +255,7 @@ void Interpreter::Select(string str){
         from_str = str.substr(from_pos + 4, str.length() - from_pos - 4 );
         where_str = "";
     }
-    cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<"\n";
+    // cout<<"[debug]: \nattr string="<<attr_str<<"\nfrom string="<<from_str<<"\nwhere string="<<where_str<<"\n";
     vector<string> attr_vec;
     vector<string> table_vec;
     vector<string> temp;
@@ -307,8 +340,8 @@ void Interpreter::Select(string str){
     }else if(response.first == -1){
         DBError e("select conditions error");
         throw e;
-    }else if(response.first == 0){
-        // cout<<"[Catalog res]: select without index,"<<response.second<<"\n";
+    }else{
+        // cout<<"[Catalog res]: select with or without index,"<<response.second<<"\n";
         // Call Record Manager
         Table* table = Cata.GetTableCatalog(table_vec[0]);
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
@@ -338,9 +371,10 @@ void Interpreter::Select(string str){
         }
 
         cout<<"[Interpreter Select Res End]:"<<"\n";
-    }else if(response.first == 1){
-        cout<<"[Catalog res]: select with index"<<response.second<<"\n";
     }
+    // else if(response.first == 1){
+    //     cout<<"[Catalog res]: select with index"<<response.second<<"\n";
+    // }
 
 }
 
@@ -483,10 +517,13 @@ void Interpreter::CreateIndex(string str){
     if( !Cata.CreateIndex(index) ){
         InternalError e("Create index \"" + index_name + "\" failed");
         throw e;
+    }else{
+        cout<<"Create index in Record now"<<"\n";
+
+        // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+        Record.CreateIndex(index);
+        cout<<"Create index successfully"<<"\n";
     }
-    cout<<"[Interpreter Debug]: begin create index into record"<<endl;
-    Record.CreateIndex(index);
-    cout<<"Create index successfully"<<"\n";
 
 }
 

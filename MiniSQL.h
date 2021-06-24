@@ -90,7 +90,7 @@ public:
 	Table* table;	//确实需要指向table，但是这里不能放指针，读出来每次都不一样，等index那边搞定再改
 	string table_name; //（zxy：这里应该存的是表名，然后从内存读出来的时候可以加载出表的指针（个人理解
 	int attr_num;	//索引建立在该属性上
-	Index(Index& index);
+	// Index(Index& index);
 	Index();
 	Index(string index_name, Table* table, string table_name, int attr_num);
 	void Print();

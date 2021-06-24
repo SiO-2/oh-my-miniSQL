@@ -4,12 +4,21 @@
 //函数功能：index manager的构造函数
 //传入参数：已经存在的index的vector
 
-IndexManager::IndexManager(vector<Index> indexList) {//构造函数，需要读取index文件并建立对应B+树
+// IndexManager::IndexManager(vector<Index> indexList) {//构造函数，需要读取index文件并建立对应B+树
+// 	for(auto i = indexList.begin(); i != indexList.end(); i++) {
+// 		readIndexfromfile(*i);
+// 	}
+// }
+
+IndexManager::IndexManager(){
+
+}
+
+void:: IndexManager::setindexIntMap(vector<Index>& indexList){
 	for(auto i = indexList.begin(); i != indexList.end(); i++) {
 		readIndexfromfile(*i);
 	}
 }
-
 
 //函数功能：在已经存在索引文件的情况下，读入索引文件，并创建B+树
 void IndexManager::readIndexfromfile(const Index& index) {//
@@ -68,15 +77,18 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber Offset)
 {
-	int len;
+	int len, intTmp;
 	string filename_index = INDEX_PATH + index.index_name + ".index";
 	
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
 
+	// cout<<"[Index Debug]: intTmp"<<intTmp<<endl;
+	// cout<<"[Index Debug]: datatype "<<data_type<<endl;
 
 	if (data_type == INT_UNIT) //int 
 	{
+		// cout<<"[Index Debug]: value.int_value "<<value.int_value<<endl;
 		len = sizeof(int);
 		intTmp = value.int_value;
 
@@ -242,19 +254,6 @@ void IndexManager::createIndex(const Index& index) {//
 
     int data_type = index.table->m_attribute[index.attr_num].type;
 
-
-	ifstream newfile_in(filename_index.c_str());
-	ofstream newfile_out;
-
-
-	if (newfile_in) {
-		cout << "in Create index: file " << filename_index << "already exist" << endl;
-		newfile_in.close();
-	}
-	else {
-		newfile_out.open(filename_index.c_str());
-		newfile_out.close();
-	}
 
 
 

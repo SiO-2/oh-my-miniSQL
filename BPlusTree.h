@@ -504,6 +504,7 @@ bool BPlusTree<ElementType>::AfterDelete(Node pNode)
 			}
 		}
 	}
+	return true;
 }
 
 template <class ElementType>

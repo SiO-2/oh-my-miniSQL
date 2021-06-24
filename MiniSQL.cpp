@@ -129,12 +129,13 @@ void Table::Print()
     }
 }
 
-Index::Index(Index &index)
-{
-    this->attr_num = index.attr_num;
-    this->index_name = index.index_name;
-    this->table = index.table;
-}
+// Index::Index(Index &index)
+// {
+//     this->attr_num = index.attr_num;
+//     this->index_name = index.index_name;
+//     this->table = index.table;
+//     this->table_name = index.table_name;
+// }
 
 Index::Index()
 {
@@ -147,7 +148,12 @@ Index::Index(string index_name, Table* table, string table_name, int attr_num):i
 
 void Index::Print()
 {
-    cout << "[Index Info]: index name = " << this->index_name << endl;
+    cout << "[Index Info]: index name = " << this->index_name <<" on table \"" << this->table_name << "\" attribute \""<<this->table->m_attribute[this->attr_num].name<<"\"\n";
+    // Table *table = this->table;
+    // table->Print();
+    // cout<<this->attr_num;
+    // this->table->m_attribute[this->attr_num].name;
+    // cout<<"\""<< endl;
 }
 
 Unit::Unit()
