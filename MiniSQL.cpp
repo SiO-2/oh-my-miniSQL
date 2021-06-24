@@ -26,8 +26,8 @@ void TableMetadata::Print()
     cout << "[Table Meta]:\n";
     cout << "Name:" << this->name << endl;
     cout << "Attr num:" << this->attr_num << endl;
-    cout << "Primary Key:" << this->primary_key << endl;
-    cout << "Primary Index:" << this->primary_index << endl;
+    // cout << "Primary Key:" << this->primary_key << endl;
+    // cout << "Primary Index:" << this->primary_index << endl;
 }
 
 Attribute::Attribute(string name, string typestr, bool notnull, bool unique, bool primary_key)
@@ -78,7 +78,7 @@ void Attribute::set_pk(bool pk)
 void Attribute::Print()
 {
     // cout<<"[debug]: "<<this->name.length()<<endl;
-    cout << "[info]: Attr:" << this->name << ", type:";
+    cout << "[Attribute info]: Attr:" << this->name << ", type:";
     if (this->type == INT_UNIT)
     {
         cout << "int";
@@ -157,19 +157,19 @@ Unit::Unit(Value value, DataType datatype) : value(value)
 
 void Unit::Print()
 {
-    cout << "[Unit info]: ";
+    // cout << "[Unit info]: ";
     string str;
     switch (this->datatype)
     {
     case INT_UNIT:
-        cout << "int: " << this->value.int_value << endl;
+        cout << "(int)" << this->value.int_value <<" ";
         break;
     case FLOAT_UNIT:
-        cout << "float: " << this->value.float_value << endl;
+        cout << "(float)" << this->value.float_value<<" ";
         break;
     case CHAR_UNIT:
         str = this->value.char_n_value;
-        cout << "string: " << str << endl;
+        cout << "(string)" << str <<" ";
         break;
     default:
         break;
@@ -181,12 +181,22 @@ Tuple::Tuple() : tuple_value(), valid(true)
 
 void Tuple::Print()
 {
-    cout << "[Tuple info]:" << endl;
+    cout << "[Tuple]:";
     for (auto unit : this->tuple_value)
     {
         unit.Print();
     }
-    cout << "[Tuple info end]" << endl;
+    cout << "[End]" << endl;
+}
+
+void Tuple::Print(vector<int>& int_vec){
+    cout << "[Tuple]:";
+    for (int idx : int_vec)
+    {
+        this->tuple_value[idx].Print();
+        // unit.Print();
+    }
+    cout << "[End]" << endl;
 }
 // void DataUnit::Print(){
 //     cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";

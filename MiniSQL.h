@@ -138,6 +138,7 @@ public:
 	bool valid;
 	Tuple();
 	void Print();
+	void Print(vector<int>& int_vec);
 };
 
 struct BPlusNode
