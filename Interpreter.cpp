@@ -313,11 +313,11 @@ void Interpreter::Insert(string str){
         tuple.tuple_value.push_back(unit);
     }
 
-    cout<<"[Insert Info]:"<<"\n";
-    for(auto tunit:tuple.tuple_value){
+    // cout<<"[Insert Info]:"<<"\n";
+    // for(auto tunit:tuple.tuple_value){
 
-        tunit.Print();
-    }
+    //     tunit.Print();
+    // }
     // 结果存储
     // string:targ_table_name
     // value: tuple
@@ -328,15 +328,16 @@ void Interpreter::Insert(string str){
         DBError e("Insert invalid");
         throw e;
     }else {
-        cout<<"[Catalog res]: Insert validate"<<"\n";
+        // cout<<"[Catalog res]: Insert validate"<<"\n";
     }
 
     // Call Record Manager
     // Befor that call Catalog to get whole table info
     Table * table = Cata.GetTableCatalog(targ_table_name);
-    table->Print();
-    tuple.Print();
+    // table->Print();
+    // tuple.Print();
     Record.InsertTuple(*table, tuple);
+    cout<<"Insert successfully"<<endl;
 }
 
 void Interpreter::CreateIndex(string str){
@@ -516,5 +517,5 @@ void Interpreter::CreateTable(string str){
     }
 
     // Call Record Manager
-    Record.CreateTableFile(table);
+    // Record.CreateTableFile(table);
 }

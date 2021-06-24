@@ -9,7 +9,7 @@ IndexManager::IndexManager(const vector<Index> indexList) {//构造函数，需�
 	
 	string filepath;
 	for(auto i = indexList.begin(); i != indexList.end(); i++) {
-		filepath = INDEX_PATH + i->indexName + ".index";
+		filepath = INDEX_PATH + i->index_name + ".index";
 		readIndexfromfile(filepath, i->type);
 	}
 }

@@ -157,8 +157,10 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     // // end of wyc test
     for (i=0; i<n; i++)
     {
-        if (!CheckAttr(t->m_attribute[i], data.tuple_value[i]))
+        if (!CheckAttr(t->m_attribute[i], data.tuple_value[i])){
+            cout<<"[Catalog Debug]: Check Attr Wrong."<<endl;
             return false;
+        }
     }
     return true;
 }
