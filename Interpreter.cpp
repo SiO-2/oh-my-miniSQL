@@ -120,8 +120,8 @@ void Interpreter::ShowDatabase(std::string str){
     for(auto index: index_pointer_vec){
         index->Print();
     }
-
 }
+
 void Interpreter::ShowTable(string str){
     string &tablename = str;
     strip(tablename);
@@ -523,13 +523,10 @@ void Interpreter::CreateIndex(string str){
     if( !Cata.CreateIndex(index) ){
         InternalError e("Create index \"" + index_name + "\" failed");
         throw e;
-    }else{
-        cout<<"Create index in Record now"<<"\n";
-
-        // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
-        Record.CreateIndex(index);
-        cout<<"Create index successfully"<<"\n";
     }
+    // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+    Record.CreateIndex(index);
+    cout<<"Create index successfully"<<"\n";
 
 }
 
@@ -597,7 +594,7 @@ void Interpreter::CreateTable(string str){
                 // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<"\n";
                 if( (*Attr).name == pk_name ){
                     (*Attr).set_pk(true);
-                    cout<<"[debug]: set pk of "<< pk_name<<"\n";
+                    // cout<<"[debug]: set pk of "<< pk_name<<"\n";
                     flag = 1;
                     pk_mark = count;
                     main_index = count;
