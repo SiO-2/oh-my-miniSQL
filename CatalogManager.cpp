@@ -139,6 +139,7 @@ bool CatalogManager::DropIndex(string& name)
             index_file.open(index_name, ios::out|ios::binary);
             // m_index.erase(m_index.begin()+i);
             swap(*(std::begin(m_index)+i),*(std::end(m_index)-1));
+            // delete m_index[m_index.size()-1];
             m_index.pop_back();
             writeallIndex(index_file);
             index_file.close();
@@ -148,6 +149,7 @@ bool CatalogManager::DropIndex(string& name)
                 if (m_table[k]->Index_name[j]->index_name==name)
                 {
                     swap(*(std::begin(m_table[k]->Index_name)+j),*(std::end( m_table[k]->Index_name)-1));
+                    // delete m_table[k]->Index_name[m_table[k]->Index_name.size()-1];
                     m_table[k]->Index_name.pop_back();
                     break;
                 }
