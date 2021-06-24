@@ -94,12 +94,6 @@ DataType ParseDataType(string& str){
         // float_value = stol(str);
     }else{
         data_type = INT_UNIT;
-        // try{
-            // int_value = stoi(str);
-        // }catch(...){
-            // SyntaxError e("Wrong condition value syntax");
-            // throw e;
-        // }
     }
     return data_type;
 }

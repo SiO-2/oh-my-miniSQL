@@ -20,6 +20,11 @@ using namespace std;
 Interpreter::Interpreter():Cata(), Record(){
 }
 
+Interpreter::~Interpreter(){
+    delete &Record;
+    delete &Cata;
+}
+
 void Interpreter::Parse(string sql){
     string t = sql;
     strip(t);
@@ -170,13 +175,13 @@ void Interpreter::DropTable(string str){
         throw e;
     }
     // Here Table Name to Drop is 'str'
-    cout<<"[info]: Drop Table Name=\""<<str<<"\""<<"\n";
+    // cout<<"[Debug info]: Drop Table Name=\""<<str<<"\""<<"\n";
 
     // 调用Catalog的部分
     if( Cata.DropTable(str) ){
-        cout<<"[Catalog res]: Drop Table "<<str<<" succussfully"<<"\n";
+        cout<<"Drop Table "<<str<<" succussfully"<<"\n";
     }else{
-        cout<<"[Catalog res]: Drop Table "<<str<<" failed"<<"\n";
+        cout<<"Drop Table "<<str<<" failed"<<"\n";
     }
 }
 

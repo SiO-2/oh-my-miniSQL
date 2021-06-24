@@ -12,3 +12,7 @@ SyntaxError::SyntaxError(string msg): SqlError(msg){
 DBError::DBError(string msg): SqlError(msg){
     
 }
+
+InternalError::InternalError(string msg): SqlError(msg){
+    
+}

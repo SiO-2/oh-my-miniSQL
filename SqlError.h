@@ -6,8 +6,6 @@ using namespace std;
 // Sql运行过程中的报错
 class SqlError{
 public:
-    // string origin_string;
-    // int pos;
     string msg;
     SqlError(string msg);
 };
@@ -18,9 +16,15 @@ public:
     SyntaxError(string msg);
 };
 
+// 数据库返回错误
 class DBError: public SqlError{
 public:
     DBError(string msg);
 };
 
+// 内部程序运行错误
+class InternalError: public SqlError{
+public:
+    InternalError(string msg);
+};
 #endif
