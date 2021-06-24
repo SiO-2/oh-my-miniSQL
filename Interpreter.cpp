@@ -461,6 +461,10 @@ void Interpreter::CreateIndex(string str){
     int count = 0, attr_num = -1;
     for(auto attr:table->m_attribute){
         if( attr_name == attr.name ){
+            if(!attr.unique){
+                DBError e("You can only build index on unique attribute");
+                throw e;
+            }
             attr_num = count;
             break;
         }else{
