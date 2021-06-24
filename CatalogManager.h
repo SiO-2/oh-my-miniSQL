@@ -60,6 +60,8 @@ private:
 	string NameToTF(string& name);
 	string NameToIF(string& name);
 
+	void replace();
+
 	int FindTable(string& table_name);
 	int FindIndex(string& index_name);
 

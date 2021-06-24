@@ -32,6 +32,7 @@ CatalogManager::CatalogManager()
         writeint(n, index_file);
         index_file.close();
     }
+    replace();
     // by wyc print to debug:
     // cout<<"[Catalog]: table list"<<endl;
     // for(auto table:this->m_table){
@@ -96,10 +97,7 @@ bool CatalogManager::CreateIndex(Index& index)
     index_file.close();
     index_file.open(NameToIF(index.index_name), ios::out|ios::binary);
     index_file.close();
-    m_table[i]->Index_name.push_back(index.index_name);
-    index_file.open(NameToTF(m_table[i]->m_metadata.name), ios::out|ios::binary);
-    writeallTable(index_file);
-    index_file.close();
+    m_table[i]->Index_name.push_back(t);
     return true;
 }
 
@@ -138,12 +136,9 @@ bool CatalogManager::DropIndex(string& name)
             writeallIndex(index_file);
             index_file.close();
             remove(NameToIF(name).c_str());
-            for (int j = 0; i<m_table[i]->Index_name.size(); j++)
-                if (m_table[i]->Index_name[j]==name)
+            for (int j = 0; j<m_table[i]->Index_name.size(); j++)
+                if (m_table[i]->Index_name[j]->index_name==name)
                     m_table[i]->Index_name.erase(m_table[i]->Index_name.begin()+j);
-            index_file.open(NameToTF(m_table[i]->m_metadata.name));
-            writeallTable(index_file);
-            index_file.close();
             return true;
         }
     }
@@ -435,14 +430,10 @@ Table* CatalogManager::readTable(fstream& f)
     Attribute* attr;
     Table* t;
     string tname;
+    Index* index = new Index;
     int num;
     readstring(tname, f);
     m_metadata.name = tname;
-    readint(num, f);
-    for (int j=0; j<num; j++) {
-        readstring(tname, f);
-        t->Index_name[j] = tname;
-    }
     readint(num, f);
     m_metadata.attr_num = num;
     for (int j=0; j<num; j++)
@@ -460,10 +451,6 @@ void CatalogManager::writeTable(Table* t, fstream& f)
 {
     int num = t->m_metadata.attr_num;
     writestring(t->m_metadata.name, f);
-    int n = t->Index_name.size();
-    writeint(n, f);
-    for (int i=0; i<n; i++)
-        writestring(t->Index_name[i], f);
     writeint(num, f);
     for (int i=0; i<num; i++)
         writeAttr(t->m_attribute[i], f);
@@ -529,4 +516,14 @@ string CatalogManager::NameToIF(string& name)
 {
     string inf = INDEX_PATH + name + INDEX_SUFFIX;
     return inf;
+}
+
+void CatalogManager::replace()
+{
+    int it = m_index.size();
+    for (int i=0; i<it; i++)
+    {
+        int j = FindTable(m_index[i]->table_name);
+        m_table[j]->Index_name.push_back(m_index[i]);
+    }
 }
