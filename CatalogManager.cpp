@@ -88,7 +88,9 @@ bool CatalogManager::CreateIndex(Index& index)
     if (i == -1)
         return false;
     index.table = m_table[i];
+    index.table_name = m_table[i]->m_metadata.name;
     Index* t = new Index(index);
+    t->table_name = m_table[i]->m_metadata.name;
     m_index.push_back(t);
     index_file.open(index_name, ios::out|ios::binary);
     writeallIndex(index_file);
