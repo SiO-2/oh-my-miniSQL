@@ -9,30 +9,46 @@ class CatalogManager
 {
 public:
 	CatalogManager();
-	~CatalogManager() {};
+	~CatalogManager();
 
-	bool CreateTable(Table& table);	//创建包含Catalog的表，需要检查重复性，返回值true表示成功，false表示失败
-	bool CreateIndex(Index& index);	//创建索引，需要检查重复性，返回值true表示成功，false表示失败
+	//创建包含Catalog的表，需要检查重复性，返回值true表示成功，false表示失败
+	bool CreateTable(Table& table);	
+	//创建索引，需要检查重复性，返回值true表示成功，false表示失败
+	bool CreateIndex(Index& index);	
 
-	bool DropTable(string& name);	//删除表，通过name判断删除哪张表，需要检查存在性，返回值true表示成功，false表示失败
-	bool DropIndex(string& name);	//删除索引，通过name判断删除哪个索引，需要检查存在性，返回值true表示成功，false表示失败
+	//删除表，通过name判断删除哪张表，需要检查存在性，返回值true表示成功，false表示失败
+	bool DropTable(string& name);	
+	//删除索引，通过name判断删除哪个索引，需要检查存在性，返回值true表示成功，false表示失败
+	bool DropIndex(string& name);	
 
-	bool CheckAttr(Attribute& attr, struct Unit& data); //这里实际上只能检测type,类型正确返回true
-	bool CheckCond(ConditionUnit& cond); //这个我没用到，不知道要不要调用
+	//这里实际上只能检测type,类型正确返回true
+	bool CheckAttr(Attribute& attr, struct Unit& data); 
+	//这个我没用到，不知道要不要调用
+	bool CheckCond(ConditionUnit& cond); 
 
 	//这里有table不需要传入attribute to：wyc, (wyc:get)
-	bool InsertTest(string& table_name, Tuple& data);	//判断是否可以插入：检查每个DataUnit中的数据类型是否与表定义的数据类型匹配
+	//判断是否可以插入：检查每个DataUnit中的数据类型是否与表定义的数据类型匹配
+	bool InsertTest(string& table_name, Tuple& data);	
 	
-	pair<int, string> SelectTest(string& table_name, vector<string>& Attr, vector<ConditionUnit>& condition);	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
-	//返回值：-2（表格不存在） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
-	//返回值危-1，-2时不需要考虑string的值, 0和1时返回文件名(我不知道文件名后缀怎么加，暂时返回表名)；
+	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
+	//返回值：-3（表格不存在）-2（attr出错） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
+	pair<int, string> SelectTest(string& table_name, vector<string>& Attr, vector<ConditionUnit>& condition);	
 
-	Table* GetTableCatalog(string& table_name);	//获取表名为table_name的Catalog信息，如果不存在则返回空的Table
-	
-	Index* TableToIndex(string& table_name);	//返回table_name表中的Index，如果不存在则返回空的Index
+	//获取表名为table_name的Catalog信息，如果不存在则返回空的Table
+	Table* GetTableCatalog(string& table_name);	
+		
+	//返回table_name表中的Index指针集合，如果不存在则返回空的Index
+	vector<Index*> TableToIndex(string& table_name);
+	//获取所有的Table指针
+	vector<Table*> GetAllTable();
+	//获取所有的Index指针
+	vector<Index*> GetAllIndex();
 
-	pair<int, string> DeleteTest(string& table_name, vector<ConditionUnit>& condition);	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
+
+	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
 	//返回值：-2（表格不存在） -1（删除条件出错）；0（只能通过遍历Record删除）；1（可以利用索引优化删除）
+	pair<int, string> DeleteTest(string& table_name, vector<ConditionUnit>& condition);	
+
 
 private:
 	vector<Table*> m_table;

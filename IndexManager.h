@@ -42,6 +42,7 @@ private:
 
 public:
 	IndexManager();//构造函数，参数为API，会调用API来获取.index文件列表并导入index信息
+	IndexManager(const vector<Index> indexList);
 	~IndexManager();//析构函数，销毁对象时会将所有index信息写回磁盘中
 
 	void createIndex(string filePath, int type);//创建一个指定名称（filePath）和类型（type）的.index文件

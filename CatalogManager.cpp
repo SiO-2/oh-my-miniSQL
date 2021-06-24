@@ -41,6 +41,16 @@ CatalogManager::CatalogManager()
 
 }
 
+CatalogManager::~CatalogManager()
+{
+    int n = m_table.size();
+    for (int i=0; i<n; i++)
+        delete m_table[i];
+    n = m_index.size();
+    for (int i=0; i<n; i++)
+        delete m_index[i];
+}
+
 //创建包含Catalog的表，需要检查重复性，返回值true表示成功，false表示失败
 bool CatalogManager::CreateTable(Table& table)
 {
@@ -53,7 +63,8 @@ bool CatalogManager::CreateTable(Table& table)
     }
     table_file.open(table_name, ios::out|ios::binary);
     // m_table[n] = table;
-    m_table.push_back(&table);
+    Table* t = new Table(table);
+    m_table.push_back(t);
     // writeTable(&table, table_file);
     writeallTable(table_file);
 
@@ -73,7 +84,9 @@ bool CatalogManager::CreateIndex(Index& index)
         if (index.index_name == m_index[i]->index_name)
             return false;
     }
-    m_index.push_back(&index);
+
+    Index* t = new Index(index);
+    m_index.push_back(t);
     index_file.open(index_name, ios::out|ios::binary);
     writeallIndex(index_file);
     // m_index[n] = index;
@@ -127,8 +140,11 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
 {
     Table* t;
     int n = m_table.size(), i;
+    cout << "[Catalog debug]:" <<endl;
+    cout << "table num:" << n << endl;
     for (i=0; i<n; i++)
     {
+        cout << m_table[i]->m_metadata.name << endl;
         if (table_name == m_table[i]->m_metadata.name)
             break;
     }
@@ -141,18 +157,20 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     // for(auto attr: t->m_attribute){
     //     attr.Print();
     // }
-    // cout<<"[Catalog debug]: end"<<endl;
+    cout<<"[Catalog debug]: end"<<endl;
     // // end of wyc test
     for (i=0; i<n; i++)
     {
-        if (!CheckAttr(t->m_attribute[i], data.tuple_value[i]))
+        if (!CheckAttr(t->m_attribute[i], data.tuple_value[i])){
+            cout<<"[Catalog Debug]: Check Attr Wrong."<<endl;
             return false;
+        }
     }
     return true;
 }
 
 //判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
-//返回值：-2（表格不存在） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
+//返回值：-3（表不存在） -2（attr问题） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
 pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>& Attr, vector<ConditionUnit>& condition)
 {
     pair<int, string> ret;
@@ -160,7 +178,7 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
     ret.second = "";
     int i = FindTable(table_name), j;
     if (i == -1) {
-        ret.first = -2;
+        ret.first = -3;
         return ret;
     }
     Table *t = m_table[i];
@@ -177,7 +195,7 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
         }
         if (flag == 0)
         {
-            ret.first = -1;
+            ret.first = -2;
             return ret;
         }
     }
@@ -222,13 +240,20 @@ Table* CatalogManager::GetTableCatalog(string& table_name)
 }
 
 //返回table_name表中的Index，如果不存在则返回空的Index
-Index* CatalogManager::TableToIndex(string& table_name)
+vector<Index*> CatalogManager::TableToIndex(string& table_name)
 {
-    int i = FindIndex(table_name);
+    vector<Index*> ret;
+    
+    int i = FindTable(table_name);
     if (i == -1)
-        return NULL;
-    Index *I = m_index[i];
-    return I;
+        return ret;
+    int n = m_index.size();
+    for (int i=0; i<n; i++)
+    {
+        if (m_index[i]->table_name == table_name)
+            ret.push_back(m_index[i]);
+    }
+    return ret;
 }
 
 //判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
@@ -286,6 +311,19 @@ bool CatalogManager::CheckCond(ConditionUnit& cond)
     return true;
 }
 
+
+//=============================================
+//private， 不写注释了
+vector<Table*> CatalogManager::GetAllTable()
+{
+    return m_table;
+}
+
+vector<Index*> CatalogManager::GetAllIndex()
+{
+    return m_index;
+}
+
 int CatalogManager::FindIndex(string& index_name)
 {
     int n = m_index.size(), i;
@@ -341,6 +379,7 @@ void CatalogManager::readAttr(Attribute& a, fstream& f)
 void CatalogManager::readIndex(Index& i, fstream& f)
 {
     readstring(i.index_name, f);
+    readstring(i.table_name, f);
     readint(i.attr_num, f);
 }
 
@@ -408,6 +447,7 @@ void CatalogManager::writeTable(Table* t, fstream& f)
 void CatalogManager::writeIndex(Index* i, fstream& f)
 {
     writestring(i->index_name, f);
+    writestring(i->table_name, f);
     writeint(i->attr_num, f);
 }
 
