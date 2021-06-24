@@ -78,7 +78,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 	if (data_type == INT_UNIT) //int 
 	{
 		len = sizeof(int);
-		intTmp = value.int_value;
+		this->intTmp = value.int_value;
 
 		intMap::iterator itInt = indexIntMap.find(filename_index);
 		if (itInt == indexIntMap.end()) {
