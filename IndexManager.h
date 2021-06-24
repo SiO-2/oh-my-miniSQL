@@ -54,7 +54,7 @@ public:
 	void dropIndex(const Index& index);
 
 
-	offsetNumber searchIndex(const Index& index, Unit unit_key);
+	offsetNumber searchIndex(const Index& index, ConditionUnit unit_key);
 
 
 };

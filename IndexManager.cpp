@@ -349,13 +349,13 @@ void IndexManager::dropIndex(const Index& index) {//删除索引
 
 
 
-offsetNumber IndexManager::searchIndex(const Index &index, Unit unit_key) {//查找索引，并返回偏移量
+offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_key) {//查找索引，并返回偏移量
 
 	int len;
 	string filename_index = index.index_name + ".index";
 
-	Value value = unit_key.value;
-	DataType data_type = unit_key.datatype;
+	ConditionUnit::Value value = unit_key.value;
+	DataType data_type = unit_key.data_type;
 
 
 	if(data_type == INT_UNIT) {
