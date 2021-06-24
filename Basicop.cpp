@@ -18,6 +18,24 @@ void split(string& str, vector<string>& sv, char flag){
     return;
 }
 
+void split_string(string& str, vector<string> &sv, string& flag){
+    sv.clear();
+    int pos;
+    str += flag;//扩展字符串以方便操作
+    int size = str.size();
+    for (int i = 0; i < size; )
+    {
+        pos = str.find(flag, i);
+        if (pos < size)
+        {
+            std::string s = str.substr(i, pos - i);
+            sv.push_back(s);
+            i = pos + flag.size() ;
+        }
+    }
+    return;
+}
+
 string strip(string& s){
     if (s.empty()){
         return s;
@@ -112,8 +130,12 @@ Value ParseStringType(DataType type, string& str){
 vector<ConditionUnit> ParseCondition(string where_str){
     vector<ConditionUnit> cond_vec;
     vector<string> temp;
-
-    split(where_str, temp, ',');
+    strip(where_str);
+    if(where_str.empty()){
+        return cond_vec;
+    }
+    string flag = "and";
+    split_string(where_str, temp, flag);
     for(vector<string>::iterator iter= temp.begin(); iter != temp.end(); iter++){
         string cond_str = *iter;
         string attr_name, value;
@@ -138,12 +160,12 @@ vector<ConditionUnit> ParseCondition(string where_str){
             }else if(infield_vec[1] == "<>"){
                 Op = NE_;
             }else{
-                SyntaxError e("Invalid Operation. must in (=, <, >, <=, >=, <>).\n");
+                SyntaxError e("Invalid Operation. must in (=, <, >, <=, >=, <>) but \"" + infield_vec[1] + "\"");
                 throw e;
             }
             attr_name = infield_vec[0], value = infield_vec[2];
         }else{
-            SyntaxError e("Invalid table name in from\n");
+            SyntaxError e("Invalid condition \"" + cond_str + "\"");
             throw e;
         }
         strip(attr_name);

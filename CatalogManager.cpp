@@ -140,11 +140,11 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
 {
     Table* t;
     int n = m_table.size(), i;
-    cout << "[Catalog debug]:" <<endl;
-    cout << "table num:" << n << endl;
+    // cout << "[Catalog debug]:" <<endl;
+    // cout << "table num:" << n << endl;
     for (i=0; i<n; i++)
     {
-        cout << m_table[i]->m_metadata.name << endl;
+        // cout << m_table[i]->m_metadata.name << endl;
         if (table_name == m_table[i]->m_metadata.name)
             break;
     }
