@@ -127,7 +127,7 @@ bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit
     for (int i = 0; i < condition.size(); i++)
     {
         Value data_value, condition_value;
-        if (condition[i].data_type != CHAR_UNIT)
+        if (condition[i].data_type == INT_UNIT)
         {
             switch (condition[i].op_code)
             {
@@ -157,7 +157,37 @@ bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit
                 break;
             }
         }
-        else
+        else if (condition[i].data_type == FLOAT_UNIT)
+        {
+            switch (condition[i].op_code)
+            {
+            case EQ_: //=
+                if (fabs(tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value) >= 0.0001)
+                    return false;
+                break;
+            case NE_: //!=
+                if (fabs(tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value) < 0.0001)
+                    return false;
+                break;
+            case L_: //<
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value >= 0.0001)
+                    return false;
+                break;
+            case G_: //>
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value <= 0.0001)
+                    return false;
+                break;
+            case LE_: //<=
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value > 0.0001)
+                    return false;
+                break;
+            case GE_: //>=
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value < 0.0001)
+                    return false;
+                break;
+            }
+        }
+        else if (condition[i].data_type == CHAR_UNIT)
         {
             switch (condition[i].op_code)
             {
@@ -241,7 +271,8 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     }
     else
     {
-        cout<<"[Select with out index]"<<"\n";
+        cout << "[Select with out index]"
+             << "\n";
         //没有对应的index时
         bids = bmanager->ReadFile2Block(filename_data);
         vector<BID>::iterator it;
