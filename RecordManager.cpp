@@ -1,4 +1,5 @@
 #include "RecordManager.h"
+// #define DEBUG
 /**
 *@brief 向表文件中插入元组，支持每次一条元组的插入操作，并调用index的函数更新index
 *@param table 待插入的表
@@ -126,32 +127,65 @@ bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit
     for (int i = 0; i < condition.size(); i++)
     {
         Value data_value, condition_value;
-        switch (condition[i].op_code)
+        if (condition[i].data_type != CHAR_UNIT)
         {
-        case EQ_: //=
-            if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) != 0)
-                return false;
-            break;
-        case NE_: //!=
-            if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) == 0)
-                return false;
-            break;
-        case L_: //<
-            if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) >= 0)
-                return false;
-            break;
-        case G_: //>
-            if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) <= 0)
-                return false;
-            break;
-        case LE_: //<=
-            if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) > 0)
-                return false;
-            break;
-        case GE_: //>=
-            if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) < 0)
-                return false;
-            break;
+            switch (condition[i].op_code)
+            {
+            case EQ_: //=
+                if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) != 0)
+                    return false;
+                break;
+            case NE_: //!=
+                if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) == 0)
+                    return false;
+                break;
+            case L_: //<
+                if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) >= 0)
+                    return false;
+                break;
+            case G_: //>
+                if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) <= 0)
+                    return false;
+                break;
+            case LE_: //<=
+                if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) > 0)
+                    return false;
+                break;
+            case GE_: //>=
+                if (memcmp(&tuple.tuple_value[condition[i].attr_num], &condition[i].value, sizeof(condition[i].value)) < 0)
+                    return false;
+                break;
+            }
+        }
+        else
+        {
+            switch (condition[i].op_code)
+            {
+            case EQ_: //=
+                if (strcmp(tuple.tuple_value[condition[i].attr_num].value.char_n_value, condition[i].value.char_n_value) != 0)
+                    return false;
+                break;
+            case NE_: //!=
+                if (strcmp(tuple.tuple_value[condition[i].attr_num].value.char_n_value, condition[i].value.char_n_value) == 0)
+                    return false;
+                break;
+            case L_: //<
+                if (strcmp(tuple.tuple_value[condition[i].attr_num].value.char_n_value, condition[i].value.char_n_value) >= 0)
+                    return false;
+                break;
+            case G_: //>
+                if (strcmp(tuple.tuple_value[condition[i].attr_num].value.char_n_value, condition[i].value.char_n_value) <= 0)
+                    return false;
+                break;
+            case LE_: //<=
+                if (strcmp(tuple.tuple_value[condition[i].attr_num].value.char_n_value, condition[i].value.char_n_value) > 0)
+                    return false;
+                break;
+            case GE_: //>=
+                if (strcmp(tuple.tuple_value[condition[i].attr_num].value.char_n_value, condition[i].value.char_n_value) < 0)
+                    return false;
+                break;
+            }
         }
     }
     return true;
@@ -189,14 +223,17 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     {
         //有对应的index时
         cout<<"[Select with index]"<<"\n";
-        unsigned int offset = imanager->searchIndex(*table.Index_name[index_num], *condition.begin());
-        unsigned int block_offset = offset / BLOCKSIZE;
-        unsigned int tuple_offset = offset % BLOCKSIZE;
-        vector<unsigned int> block_offsets;
-        block_offsets.push_back(block_offset);
-        bids = bmanager->ReadFile2Block(filename_data, block_offsets);
-        Tuple tuple = ExtractTuple(table, *bids.begin(), tuple_offset);
-        result.push_back(tuple);
+        try{
+            unsigned int offset = imanager->searchIndex(*table.Index_name[index_num], *condition.begin());
+            unsigned int block_offset = offset / BLOCKSIZE;
+            unsigned int tuple_offset = offset % BLOCKSIZE;
+            vector<unsigned int> block_offsets;
+            block_offsets.push_back(block_offset);
+            bids = bmanager->ReadFile2Block(filename_data, block_offsets);
+            Tuple tuple = ExtractTuple(table, *bids.begin(), tuple_offset);
+            result.push_back(tuple);
+        }catch(DBError e){
+        }
     }
     else
     {
@@ -210,6 +247,9 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
                 if (bmanager->blocks[*it].data[tuple_offset] == 1) //先判断该处的tuple数据是否有效
                 {
                     Tuple tuple = ExtractTuple(table, *it, tuple_offset);
+#ifdef DEBUG
+                    printf("RecordManager::SelectTuple::247:: condition[0].attr_num = %d\n", condition[0].attr_num);
+#endif
                     if (ConditionTest(tuple, condition) && tuple.valid == true)
                         result.push_back(tuple);
                 }
@@ -304,9 +344,9 @@ void RecordManager::CreateIndex(const Index &index)
             if (bmanager->blocks[bid].data[tuple_offset] == 1) //先判断该处的tuple数据是否有效
             {
                 Tuple tuple = ExtractTuple(table, bid, tuple_offset);
-                cout<<"[Record Debug]:"<<endl;
-                tuple.Print();
-                cout<<"[Record Debug end]:"<<endl;
+                // cout<<"[Record Debug]:"<<endl;
+                // tuple.Print();
+                // cout<<"[Record Debug end]:"<<endl;
                 unit = tuple.tuple_value[index.attr_num];
                 if (ConditionTest(tuple) && tuple.valid == true)
                     imanager->insertIndex(index, unit, offset);

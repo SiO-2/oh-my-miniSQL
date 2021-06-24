@@ -111,7 +111,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 		}
 		else {
 			itInt->second->Insert(intTmp, Offset);
-			cout<<"[Idx debug]: here writeback [end]\n";
+			// cout<<"[Idx debug]: here writeback [end]\n";
 			itInt->second->WriteBack();
 			return;
 		}

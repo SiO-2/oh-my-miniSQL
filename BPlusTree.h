@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "SqlError.h"
 #include "BufferManager.h"
 #include "BPlusTreeNode.h"
 using namespace std;
@@ -157,7 +158,7 @@ void BPlusTree<ElementType>::WriteBack()
 		buffer.blocks[tempblock].SetDirty();
 		buffer.WriteBlock2File(tempblock);
 		string filename = buffer.blocks[tempblock].GetFilename();
-		cout<<"[BPT debug]: filename writeback "<<filename<<"[end]\n";
+		// cout<<"[BPT debug]: filename writeback "<<filename<<"[end]\n";
 		//printf("BPlusTree<ElementType>::WriteBack()::157:: tempblock = %d\n", tempblock);
 		i++;
 		vec.pop_back();
@@ -175,6 +176,8 @@ offsetNumber BPlusTree<ElementType>::Search(ElementType key)
 	FindLeaf(root, key, targetnode); //在叶结点中查找key
 	if (!targetnode.exist)
 	{ //没找到
+		DBError e("not find");
+		throw e;
 		cout<<"[BPlusTree Debug]: not find key "<<key<<endl;
 		return -1;
 	}
@@ -196,7 +199,9 @@ bool BPlusTree<ElementType>::Insert(ElementType key, offsetNumber offset)
 	FindLeaf(root, key, newnode);
 	if (newnode.exist)
 	{ //树中已存在该key
-		cout << "Error:Cannot inserrt key to index: the duplicated key!" << endl;
+		DBError e("Cannot insert because of the duplicated key");
+		throw e;
+		cout << "Error:Cannot insert key to index: the duplicated key!" << endl;
 		return false;
 	}
 	else

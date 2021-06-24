@@ -11,7 +11,7 @@
 #include "SqlError.h"
 // #include "Attribute.h"
 #include "MiniSQL.h"
-
+// #define DEBUG
 // DEBUG INFO开关
 // #define DEBUG 0
 using namespace std;
@@ -105,8 +105,23 @@ void Interpreter::Parse(string sql){
 }
 
 void Interpreter::ShowDatabase(std::string str){
-
+    strip(str);
+    if(!str.empty()){
+        SyntaxError e("Show database can not be followed by other characters");
+        throw e;
+    }
+    vector<Table *> table_pointer_vec = Cata.GetAllTable();
+    vector<Index *> index_pointer_vec = Cata.GetAllIndex();
+    cout<<"[All Table Info]:"<<"\n";
+    for(auto table: table_pointer_vec){
+        table->Print();
+    }
+    cout<<"[All Index Info]:"<<"\n";
+    for(auto index: index_pointer_vec){
+        index->Print();
+    }
 }
+
 void Interpreter::ShowTable(string str){
     string &tablename = str;
     strip(tablename);
@@ -140,6 +155,11 @@ void Interpreter::Delete(string str){
         throw e;
     }
     vector<ConditionUnit> cond_vec;
+    Table * table = Cata.GetTableCatalog(tablename);
+    if(table == NULL){
+        DBError e("No such Table " + tablename);
+        throw e;
+    }
     try{
         cond_vec = ParseCondition(str);
     }catch(SyntaxError e){
@@ -292,9 +312,12 @@ void Interpreter::Select(string str){
         SyntaxError e("Multiple Table Select is not supported yet\n");
         throw e;
     }
-    
+    Table* table = Cata.GetTableCatalog(table_vec[0]);
     cond_vec = ParseCondition(where_str);
 
+#ifdef DEBUG
+                    printf("Interpreter::Select::314:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
+#endif    
     // debug 打印 condition 信息
     // for(auto cond:cond_vec){
     //     cond.Print();
@@ -329,6 +352,9 @@ void Interpreter::Select(string str){
         // cout<<"[Catalog res]: select with or without index,"<<response.second<<"\n";
         // Call Record Manager
         Table* table = Cata.GetTableCatalog(table_vec[0]);
+#ifdef DEBUG
+                    printf("Interpreter::Select::348:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
+#endif
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
         cout<<"[Interpreter Select Res without index]:"<<"\n";
 
@@ -573,7 +599,8 @@ void Interpreter::CreateTable(string str){
                 // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<"\n";
                 if( (*Attr).name == pk_name ){
                     (*Attr).set_pk(true);
-                    cout<<"[debug]: set pk of "<< pk_name<<"\n";
+                    Attr->unique = true;
+                    // cout<<"[debug]: set pk of "<< pk_name<<"\n";
                     flag = 1;
                     pk_mark = count;
                     main_index = count;

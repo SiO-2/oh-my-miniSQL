@@ -186,6 +186,20 @@ vector<ConditionUnit> ParseCondition(string where_str){
                 // data_unit.value.char_n_value = value_str_c; break;
                 Cond.value.char_n_value = value_str_c; break;
         }
+        // int count = 0, find = 0;
+        // for(auto attr: table.m_attribute){
+        //     if(attr.name == attr_name){
+        //         Cond.attr_num = count;
+        //         find = 1;
+        //         break;
+        //     }else{
+        //         count ++;
+        //     }
+        // }
+        // if( find == 0){
+        //     DBError e("Invalid attribute name " + attr_name);
+        //     throw e;
+        // }
         cond_vec.push_back(Cond);
     }
 

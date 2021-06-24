@@ -71,7 +71,7 @@ Attribute::Attribute(string name, string typestr, bool notnull, bool unique, boo
 
 void Attribute::set_pk(bool pk)
 {
-    cout << "[debug]: call set pk for " << this->name << " to pk=" << pk << endl;
+    // cout << "[debug]: call set pk for " << this->name << " to pk=" << pk << endl;
     this->primary_key = pk;
 }
 
