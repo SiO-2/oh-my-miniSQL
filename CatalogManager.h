@@ -31,7 +31,14 @@ public:
 	bool InsertTest(string& table_name, Tuple& data);	
 	
 	//判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
-	//返回值：-3（表格不存在）-2（attr出错） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
+	/**
+	 * <-4,错误类型名> （选择条件类型不匹配）
+	 * <-3,表格名> （表格不存在）
+	 * <-2,"attr名,attr类型,应该的类型" attr出错（逗号一并返回便于split
+	 * <-1,"attr名"> attr不存在
+	 * <0, 表名> record查询
+	 * <1, index名> index 查询
+	 */
 	pair<int, string> SelectTest(string& table_name, vector<string>& Attr, vector<ConditionUnit>& condition);	
 
 	//获取表名为table_name的Catalog信息，如果不存在则返回空的Table
@@ -57,6 +64,9 @@ private:
 	
     string table_name = "./database/meta/table.meta";
     string index_name = "./database/meta/index.meta";
+	
+
+	string TypeString[3] = {"INT", "CHAR", "FLOAT"};
 
 	string NameToTF(string& name);
 	string NameToIF(string& name);

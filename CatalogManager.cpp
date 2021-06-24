@@ -187,7 +187,7 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
 }
 
 //判断表格是否存在，选择条件是否有误，将attr_name转化成attr_num
-//返回值：-3（表不存在） -2（attr问题） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
+//返回值：-4（选择条件类型不匹配）-3（表不存在） -2（attr问题） -1（选择条件出错）；0（只能通过遍历Record查询）；1（可以利用索引优化查询）
 pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>& Attr, vector<ConditionUnit>& condition)
 {
     pair<int, string> ret;
@@ -196,6 +196,7 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
     int i = FindTable(table_name), j;
     if (i == -1) {
         ret.first = -3;
+        ret.second = table_name;
         return ret;
     }
     Table *t = m_table[i];
@@ -213,6 +214,7 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
         if (flag == 0)
         {
             ret.first = -2;
+            ret.second = Attr[i];
             return ret;
         }
     }
@@ -227,11 +229,19 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
         {
             if (condition[i].attr_name == t->m_attribute[j].name)
             {
-                condition[i].attr_num = j;
+                if (condition[i].data_type == t->m_attribute[j].type)
+                    condition[i].attr_num = j;
+                else
+                {
+                    ret.first = -4;
+                    ret.second = condition[i].attr_name + "," + TypeString[condition[i].data_type] + "," + TypeString[t->m_attribute[j].type];
+                    return ret;
+                }
             }
         }
         if (condition[i].attr_num == m) {
             ret.first = -1;
+            ret.second = condition[i].attr_name;
             return ret;
         }
         for (int k=0; k<m_index.size(); k++)
