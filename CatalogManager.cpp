@@ -39,7 +39,6 @@ CatalogManager::CatalogManager()
     //     table->Print();
     // }
     // cout<<"[catalog]: end of table list"<<endl;
-
 }
 
 CatalogManager::~CatalogManager()

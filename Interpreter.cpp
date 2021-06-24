@@ -484,7 +484,7 @@ void Interpreter::CreateIndex(string str){
         InternalError e("Create index \"" + index_name + "\" failed");
         throw e;
     }
-    cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+    // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
     Record.CreateIndex(index);
     cout<<"Create index successfully"<<"\n";
 
