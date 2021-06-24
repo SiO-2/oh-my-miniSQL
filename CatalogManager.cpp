@@ -98,7 +98,7 @@ int CatalogManager::CreateIndex(Index& index)
     index_file.close();
     index_file.open(NameToIF(index.index_name), ios::out|ios::binary);
     index_file.close();
-    m_table[i]->Index_name.push_back(t);
+    m_table[i]->Index_ptr.push_back(t);
     return 1;
 }
 
@@ -137,9 +137,9 @@ bool CatalogManager::DropIndex(string& name)
             writeallIndex(index_file);
             index_file.close();
             remove(NameToIF(name).c_str());
-            for (int j = 0; j<m_table[i]->Index_name.size(); j++)
-                if (m_table[i]->Index_name[j]->index_name==name)
-                    m_table[i]->Index_name.erase(m_table[i]->Index_name.begin()+j);
+            for (int j = 0; j<m_table[i]->Index_ptr.size(); j++)
+                if (m_table[i]->Index_ptr[j]->index_name==name)
+                    m_table[i]->Index_ptr.erase(m_table[i]->Index_ptr.begin()+j);
             return true;
         }
     }
@@ -536,6 +536,8 @@ void CatalogManager::replace()
     for (int i=0; i<it; i++)
     {
         int j = FindTable(m_index[i]->table_name);
-        m_table[j]->Index_name.push_back(m_index[i]);
+        m_table[j]->Index_ptr.push_back(m_index[i]);
+        m_index[i]->table = m_table[j];
+        // cout << m_index[i]->index_name << endl;
     }
 }
