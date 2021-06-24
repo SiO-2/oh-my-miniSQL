@@ -176,6 +176,8 @@ offsetNumber BPlusTree<ElementType>::Search(ElementType key)
 	FindLeaf(root, key, targetnode); //在叶结点中查找key
 	if (!targetnode.exist)
 	{ //没找到
+		DBError e("not find");
+		throw e;
 		cout<<"[BPlusTree Debug]: not find key "<<key<<endl;
 		return -1;
 	}

@@ -189,14 +189,17 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     {
         //有对应的index时
         cout<<"[Select with index]"<<"\n";
-        unsigned int offset = imanager->searchIndex(*table.Index_name[index_num], *condition.begin());
-        unsigned int block_offset = offset / BLOCKSIZE;
-        unsigned int tuple_offset = offset % BLOCKSIZE;
-        vector<unsigned int> block_offsets;
-        block_offsets.push_back(block_offset);
-        bids = bmanager->ReadFile2Block(filename_data, block_offsets);
-        Tuple tuple = ExtractTuple(table, *bids.begin(), tuple_offset);
-        result.push_back(tuple);
+        try{
+            unsigned int offset = imanager->searchIndex(*table.Index_name[index_num], *condition.begin());
+            unsigned int block_offset = offset / BLOCKSIZE;
+            unsigned int tuple_offset = offset % BLOCKSIZE;
+            vector<unsigned int> block_offsets;
+            block_offsets.push_back(block_offset);
+            bids = bmanager->ReadFile2Block(filename_data, block_offsets);
+            Tuple tuple = ExtractTuple(table, *bids.begin(), tuple_offset);
+            result.push_back(tuple);
+        }catch(DBError e){
+        }
     }
     else
     {
@@ -304,9 +307,9 @@ void RecordManager::CreateIndex(const Index &index)
             if (bmanager->blocks[bid].data[tuple_offset] == 1) //先判断该处的tuple数据是否有效
             {
                 Tuple tuple = ExtractTuple(table, bid, tuple_offset);
-                cout<<"[Record Debug]:"<<endl;
-                tuple.Print();
-                cout<<"[Record Debug end]:"<<endl;
+                // cout<<"[Record Debug]:"<<endl;
+                // tuple.Print();
+                // cout<<"[Record Debug end]:"<<endl;
                 unit = tuple.tuple_value[index.attr_num];
                 if (ConditionTest(tuple) && tuple.valid == true)
                     imanager->insertIndex(index, unit, offset);

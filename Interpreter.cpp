@@ -155,6 +155,11 @@ void Interpreter::Delete(string str){
         throw e;
     }
     vector<ConditionUnit> cond_vec;
+    Table * table = Cata.GetTableCatalog(tablename);
+    if(table == NULL){
+        DBError e("No such Table " + tablename);
+        throw e;
+    }
     try{
         cond_vec = ParseCondition(str);
     }catch(SyntaxError e){
@@ -307,7 +312,7 @@ void Interpreter::Select(string str){
         SyntaxError e("Multiple Table Select is not supported yet\n");
         throw e;
     }
-    
+    Table* table = Cata.GetTableCatalog(table_vec[0]);
     cond_vec = ParseCondition(where_str);
 
     // debug 打印 condition 信息
@@ -588,6 +593,7 @@ void Interpreter::CreateTable(string str){
                 // cout<<"[debug]: each attr name when find pk = "<<((*Attr).name)<<"\n";
                 if( (*Attr).name == pk_name ){
                     (*Attr).set_pk(true);
+                    Attr->unique = true;
                     // cout<<"[debug]: set pk of "<< pk_name<<"\n";
                     flag = 1;
                     pk_mark = count;
