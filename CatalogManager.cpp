@@ -84,7 +84,10 @@ bool CatalogManager::CreateIndex(Index& index)
         if (index.index_name == m_index[i]->index_name)
             return false;
     }
-
+    int i = FindTable(index.table_name);
+    if (i == -1)
+        return false;
+    index.table = m_table[i];
     Index* t = new Index(index);
     m_index.push_back(t);
     index_file.open(index_name, ios::out|ios::binary);
@@ -92,6 +95,10 @@ bool CatalogManager::CreateIndex(Index& index)
     // m_index[n] = index;
     index_file.close();
     index_file.open(NameToIF(index.index_name), ios::out|ios::binary);
+    index_file.close();
+    m_table[i]->Index_name.push_back(index.index_name);
+    index_file.open(NameToTF(m_table[i]->m_metadata.name), ios::out|ios::binary);
+    writeallTable(index_file);
     index_file.close();
     return true;
 }
@@ -123,11 +130,20 @@ bool CatalogManager::DropIndex(string& name)
     for (int i=0; i<n; i++)
     {
         if (name == m_index[i]->index_name){
+            int i = FindTable(m_index[i]->table_name);
+            if (i==-1)
+                return false;
             index_file.open(NameToIF(index_name), ios::out|ios::binary);
             m_index.erase(m_index.begin()+i);
             writeallIndex(index_file);
             index_file.close();
             remove(NameToIF(name).c_str());
+            for (int j = 0; i<m_table[i]->Index_name.size(); j++)
+                if (m_table[i]->Index_name[j]==name)
+                    m_table[i]->Index_name.erase(m_table[i]->Index_name.begin()+j);
+            index_file.open(NameToTF(m_table[i]->m_metadata.name));
+            writeallTable(index_file);
+            index_file.close();
             return true;
         }
     }
@@ -423,6 +439,11 @@ Table* CatalogManager::readTable(fstream& f)
     readstring(tname, f);
     m_metadata.name = tname;
     readint(num, f);
+    for (int j=0; j<num; j++) {
+        readstring(tname, f);
+        t->Index_name[j] = tname;
+    }
+    readint(num, f);
     m_metadata.attr_num = num;
     for (int j=0; j<num; j++)
     {
@@ -439,6 +460,10 @@ void CatalogManager::writeTable(Table* t, fstream& f)
 {
     int num = t->m_metadata.attr_num;
     writestring(t->m_metadata.name, f);
+    int n = t->Index_name.size();
+    writeint(n, f);
+    for (int i=0; i<n; i++)
+        writestring(t->Index_name[i], f);
     writeint(num, f);
     for (int i=0; i<num; i++)
         writeAttr(t->m_attribute[i], f);
