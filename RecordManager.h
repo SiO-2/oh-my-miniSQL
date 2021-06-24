@@ -49,7 +49,7 @@ public:
 
 	// void DropTableFile(const Table &table);
 
-	void InsertTuple(const Table &table, const Tuple &tuple, const vector<Index> &indexs = vector<Index>());
+	void InsertTuple(const Table &table, const Tuple &tuple);
 	// void InsertTuple(const Table &table, const Tuple &tuple, Index & index);
 
 	bool ConditionTest(const Tuple &tuple, const vector<ConditionUnit> &condition = vector<ConditionUnit>()) const;

@@ -5,7 +5,7 @@
 *@param tuple 待插入的元组
 *@return 没有返回值
 */
-void RecordManager::InsertTuple(const Table &table, const Tuple &tuple, const vector<Index> &indexs)
+void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
 {
     string tablename = table.m_metadata.name;
     // wyc: 写错了吧，我帮你改了
@@ -36,9 +36,9 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple, const ve
     }
     tuple_offset.push_back(toffset);
 
-    for (int i = 0; i < indexs.size(); i++) //更新index
+    for (int i = 0; i < table.Index_name.size(); i++) //更新index
     {
-        imanager->insertIndex(indexs[i], tuple.tuple_value[indexs[i].attr_num], boffset * BLOCKSIZE + toffset);
+        imanager->insertIndex(*table.Index_name[i], tuple.tuple_value[table.Index_name[i]->attr_num], boffset * BLOCKSIZE + toffset); //将tuple在文件中的偏移量写到index文件中
     }
 
     bmanager->blocks[*bids.begin()].SetDirty(); //设置为dirty
@@ -170,17 +170,48 @@ vector<Tuple> RecordManager::SelectTuple(const Table &table, const vector<Condit
     vector<Tuple> result;
     string filename_data = GetDataFileName(table.m_metadata.name);
     vector<BID> bids;
-    bids = bmanager->ReadFile2Block(filename_data);
-    vector<BID>::iterator it;
-    for (it = bids.begin(); it != bids.end(); it++)
+    bool flag = false;
+    unsigned int attr_num;
+    unsigned int index_num;
+    unsigned int condition_num;
+    if (condition.size() == 1 && condition.begin()->op_code == EQ_) //index只支持单条件的等值查询
     {
-        for (unsigned int tuple_offset = 0; tuple_offset < BLOCKSIZE; tuple_offset += tuple_len)
+        for (int i = 0; i < table.Index_name.size() && flag == false; i++)
         {
-            if (bmanager->blocks[*it].data[tuple_offset] == 1) //先判断该处的tuple数据是否有效
+            if (condition.begin()->attr_num == table.Index_name[i]->attr_num)
             {
-                Tuple tuple = ExtractTuple(table, *it, tuple_offset);
-                if (ConditionTest(tuple, condition) && tuple.valid == true)
-                    result.push_back(tuple);
+                index_num = i;
+                flag = true;
+            }
+        }
+    }
+    if (flag)
+    {
+        //有对应的index时
+        unsigned int offset = imanager->searchIndex(*table.Index_name[index_num], *condition.begin());
+        unsigned int block_offset = offset / BLOCKSIZE;
+        unsigned int tuple_offset = offset % BLOCKSIZE;
+        vector<unsigned int> block_offsets;
+        block_offsets.push_back(block_offset);
+        bids = bmanager->ReadFile2Block(filename_data, block_offsets);
+        Tuple tuple = ExtractTuple(table, *bids.begin(), tuple_offset);
+        result.push_back(tuple);
+    }
+    else
+    {
+        //没有对应的index时
+        bids = bmanager->ReadFile2Block(filename_data);
+        vector<BID>::iterator it;
+        for (it = bids.begin(); it != bids.end(); it++)
+        {
+            for (unsigned int tuple_offset = 0; tuple_offset < BLOCKSIZE; tuple_offset += tuple_len)
+            {
+                if (bmanager->blocks[*it].data[tuple_offset] == 1) //先判断该处的tuple数据是否有效
+                {
+                    Tuple tuple = ExtractTuple(table, *it, tuple_offset);
+                    if (ConditionTest(tuple, condition) && tuple.valid == true)
+                        result.push_back(tuple);
+                }
             }
         }
     }
@@ -212,6 +243,10 @@ void RecordManager::DeleteTuple(const Table &table, const vector<ConditionUnit> 
             {
                 memcpy((bmanager->blocks[*it]).data + tuple_offset, &unvalid, sizeof(unvalid) * sizeof(char)); //设置valid为0
                 bmanager->blocks[*bids.begin()].SetDirty();                                                    //将该tuple所在的block设置为dirty
+                for (int i = 0; i < table.Index_name.size(); i++)
+                {
+                    imanager->deleteIndex(*table.Index_name[i], tuple.tuple_value[table.Index_name[i]->attr_num]);
+                }
             }
         }
     }
