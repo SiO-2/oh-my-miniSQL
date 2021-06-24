@@ -146,7 +146,7 @@ Index::Index(string index_name, Table* table, string table_name, int attr_num):i
 }
 
 
-void Index::Print()
+void Index::Print() const
 {
     cout << "[Index Info]: index name = " << this->index_name <<" on table \"" << this->table_name << "\" attribute \""<<this->table->m_attribute[this->attr_num].name<<"\"\n";
     // Table *table = this->table;

@@ -156,6 +156,8 @@ void BPlusTree<ElementType>::WriteBack()
 		}
 		buffer.blocks[tempblock].SetDirty();
 		buffer.WriteBlock2File(tempblock);
+		string filename = buffer.blocks[tempblock].GetFilename();
+		cout<<"[BPT debug]: filename writeback "<<filename<<"[end]\n";
 		//printf("BPlusTree<ElementType>::WriteBack()::157:: tempblock = %d\n", tempblock);
 		i++;
 		vec.pop_back();
@@ -173,6 +175,7 @@ offsetNumber BPlusTree<ElementType>::Search(ElementType key)
 	FindLeaf(root, key, targetnode); //在叶结点中查找key
 	if (!targetnode.exist)
 	{ //没找到
+		cout<<"[BPlusTree Debug]: not find key "<<key<<endl;
 		return -1;
 	}
 	else
