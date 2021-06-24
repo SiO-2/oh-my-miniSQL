@@ -7,8 +7,8 @@
 #include <fstream>
 #include "BPlusTree.h"
 #include "BufferManager.h"
-#define TYPE_FLOAT -1	//the type of the attribute,-1 represents float
-#define TYPE_INT 0		//0 represents int
+#include "MiniSQL.h"
+
 // other positive integer represents char and the value is the number of char
 using namespace std;
 
@@ -36,33 +36,27 @@ private:
 	float floatTmp;
 	string stringTmp;
 
-	int getDegree(int type);//得到一个block中所能保存的index数量
-	int getKeySize(int type);//得到当前搜索码的大小
-	void setKey(int type, string key);//设置当前的搜索码
 
 public:
-	IndexManager();//构造函数，参数为API，会调用API来获取.index文件列表并导入index信息
-	IndexManager(const vector<Index> indexList);
+	IndexManager(vector<Index> indexList);//构造函数，参数为API，会调用API来获取.index文件列表并导入index信息
 	~IndexManager();//析构函数，销毁对象时会将所有index信息写回磁盘中
+	void readIndexfromfile(Index& index);
 
-	void createIndex(string filePath, int type);//创建一个指定名称（filePath）和类型（type）的.index文件
-												//例：createIndex("salary_index.index",TYPE_INT);
-												//会创建一个名为“salary_index”的.index文件，类型为TYPE_INT
-	void readIndexfromfile(string filePath, int type);
+	void insertIndex(Index& index, Unit unit_key, offsetNumber Offset);
 
-	void dropIndex(string filePath, int type);//删除一个指定名称（filePath）和类型（type）的.index文件，用法同上
-
-	offsetNumber searchIndex(string filePath, string key, int type);//在B+树中搜索码为key的index，返回偏移量
-																	
-
-	void insertIndex(string filePath, string key, offsetNumber blockOffset, int type);//在B+数中插入一个搜索码为key的index
-																					  
-
-	void deleteIndex(string filePath, string key, int type);//从B+数中删除一个搜索码为key的index
-															//例：deleteIndex("salary_index.index","20000",TYPE_INT);
+	void deleteIndex(Index& index, Unit unit_key);
 
 
-	//void readIndex(string filePath, int type);//从一个指定名称（filePath）和类型（type）的.index文件中读取index信息，建立对应B+树，并在相应的map容器中建立二者的映射
+	int getDegree(int len);
+
+	void createIndex(Index& index);
+
+	void dropIndex(Index& index);
+
+
+	offsetNumber searchIndex(Index& index, Unit unit_key);
+
+
 };
 
 
