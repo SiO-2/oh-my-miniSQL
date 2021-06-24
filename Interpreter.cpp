@@ -516,5 +516,5 @@ void Interpreter::CreateTable(string str){
     }
 
     // Call Record Manager
-    Record.CreateTableFile(table);
+    // Record.CreateTableFile(table);
 }
