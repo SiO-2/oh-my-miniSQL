@@ -135,7 +135,6 @@ bool CatalogManager::DropIndex(string& name)
             int k = FindTable(tname);
             if (k==-1)
                 return false;
-            cout << index_name << endl;
             index_file.open(index_name, ios::out|ios::binary);
             // m_index.erase(m_index.begin()+i);
             swap(*(std::begin(m_index)+i),*(std::end(m_index)-1));

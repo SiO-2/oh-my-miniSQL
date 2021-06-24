@@ -114,7 +114,7 @@ public:
     ~BufferManager()
     {
         for (BID bid = 0; bid < MAX_BLOCK_NUMBER; bid++)
-            if (blocks[bid].IsDirty())
+            if (blocks[bid].IsDirty() && blocks[bid].IsValid())
                 WriteBlock2File(bid);
 
         // cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;

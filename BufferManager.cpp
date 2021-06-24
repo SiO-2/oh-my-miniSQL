@@ -127,6 +127,7 @@ void BufferManager::FlushBlock(const string &filename)
         {
             memset(blocks[bid].data, 0, BLOCKSIZE);
             blocks[bid].SetUnValid();
+            cout << "[BufferManager] FlushBlock setUnValid success" << endl;
         }
     }
 }

@@ -301,13 +301,12 @@ void Interpreter::DropTable(string str)
         DBError e("Invalid table name \"" + tablename + "\"");
         throw e;
     }
-    
+
     Index* index;
     int n = table->Index_name.size();
     for (int i=0; i<n; i++)
     {
         index = table->Index_name[0];
-        cout << index->index_name << endl;
         this->DropIndex(index->index_name);
     }
     // for (auto index : table->Index_name)

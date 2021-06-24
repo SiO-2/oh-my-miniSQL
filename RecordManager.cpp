@@ -162,27 +162,27 @@ bool RecordManager::ConditionTest(const Tuple &tuple, const vector<ConditionUnit
             switch (condition[i].op_code)
             {
             case EQ_: //=
-                if (fabs(tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value) >= 0.0001)
+                if (fabs(tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value) >= EPSILON)
                     return false;
                 break;
             case NE_: //!=
-                if (fabs(tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value) < 0.0001)
+                if (fabs(tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value) < EPSILON)
                     return false;
                 break;
             case L_: //<
-                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value >= 0.0001)
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value >= EPSILON)
                     return false;
                 break;
             case G_: //>
-                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value <= 0.0001)
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value <= EPSILON)
                     return false;
                 break;
             case LE_: //<=
-                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value > 0.0001)
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value > EPSILON)
                     return false;
                 break;
             case GE_: //>=
-                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value < 0.0001)
+                if (tuple.tuple_value[condition[i].attr_num].value.float_value - condition[i].value.float_value < EPSILON)
                     return false;
                 break;
             }

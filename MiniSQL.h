@@ -16,6 +16,8 @@ const string TABLE_SUFFIX = ".table";
 const string INDEX_SUFFIX = ".index";
 const string META_SUFFIX = ".meta";
 
+const float EPSILON = 1e-6; //用于float类型的比较
+
 typedef enum
 {
 	INT_UNIT,
