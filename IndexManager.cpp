@@ -323,11 +323,11 @@ void IndexManager::dropIndex(const Index& index) {//删除索引
     int data_type = index.table->m_attribute[index.attr_num].type;
 
 
-	ifstream oldfile(filename_index.c_str());
-	if(oldfile.is_open()) {
-		oldfile.close();
-		remove(filename_index.c_str());
-	}
+	//ifstream oldfile(filename_index.c_str());
+	//if(oldfile.is_open()) {
+		//oldfile.close();
+		//remove(filename_index.c_str());
+	//}
 
 
 
