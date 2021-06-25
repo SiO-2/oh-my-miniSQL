@@ -304,13 +304,21 @@ void Interpreter::DropTable(string str)
         throw e;
     }
 
-    for (auto index : table->Index_name)
+    Index* index;
+    int n = table->Index_name.size();
+    for (int i=0; i<n; i++)
     {
+        index = table->Index_name[0];
         this->DropIndex(index->index_name);
+    }
+    // for (auto index : table->Index_name)
+    // {
+    //     cout << index->index_name;
+    //     this->DropIndex(index->index_name);
         // if( !(this->DropIndex(index->index_name)) ){
         //     cout<<"Drop index \"" + index->index_name + "\" of table \"" + tablename + "\" fail"<<"\n";
         // }
-    }
+    // }
 
     if (Cata.DropTable(str))
     {
@@ -336,10 +344,8 @@ void Interpreter::DropIndex(string str)
     }
     // Here Index Name to Drop is 'str'
     // cout<<"[info]: Drop Index Name=\""<<str<<"\""<<"\n";
-
+    Index ind(*Cata.GetIndexCatalog(str));
     bool b = Cata.DropIndex(str);
-    string filename_index = INDEX_PATH + str + INDEX_SUFFIX;
-    this->Record.imanager->buffer.FlushBlock(filename_index);
     if (!b)
     {
         DBError e("Drop index \"" + str + "\" failed");
@@ -347,6 +353,9 @@ void Interpreter::DropIndex(string str)
     }
     cout << "Drop index \"" << str << "\" successfully"
          << "\n";
+    string filename_index = INDEX_PATH + str + INDEX_SUFFIX;
+    this->Record.imanager->buffer.FlushBlock(filename_index);
+    this->Record.imanager->dropIndex(ind);
 }
 
 void Interpreter::Select(string str)

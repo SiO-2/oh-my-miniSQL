@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
         I.Parse(cmd);
     }
     // delete &I;
+    cout<<"[Good Bye!]"<<"\n";
     // system("pause");
     return 0;
 }
