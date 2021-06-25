@@ -31,6 +31,9 @@ void TableMetadata::Print()
     // cout << "Primary Index:" << this->primary_index << "\n";
 }
 
+Attribute::Attribute(){
+    
+}
 Attribute::Attribute(string name, string typestr, bool notnull, bool unique, bool primary_key)
 {
     std::regex re_char("char\\(\\d+\\)", regex_constants::icase);

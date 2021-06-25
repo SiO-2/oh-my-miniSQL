@@ -63,7 +63,7 @@ public:
 	// name: Attribute constructor
 	// Function: init value in class
 	Attribute(string name, string typestr, bool notnull = false, bool unique = false, bool primary_key = false);
-	Attribute(){};
+	Attribute();
 	// name:set_pk
 	// Function: set primary key of attribute, becase "primary key(pk)" usually occurs in the end
 	void set_pk(bool pk);
