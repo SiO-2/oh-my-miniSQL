@@ -176,15 +176,15 @@ offsetNumber BPlusTree<ElementType>::Search(ElementType key)
 	FindLeaf(root, key, targetnode); //在叶结点中查找key
 	if (!targetnode.exist)
 	{ //没找到
-		// cout<<"[BPT DEBUG]: Not find"<<endl;
+		// cout<<"[BPT DEBUG]: Not find"<<"\n";
 		DBError e("not find");
 		throw e;
-		// cout<<"[BPlusTree Debug]: not find key "<<key<<endl;
+		// cout<<"[BPlusTree Debug]: not find key "<<key<<"\n";
 		return -1;
 	}
 	else
 	{
-		// cout<<"[BPT DEBUG]: targetnode.index = "<<targetnode.index<<endl;
+		// cout<<"[BPT DEBUG]: targetnode.index = "<<targetnode.index<<"\n";
 		return targetnode.pNode->offset[targetnode.index];
 	}
 }
@@ -203,7 +203,7 @@ bool BPlusTree<ElementType>::Insert(ElementType key, offsetNumber offset)
 	{ //树中已存在该key
 		DBError e("Cannot insert because of the duplicated key");
 		throw e;
-		cout << "Error:Cannot insert key to index: the duplicated key!" << endl;
+		cout << "Error:Cannot insert key to index: the duplicated key!" << "\n";
 		return false;
 	}
 	else
@@ -222,13 +222,13 @@ bool BPlusTree<ElementType>::Delete(ElementType key)
 	NodeInfo<ElementType> newnode;
 	if (!root)
 	{ //树为空
-		cout << "Error:Cannot delete key from index: the tree not exist!" << endl;
+		cout << "Error:Cannot delete key from index: the tree not exist!" << "\n";
 		return false;
 	}
 	FindLeaf(root, key, newnode);
 	if (!newnode.exist)
 	{ //树中没有key
-		cout << "Error:Cannot delete key from index: the key not exist!" << endl;
+		cout << "Error:Cannot delete key from index: the key not exist!" << "\n";
 		return false;
 	}
 	else
@@ -285,7 +285,7 @@ bool BPlusTree<ElementType>::AfterInsert(Node pNode)
 		Node root = new TreeNode<ElementType>(degree, false);
 		if (root == NULL)
 		{ //创建新结点失败
-			cout << "Error: can not allocate memory for the new root after insert" << endl;
+			cout << "Error: can not allocate memory for the new root after insert" << "\n";
 			return false;
 		}
 		else

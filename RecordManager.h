@@ -36,7 +36,7 @@ public:
 
 	string GetDataFileName(const string tablename) const
 	{
-		// cout<<"[DataFileName Debug]:"<<TABLE_PATH<<" "<<tablename<<" "<<TABLE_SUFFIX<<endl;
+		// cout<<"[DataFileName Debug]:"<<TABLE_PATH<<" "<<tablename<<" "<<TABLE_SUFFIX<<"\n";
 		return TABLE_PATH + tablename + TABLE_SUFFIX;
 	}
 

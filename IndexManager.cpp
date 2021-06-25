@@ -23,9 +23,9 @@ void:: IndexManager::setindexIntMap(vector<Index>& indexList){
 //函数功能：在已经存在索引文件的情况下，读入索引文件，并创建B+树
 void IndexManager::readIndexfromfile(const Index& index) {//
 	
-	// cout<<"[Index DEBUG]: here read Index from file"<<endl;
+	// cout<<"[Index DEBUG]: here read Index from file"<<"\n";
 	// index.Print();
-	// cout<<"[Index DEBUG end]:"<<endl;
+	// cout<<"[Index DEBUG end]:"<<"\n";
 	int len;
 	string filename_index = INDEX_PATH + index.index_name + ".index";
 
@@ -38,7 +38,7 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 
 	if (!newfile_in) {
-		// cout << "in Create index: file " << filename_index << "not exist" << endl;
+		// cout << "in Create index: file " << filename_index << "not exist" << "\n";
 		newfile_in.close();
 	}
 	else {
@@ -56,9 +56,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 
 		BPlusTree<int>* tree = new BPlusTree<int>(filename_index, keysize, degree);
 		tree->ReadTree();
-		// cout<<"[Index DEBUG]:"<<endl;
+		// cout<<"[Index DEBUG]:"<<"\n";
 		// tree->printleaf();
-		// cout<<"[Index DEBUG end]:"<<endl;
+		// cout<<"[Index DEBUG end]:"<<"\n";
 		indexIntMap.insert(intMap::value_type(filename_index, tree));
 	}
 	else if (data_type == FLOAT_UNIT) {
@@ -66,9 +66,9 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 		degree = getDegree(keysize);
 		BPlusTree<float>* tree = new BPlusTree<float>(filename_index, keysize, degree);
 		tree->ReadTree();
-		// cout<<"[Index DEBUG]:"<<endl;
+		// cout<<"[Index DEBUG]:"<<"\n";
 		// tree->printleaf();
-		// cout<<"[Index DEBUG end]:"<<endl;
+		// cout<<"[Index DEBUG end]:"<<"\n";
 		indexFloatMap.insert(floatMap::value_type(filename_index, tree));
 	}
 	else if (data_type == CHAR_UNIT) {
@@ -76,13 +76,13 @@ void IndexManager::readIndexfromfile(const Index& index) {//
 		degree = getDegree(keysize);
 		BPlusTree<string>* tree = new BPlusTree<string>(filename_index, keysize, degree);
 		tree->ReadTree();
-		// cout<<"[Index DEBUG]:"<<endl;
+		// cout<<"[Index DEBUG]:"<<"\n";
 		// tree->printleaf();
-		// cout<<"[Index DEBUG end]:"<<endl;
+		// cout<<"[Index DEBUG end]:"<<"\n";
 		indexStringMap.insert(stringMap::value_type(filename_index, tree));
 	}
 	else {
-		cout << "ERROR: in create index: Invalid type" << endl;
+		cout << "ERROR: in create index: Invalid type" << "\n";
 	}
 }
 
@@ -95,18 +95,18 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 	Value value = unit_key.value;
 	DataType data_type = unit_key.datatype;
 
-	// cout<<"[Index Debug]: here insert "<<endl;
-	// cout<<"[Index Debug]: datatype "<<data_type<<endl;
+	// cout<<"[Index Debug]: here insert "<<"\n";
+	// cout<<"[Index Debug]: datatype "<<data_type<<"\n";
 
 	if (data_type == INT_UNIT) //int 
 	{
-		// cout<<"[Index Debug]: value.int_value "<<value.int_value<<endl;
+		// cout<<"[Index Debug]: value.int_value "<<value.int_value<<"\n";
 		len = sizeof(int);
 		intTmp = value.int_value;
 
 		intMap::iterator itInt = indexIntMap.find(filename_index);
 		if (itInt == indexIntMap.end()) {
-			cout << "Error:in insert index, index not exits" << endl;
+			cout << "Error:in insert index, index not exits" << "\n";
 			return;
 		}
 		else {
@@ -123,7 +123,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 		floatTmp = value.float_value;
 		floatMap::iterator itFloat = indexFloatMap.find(filename_index);
 		if (itFloat == indexFloatMap.end()) {
-			cout << "Error:in insert index, index not exits" << endl;
+			cout << "Error:in insert index, index not exits" << "\n";
 			return;
 		}
 		else {
@@ -140,7 +140,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 		stringTmp = value.char_n_value;
 		stringMap::iterator itString = indexStringMap.find(filename_index);
 		if (itString == indexStringMap.end()) {
-			cout << "Error:in insert index, index not exits" << endl;
+			cout << "Error:in insert index, index not exits" << "\n";
 			return;
 		}
 		else {
@@ -150,7 +150,7 @@ void IndexManager::insertIndex(const Index& index, Unit unit_key, offsetNumber O
 		}
 	}
 	else {
-		cout << "ERROR: in insert index: Invalid type" << endl;
+		cout << "ERROR: in insert index: Invalid type" << "\n";
 		return;
 	}
 
@@ -175,7 +175,7 @@ void IndexManager::deleteIndex(const Index& index, Unit unit_key)
 
 		intMap::iterator itInt = indexIntMap.find(filename_index);
 		if (itInt == indexIntMap.end()) {
-			cout << "Error:in delete index, index not exits" << endl;
+			cout << "Error:in delete index, index not exits" << "\n";
 			return;
 		}
 		else {
@@ -191,7 +191,7 @@ void IndexManager::deleteIndex(const Index& index, Unit unit_key)
 		floatTmp = value.float_value;
 		floatMap::iterator itFloat = indexFloatMap.find(filename_index);
 		if (itFloat == indexFloatMap.end()) {
-			cout << "Error:in delete index, index not exits" << endl;
+			cout << "Error:in delete index, index not exits" << "\n";
 			return;
 		}
 		else {
@@ -208,7 +208,7 @@ void IndexManager::deleteIndex(const Index& index, Unit unit_key)
 		stringTmp = value.char_n_value;
 		stringMap::iterator itString = indexStringMap.find(filename_index);
 		if (itString == indexStringMap.end()) {
-			cout << "Error:in delete index, index not exits" << endl;
+			cout << "Error:in delete index, index not exits" << "\n";
 			return;
 		}
 		else {
@@ -218,7 +218,7 @@ void IndexManager::deleteIndex(const Index& index, Unit unit_key)
 		}
 	}
 	else {
-		cout << "ERROR: in insert index: Invalid type" << endl;
+		cout << "ERROR: in insert index: Invalid type" << "\n";
 		return;
 	}
 
@@ -273,7 +273,7 @@ void IndexManager::createIndex(const Index& index) {//
 
 
 	if (newfile_in) {
-		cout << "in Create index: file " << filename_index << "already exist" << endl;
+		cout << "in Create index: file " << filename_index << "already exist" << "\n";
 		newfile_in.close();
 	}
 	else {
@@ -307,7 +307,7 @@ void IndexManager::createIndex(const Index& index) {//
 		indexStringMap.insert(stringMap::value_type(filename_index, tree));
 	}
 	else {
-		cout << "ERROR: in create index: Invalid type" << endl;
+		cout << "ERROR: in create index: Invalid type" << "\n";
 	}
 }
 
@@ -335,7 +335,7 @@ void IndexManager::dropIndex(const Index& index) {//删除索引
 	if(data_type == INT_UNIT) {
 		intMap::iterator itInt = indexIntMap.find(filename_index);
 		if(itInt == indexIntMap.end()) {
-			cout << "Error:in drop index: index not exits" << endl;
+			cout << "Error:in drop index: index not exits" << "\n";
 			return;
 		}
 		else {
@@ -346,7 +346,7 @@ void IndexManager::dropIndex(const Index& index) {//删除索引
 	else if(data_type == FLOAT_UNIT) {
 		floatMap::iterator itFloat = indexFloatMap.find(filename_index);
 		if(itFloat == indexFloatMap.end()) {
-			cout << "Error:in drop index: index not exits" << endl;
+			cout << "Error:in drop index: index not exits" << "\n";
 			return;
 		}
 		else {
@@ -357,7 +357,7 @@ void IndexManager::dropIndex(const Index& index) {//删除索引
 	else if(data_type == CHAR_UNIT) {
 		stringMap::iterator itString = indexStringMap.find(filename_index);
 		if(itString == indexStringMap.end()) {
-			cout << "Error:in drop index: index not exits" << endl;
+			cout << "Error:in drop index: index not exits" << "\n";
 			return;
 		}
 		else {
@@ -366,7 +366,7 @@ void IndexManager::dropIndex(const Index& index) {//删除索引
 		}
 	}
 	else {
-		cout << "ERROR: in drop index: Invalid type" << endl;
+		cout << "ERROR: in drop index: Invalid type" << "\n";
 	}
 }
 
@@ -388,13 +388,13 @@ offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_ke
 		intTmp = value.int_value;
 		intMap::iterator itInt = indexIntMap.find(filename_index);
 		if(itInt == indexIntMap.end()) {
-			cout << "Error:in search index, index not exits" << endl;
+			cout << "Error:in search index, index not exits" << "\n";
 			return -1;
 		}
 		else {
-			// cout<<"[Index Manager debug]:"<<endl;
+			// cout<<"[Index Manager debug]:"<<"\n";
 			// itInt->second->printleaf();
-			// cout<<"[Index Manager debug end]:"<<endl;
+			// cout<<"[Index Manager debug end]:"<<"\n";
 			return itInt->second->Search(intTmp);
 		}
 	}
@@ -402,7 +402,7 @@ offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_ke
 		floatTmp = value.float_value;
 		floatMap::iterator itFloat = indexFloatMap.find(filename_index);
 		if(itFloat == indexFloatMap.end()) {
-			cout << "Error:in search index, index not exits" << endl;
+			cout << "Error:in search index, index not exits" << "\n";
 			return -1;
 		}
 		else {
@@ -413,7 +413,7 @@ offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_ke
 		stringTmp = value.char_n_value;
 		stringMap::iterator itString = indexStringMap.find(filename_index);
 		if(itString == indexStringMap.end()) {
-			cout << "Error:in search index, index not exits" << endl;
+			cout << "Error:in search index, index not exits" << "\n";
 			return -1;
 		}
 		else {
@@ -421,7 +421,7 @@ offsetNumber IndexManager::searchIndex(const Index &index, ConditionUnit unit_ke
 		}
 	}
 	else {
-		cout << "ERROR: in search index: Invalid type" << endl;
+		cout << "ERROR: in search index: Invalid type" << "\n";
 		return -2;
 	}
 }

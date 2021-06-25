@@ -25,7 +25,7 @@ Interpreter::Interpreter() : Cata(), Record()
         index_list.push_back(*pindex);
         // pindex->Print();
     }
-    // cout<<"[Interpreter debug]: begin set index int map"<<endl;
+    // cout<<"[Interpreter debug]: begin set index int map"<<"\n";
     Record.imanager->setindexIntMap(index_list);
 }
 
@@ -438,7 +438,7 @@ void Interpreter::Select(string str)
         }
         else
         {
-            cout << "[Interpreter debug]: " << infield_vec.size() << endl;
+            cout << "[Interpreter debug]: " << infield_vec.size() << "\n";
             SyntaxError e("Invalid table name  \"" + table_str + "\"");
             throw e;
         }
@@ -631,7 +631,7 @@ void Interpreter::Insert(string str)
     // table->Print();
     // tuple.Print();
     Record.InsertTuple(*table, tuple);
-    // cout << "Insert successfully" << endl;
+    cout << "Insert successfully" << "\n";
 }
 
 void Interpreter::CreateIndex(string str)
@@ -678,7 +678,7 @@ void Interpreter::CreateIndex(string str)
     // cout<<"[debug create index]:"<<index_name<<" on "<<targ_table_name<<"("<<attr_name<<")"<<"\n";
     Table *table = Cata.GetTableCatalog(targ_table_name);
 
-    // cout<<"[Interpreter Debug]: got table from cata"<<endl;
+    // cout<<"[Interpreter Debug]: got table from cata"<<"\n";
 
     if (table == NULL)
     {
@@ -710,16 +710,16 @@ void Interpreter::CreateIndex(string str)
         throw e;
     }
 
-    // cout<<"[Interpreter Debug]: begin create index"<<endl;
+    // cout<<"[Interpreter Debug]: begin create index"<<"\n";
     Index index(index_name, table, targ_table_name, attr_num);
 
-    // cout<<"[Interpreter Debug]: begin create index into cata"<<endl;
+    // cout<<"[Interpreter Debug]: begin create index into cata"<<"\n";
     if (!Cata.CreateIndex(index))
     {
         InternalError e("Create index \"" + index_name + "\" failed");
         throw e;
     }
-    // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+    // cout<<"[Interpreter Debug]: begin create index into record"<<"\n";
     Record.CreateIndex(index);
     cout << "Create index successfully"
          << "\n";
@@ -907,7 +907,7 @@ void Interpreter::CreateTable(string str)
                 InternalError e("Create index \"" + index_name + "\" failed");
                 throw e;
             }
-            // cout<<"[Interpreter Debug]: begin create index into record"<<endl;
+            // cout<<"[Interpreter Debug]: begin create index into record"<<"\n";
             Record.CreateIndex(index);
             cout << "Create index \"" + index_name + "\" successfully"
                  << "\n";

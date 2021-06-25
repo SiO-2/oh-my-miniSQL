@@ -7,7 +7,7 @@ int main()
     RecordManager rmanager;
 
     //创建Table
-    cout << "待插入的表信息" << endl;
+    cout << "待插入的表信息" << "\n";
     TableMetadata metadata;
     vector<Attribute> attrs;
     metadata.name = "recordtest";
@@ -20,10 +20,10 @@ int main()
     attrs.push_back(attr3);
     Table table(metadata, attrs);
     table.Print();
-    cout << endl;
+    cout << "\n";
 
     //创建Tuple
-    cout << "待插入的元组信息" << endl;
+    cout << "待插入的元组信息" << "\n";
     Tuple tuple;
     tuple.valid = 1;
     Value value1, value2, value3;
@@ -37,21 +37,21 @@ int main()
     tuple.tuple_value.push_back(unit2);
     tuple.tuple_value.push_back(unit3);
     tuple.Print();
-    cout << endl;
+    cout << "\n";
 
     // rmanager.CreateTableFile(table);
     // cin >> cont;
-    cout << "------insert---------------" << endl;
+    cout << "------insert---------------" << "\n";
     rmanager.InsertTuple(table, tuple);
     table.Print();
-    cout << endl;
+    cout << "\n";
 
-    cout << "------select---------------" << endl;
+    cout << "------select---------------" << "\n";
     vector<Tuple> results(rmanager.SelectTuple(table));
     Tuple result(*results.begin());
 
     cout << result.tuple_value.begin()->value.int_value << "  ";
-    cout << result.tuple_value.end()->value.float_value << endl;
-    cout << endl;
+    cout << result.tuple_value.end()->value.float_value << "\n";
+    cout << "\n";
     return 0;
 }

@@ -12,12 +12,18 @@
     </div>
     <div class="btnarea">
         <el-button type="primary" @click="HandleExecute">Execute</el-button>
-        <el-button type="primary" @click="HandleClear">清空</el-button>
+        <el-button type="primary" @click="HandleClear">清空结果</el-button>
     </div>
     <div class="ResultArea">
         <div> 结果 </div>
         <div>
-            {{consoletext}}
+            <el-input
+            type="textarea"
+            :rows="15"
+            placeholder="结果区"
+            v-model="consoletext"
+            :disabled="true">
+            </el-input>
         </div>
 
     </div>
@@ -43,6 +49,8 @@ export default {
             .then((response)=>{
                 console.log(response);
                 this.consoletext = response.data;
+                while (this.consoletext.indexOf("\\n") >= 0) { this.consoletext = this.consoletext.replace("\\n", " \\n "); } 
+                console.log(this.consoletext);
                 // if(response.data.status == 100){
                 //     sessionStorage.setItem('usr_id', response.data.usr_name);
                 //     sessionStorage.setItem('pwd_session', response.data.pwd_session);
@@ -89,6 +97,7 @@ export default {
 }
 .ResultArea{
     margin:auto;
+    width:80%;
     padding: 5% 5% 5% 5%;
 }
 </style>

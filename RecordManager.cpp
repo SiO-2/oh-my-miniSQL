@@ -379,9 +379,9 @@ void RecordManager::CreateIndex(const Index &index)
             if (bmanager->blocks[bid].data[tuple_offset] == 1) //先判断该处的tuple数据是否有效
             {
                 Tuple tuple = ExtractTuple(table, bid, tuple_offset);
-                // cout<<"[Record Debug]:"<<endl;
+                // cout<<"[Record Debug]:"<<"\n";
                 // tuple.Print();
-                // cout<<"[Record Debug end]:"<<endl;
+                // cout<<"[Record Debug end]:"<<"\n";
                 unit = tuple.tuple_value[index.attr_num];
                 offset = bmanager->blocks[bid].GetOffset() * BLOCKSIZE + tuple_offset;
                 if (ConditionTest(tuple) && tuple.valid == true)

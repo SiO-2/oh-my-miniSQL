@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     }
     strip(cmd);
     if(cmd[cmd.length() - 1] != ';'){
-        cout<<"[Error]: you must end your command by a \";\""<<endl;
+        cout<<"[Error]: you must end your command by a \";\""<<"\n";
         return 0;
     }
     cmd = cmd.substr(0, cmd.length() - 1);

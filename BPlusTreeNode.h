@@ -114,7 +114,7 @@ TreeNode<ElementType>* TreeNode<ElementType>::devide(ElementType &key, offsetNum
 	int midofNode = (degree - 1) / 2;
 	TreeNode* newNode = new TreeNode(this->degree, this->isLeaf);
 	if(newNode == NULL) {
-		cout << "Error: cannot allocate momeory when devide node (" << key << ")" << endl;
+		cout << "Error: cannot allocate momeory when devide node (" << key << ")" << "\n";
 		return NULL;
 	}
 
@@ -161,16 +161,16 @@ int TreeNode<ElementType>::insertKey(ElementType key, offsetNumber offset) {	//�
 	bool ifexist = search(key, index);
 	//偏移量与结点性质不匹配
 	if(offset == -1 && isLeaf) {
-		cout << "Error: cannot do this on leaf node" << endl;
+		cout << "Error: cannot do this on leaf node" << "\n";
 		return -1;
 	}
 	if(offset != -1 && !isLeaf) {
-		cout << "Error: cannot do this on non-leaf node" << endl;
+		cout << "Error: cannot do this on non-leaf node" << "\n";
 		return -1;
 	}
 	//key已经存在
 	if(ifexist) {
-		cout << "Error: one value cannot appear in the index twice, value (" << key << ")" << endl;
+		cout << "Error: one value cannot appear in the index twice, value (" << key << ")" << "\n";
 		return -1;
 	}
 	else {//插入新的key
@@ -193,7 +193,7 @@ int TreeNode<ElementType>::insertKey(ElementType key, offsetNumber offset) {	//�
 template <class ElementType>
 bool TreeNode<ElementType>::deleteKey(int index) {//删除index位置的key
 	if(index >= keycount) {//这个位置不存在key
-		cout << "Error: cannot find the " << index << "-th element" << endl;
+		cout << "Error: cannot find the " << index << "-th element" << "\n";
 		return false;
 	}
 	if(isLeaf) {//叶结点
@@ -225,7 +225,7 @@ void TreeNode<ElementType>::printl()
 {
     for (int i = 0; i < keycount; i++)
         std::cout << "->" << keys[i];
-    std::cout<<std::endl;
+    std::cout<<"\n";
     
 }
 

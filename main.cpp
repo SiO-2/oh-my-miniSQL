@@ -20,8 +20,8 @@ string query = "insert into s values(\"chartest\", 10, 10.5)";
 
 int main(int argc, char *argv[])
 {
-    cout<<"Welcome to MiniSQL !!"<<endl;
-    cout<<"If you want to quit, type \"quit\""<<endl;
+    cout<<"Welcome to MiniSQL !!"<<"\n";
+    cout<<"If you want to quit, type \"quit\""<<"\n";
     Interpreter I;
     string cmd;
     char cmd_cstr[100];
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
         cmd = cmd_cstr;
         strip(cmd);
         if(cmd[cmd.length() - 1] != ';'){
-            cout<<"[Error]: you must end you command by a \";\""<<endl;
+            cout<<"[Error]: you must end you command by a \";\""<<"\n";
             continue;
         }
         cmd = cmd.substr(0, cmd.length() - 1);

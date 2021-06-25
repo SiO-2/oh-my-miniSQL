@@ -16,7 +16,7 @@ int main()
 	tree->Delete(2);
 	tree->printleaf();
 	
-	cout<< tree->Search(4)<<endl;
+	cout<< tree->Search(4)<<"\n";
 	
 	tree->WriteBack(); 
 	
@@ -25,5 +25,5 @@ int main()
 	tree1->ReadTree();
 	tree1->printleaf();
 	
-	cout<<tree1->Search(3)<<endl;
+	cout<<tree1->Search(3)<<"\n";
  } 

@@ -34,16 +34,16 @@ CatalogManager::CatalogManager()
     }
     replace();
     // by wyc print to debug:
-    // cout<<"[Catalog]: table list"<<endl;
+    // cout<<"[Catalog]: table list"<<"\n";
     // for(auto table:this->m_table){
     //     table->Print();
     // }
-    // cout<<"[catalog]: end of table list"<<endl;
+    // cout<<"[catalog]: end of table list"<<"\n";
 }
 
 CatalogManager::~CatalogManager()
 {
-    // cout<<"[Catalog deconstruct]"<<endl;
+    // cout<<"[Catalog deconstruct]"<<"\n";
     int n = m_table.size();
     for (int i=0; i<n; i++)
         delete m_table[i];
@@ -125,7 +125,7 @@ bool CatalogManager::DropTable(string& name)
 //删除索引，通过name判断删除哪个索引，需要检查存在性，返回值true表示成功，false表示失败
 bool CatalogManager::DropIndex(string& name)
 {
-    // cout << "[catalog Drop index]"<<endl;
+    // cout << "[catalog Drop index]"<<"\n";
     int n = m_index.size();
     fstream index_file;
     for (int i=0; i<n; i++)
@@ -167,11 +167,11 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
 {
     Table* t;
     int n = m_table.size(), i;
-    // cout << "[Catalog debug]:" <<endl;
-    // cout << "table num:" << n << endl;
+    // cout << "[Catalog debug]:" <<"\n";
+    // cout << "table num:" << n << "\n";
     for (i=0; i<n; i++)
     {
-        // cout << m_table[i]->m_metadata.name << endl;
+        // cout << m_table[i]->m_metadata.name << "\n";
         if (table_name == m_table[i]->m_metadata.name)
             break;
     }
@@ -183,11 +183,11 @@ bool CatalogManager::InsertTest(string& table_name, Tuple& data)
     t = m_table[i];
     n = t->m_metadata.attr_num;
     // wyc test
-    // cout<<"[Catalog debug]:"<<endl;
+    // cout<<"[Catalog debug]:"<<"\n";
     // for(auto attr: t->m_attribute){
     //     attr.Print();
     // }
-    // cout<<"[Catalog debug]: end"<<endl;
+    // cout<<"[Catalog debug]: end"<<"\n";
     // // end of wyc test
     for (i=0; i<n; i++)
     {
@@ -280,12 +280,12 @@ pair<int, string> CatalogManager::SelectTest(string& table_name, vector<string>&
 //获取表名为table_name的Catalog信息，如果不存在则返回空的Table
 Table* CatalogManager::GetTableCatalog(string& table_name)
 {
-    // cout<<"[Cata debug]: get table catalog for "<< table_name<<endl;
+    // cout<<"[Cata debug]: get table catalog for "<< table_name<<"\n";
     int i = FindTable(table_name);
     if (i == -1)
         return NULL;
     Table *t = m_table[i];
-    // cout<<"[Cata debug end]"<<endl;
+    // cout<<"[Cata debug end]"<<"\n";
     return t;
 }
 
@@ -580,6 +580,6 @@ void CatalogManager::replace()
         int j = FindTable(m_index[i]->table_name);
         m_table[j]->Index_name.push_back(m_index[i]);
         m_index[i]->table = m_table[j];
-        // cout << m_index[i]->index_name << endl;
+        // cout << m_index[i]->index_name << "\n";
     }
 }

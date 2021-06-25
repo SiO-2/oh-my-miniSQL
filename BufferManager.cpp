@@ -58,8 +58,8 @@ vector<BID> BufferManager::ReadFile2Block(const string &filename, const vector<u
     {
         if ((fp = fopen(filename.c_str(), "wb+")) == NULL)
         {
-            cout << "[ReadFile2Block Fail]" << endl;
-            // cout<<"[ReadFile2Block]: Can't open "<<filename<<endl;
+            cout << "[ReadFile2Block Fail]" << "\n";
+            // cout<<"[ReadFile2Block]: Can't open "<<filename<<"\n";
             printf("Can't open %s\n", filename.c_str());
             exit(EXIT_FAILURE); //be panic
         }
@@ -101,8 +101,8 @@ void BufferManager::WriteBlock2File(const BID &bid)
         FILE *fp;
         if ((fp = fopen(blocks[bid].GetFilename().c_str(), "wb")) == NULL)
         {
-            cout << "[WriteBlock2File Fail]" << endl;
-            // cout<<"[WriteBlock2File]: Can't open "<<blocks[bid].GetFilename()<<endl;
+            cout << "[WriteBlock2File Fail]" << "\n";
+            // cout<<"[WriteBlock2File]: Can't open "<<blocks[bid].GetFilename()<<"\n";
             printf("Can't open %s\n", blocks[bid].GetFilename().c_str());
             exit(EXIT_FAILURE);
         }
@@ -127,7 +127,7 @@ void BufferManager::FlushBlock(const string &filename)
         {
             memset(blocks[bid].data, 0, BLOCKSIZE);
             blocks[bid].SetUnValid();
-            cout << "[BufferManager] FlushBlock setUnValid success" << endl;
+            cout << "[BufferManager] FlushBlock setUnValid success" << "\n";
         }
     }
 }

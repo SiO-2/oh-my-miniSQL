@@ -37,7 +37,7 @@ public:
     string GetFilename() const
     {
 #ifdef DEBUG
-        // cout << "GetFilename return filename = " << this->filename << "output finish" << endl;
+        // cout << "GetFilename return filename = " << this->filename << "output finish" << "\n";
 #endif
         return this->filename;
     }
@@ -48,8 +48,8 @@ public:
     bool IsValid() const
     {
 #ifdef DEBUG
-        // cout << "BufferManager.h::IsValid():49" << endl;
-        // cout << "GetFilename return valid = " << this->valid << "   output finish" << endl;
+        // cout << "BufferManager.h::IsValid():49" << "\n";
+        // cout << "GetFilename return valid = " << this->valid << "   output finish" << "\n";
 #endif
         return this->valid;
     }
@@ -117,7 +117,7 @@ public:
             if (blocks[bid].IsDirty() && blocks[bid].IsValid())
                 WriteBlock2File(bid);
 
-        // cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;
+        // cout << "BufferManager.h>BufferManager>~BufferManager() finished" << "\n";
     };
 
     /*

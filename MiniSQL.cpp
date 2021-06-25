@@ -24,10 +24,10 @@ TableMetadata::TableMetadata(TableMetadata &t)
 void TableMetadata::Print()
 {
     cout << "[Table Meta]:\n";
-    cout << "Name:" << this->name << endl;
-    cout << "Attr num:" << this->attr_num << endl;
-    // cout << "Primary Key:" << this->primary_key << endl;
-    // cout << "Primary Index:" << this->primary_index << endl;
+    cout << "Name:" << this->name << "\n";
+    cout << "Attr num:" << this->attr_num << "\n";
+    // cout << "Primary Key:" << this->primary_key << "\n";
+    // cout << "Primary Index:" << this->primary_index << "\n";
 }
 
 Attribute::Attribute(string name, string typestr, bool notnull, bool unique, bool primary_key)
@@ -54,10 +54,10 @@ Attribute::Attribute(string name, string typestr, bool notnull, bool unique, boo
         {
             // ！！！ 这里可能有点隐患，默认\d+是贪婪匹配了
             // string L = itr->str();
-            // cout<<L<<endl;
+            // cout<<L<<"\n";
             this->charlen = stoi(itr->str());
             break;
-            // cout << itr->str() << endl;
+            // cout << itr->str() << "\n";
         }
     }
     this->name = name;
@@ -65,19 +65,19 @@ Attribute::Attribute(string name, string typestr, bool notnull, bool unique, boo
     this->notnull = notnull;
     this->unique = unique;
     this->primary_key = primary_key;
-    // cout<<"[info]: Create Attribute "<<(this->name)<<", type = "<<this->type<<", charlen = "<<this->charlen<<endl;
-    // cout<<"[debug]: "<<this->name.length()<<endl;
+    // cout<<"[info]: Create Attribute "<<(this->name)<<", type = "<<this->type<<", charlen = "<<this->charlen<<"\n";
+    // cout<<"[debug]: "<<this->name.length()<<"\n";
 }
 
 void Attribute::set_pk(bool pk)
 {
-    // cout << "[debug]: call set pk for " << this->name << " to pk=" << pk << endl;
+    // cout << "[debug]: call set pk for " << this->name << " to pk=" << pk << "\n";
     this->primary_key = pk;
 }
 
 void Attribute::Print()
 {
-    // cout<<"[debug]: "<<this->name.length()<<endl;
+    // cout<<"[debug]: "<<this->name.length()<<"\n";
     cout << "[Attribute info]: Attr:" << this->name << ", type:";
     if (this->type == INT_UNIT)
     {
@@ -108,7 +108,7 @@ void Attribute::Print()
         cout << ", primary key";
     }
 
-    cout << endl;
+    cout << "\n";
 }
 
 Table::Table(TableMetadata m_metadata, vector<Attribute> m_attribute) : m_metadata(m_metadata), m_attribute(m_attribute){};
@@ -153,7 +153,7 @@ void Index::Print() const
     // table->Print();
     // cout<<this->attr_num;
     // this->table->m_attribute[this->attr_num].name;
-    // cout<<"\""<< endl;
+    // cout<<"\""<< "\n";
 }
 
 Unit::Unit()
@@ -197,7 +197,7 @@ void Tuple::Print()
     {
         unit.Print();
     }
-    cout << "[End]" << endl;
+    cout << "[End]" << "\n";
 }
 
 void Tuple::Print(vector<int>& int_vec){
@@ -207,7 +207,7 @@ void Tuple::Print(vector<int>& int_vec){
         this->tuple_value[idx].Print();
         // unit.Print();
     }
-    cout << "[End]" << endl;
+    cout << "[End]" << "\n";
 }
 // void DataUnit::Print(){
 //     cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
@@ -226,7 +226,7 @@ void Tuple::Print(vector<int>& int_vec){
 //     default:
 //         break;
 //     }
-//     cout<<endl;
+//     cout<<"\n";
 // }
 
 ConditionUnit::ConditionUnit(string attr_name, int attr_num, OpCode op_code, DataType data_type) : value()
@@ -280,5 +280,5 @@ void ConditionUnit::Print()
     default:
         break;
     }
-    cout << "\"" << endl;
+    cout << "\"" << "\n";
 }
