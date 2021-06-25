@@ -342,10 +342,8 @@ void Interpreter::DropIndex(string str)
     }
     // Here Index Name to Drop is 'str'
     // cout<<"[info]: Drop Index Name=\""<<str<<"\""<<"\n";
-
+    Index ind(*Cata.GetIndexCatalog(str));
     bool b = Cata.DropIndex(str);
-    string filename_index = INDEX_PATH + str + INDEX_SUFFIX;
-    this->Record.imanager->buffer.FlushBlock(filename_index);
     if (!b)
     {
         DBError e("Drop index \"" + str + "\" failed");
@@ -353,6 +351,9 @@ void Interpreter::DropIndex(string str)
     }
     cout << "Drop index \"" << str << "\" successfully"
          << "\n";
+    string filename_index = INDEX_PATH + str + INDEX_SUFFIX;
+    this->Record.imanager->buffer.FlushBlock(filename_index);
+    this->Record.imanager->dropIndex(ind);
 }
 
 void Interpreter::Select(string str)
