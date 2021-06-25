@@ -9,8 +9,8 @@
 using namespace std;
 
 typedef unsigned int BID;
-const BID MAX_BLOCK_NUMBER = 4096;
-const unsigned int BLOCKSIZE = 4096;
+const BID MAX_BLOCK_NUMBER = 4096 ;
+const unsigned int BLOCKSIZE = 4096 * 100 ;
 
 class Block
 {

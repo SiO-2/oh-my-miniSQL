@@ -6,6 +6,8 @@ import hashlib
 import time
 import os
 import datetime
+# import minisql
+
 
 def add_api_rouer(app):
     @app.route('/api/minisql', methods=['GET'])
