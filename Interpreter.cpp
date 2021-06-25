@@ -31,8 +31,8 @@ Interpreter::Interpreter() : Cata(), Record()
 
 Interpreter::~Interpreter()
 {
-    delete &Record;
-    delete &Cata;
+    // delete &Record;
+    // delete &Cata;
 }
 
 void Interpreter::Parse(string sql)
