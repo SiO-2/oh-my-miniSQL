@@ -43,6 +43,7 @@ CatalogManager::CatalogManager()
 
 CatalogManager::~CatalogManager()
 {
+    // cout<<"[Catalog deconstruct]"<<endl;
     int n = m_table.size();
     for (int i=0; i<n; i++)
         delete m_table[i];

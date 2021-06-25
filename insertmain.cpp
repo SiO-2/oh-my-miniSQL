@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     int i;
     string str;
     Interpreter I;
-    for( i = 100; i < 110; i++){
+    for( i = 100; i < 5010; i++){
         str = "insert into speedtest values(" + to_string(i) + "," + to_string(i) +")";
         I.Parse(str);
         printf("\r%d", i);

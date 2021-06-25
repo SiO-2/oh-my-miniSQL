@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
         }
         I.Parse(cmd);
     }
-    delete &I;
+    // delete &I;
     // system("pause");
     return 0;
 }

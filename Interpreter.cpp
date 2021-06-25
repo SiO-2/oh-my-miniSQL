@@ -31,8 +31,10 @@ Interpreter::Interpreter() : Cata(), Record()
 
 Interpreter::~Interpreter()
 {
-    delete &Record;
-    delete &Cata;
+    // this->Record.~RecordManager();
+    // this->Cata.~CatalogManager();
+    // delete &Record;
+    // delete &Cata;
 }
 
 void Interpreter::Parse(string sql)
@@ -620,7 +622,7 @@ void Interpreter::Insert(string str)
     // table->Print();
     // tuple.Print();
     Record.InsertTuple(*table, tuple);
-    cout << "Insert successfully" << endl;
+    // cout << "Insert successfully" << endl;
 }
 
 void Interpreter::CreateIndex(string str)

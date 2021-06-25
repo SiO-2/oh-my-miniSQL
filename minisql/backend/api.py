@@ -12,7 +12,10 @@ def add_api_rouer(app):
     def minisql():
         sql = request.args.get('sql')
         sql = sql.replace('"', '\\"')
+        # print('sqlexecute \"' + sql + '\"')
+        # print(os.path.abspath('./'))
         # proc = os.popen('test ' + sql)
         proc = os.popen('sqlexecute \"' + sql + '\"')
+        # print(proc.read())
         return proc.read()
 
