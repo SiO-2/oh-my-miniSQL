@@ -345,9 +345,10 @@ void Interpreter::DropIndex(string str)
 
     Index ind;
     ind = Record.GetIndexCatalog(str);
-    this->Record.imanager->dropIndex(ind);
 
     bool b = Cata.DropIndex(str);
+    if(b)
+        this->Record.imanager->dropIndex(ind);
     string filename_index = INDEX_PATH + str + INDEX_SUFFIX;
     this->Record.imanager->buffer.FlushBlock(filename_index);
     if (!b)
