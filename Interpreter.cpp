@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include <ctime>
 #include <algorithm>
 #include <regex>
 #include <cstring>
@@ -517,7 +518,10 @@ void Interpreter::Select(string str)
 #ifdef DEBUG
         printf("Interpreter::Select::348:: cond_vec[0].attr_num = %d\n", cond_vec[0].attr_num);
 #endif
+        clock_t startTime,endTime;
+        startTime = clock();
         vector<Tuple> Select_Res = Record.SelectTuple(*table, cond_vec);
+        endTime = clock();
         // cout<<"[Interpreter Select Res without index]:"<<"\n";
 
         // 这里还需要做一下筛选属性
@@ -549,7 +553,9 @@ void Interpreter::Select(string str)
             }
         }
 
-        cout << "[Interpreter Select Res End]:"
+        cout << "[Interpreter Select Res End]: ";
+        printf("%e", (double)(endTime - startTime) / CLOCKS_PER_SEC);
+        cout<<" seconds spent"
              << "\n";
     }
     // else if(response.first == 1){
@@ -567,7 +573,7 @@ void Interpreter::Insert(string str)
     strip(s1);
     if (!icasecompare(s1, "VALUES") || str[str.length() - 1] != ')')
     {
-        cout << "[debug]: insert query=" << s1 << "\n";
+        // cout << "[debug]: insert query=" << s1 << "\n";
         SyntaxError e("Invalid Syntax please insert value by: insert into tablename values(values...)\n");
         throw e;
     }
@@ -650,7 +656,7 @@ void Interpreter::CreateIndex(string str)
     split(s1, sv, ' ');
     if (sv.size() != 3 || (!icasecompare(sv[1], "on")))
     {
-        cout << "[debug]: parse string=" << s1 << sv.size() << "\n";
+        // cout << "[debug]: parse string=" << s1 << sv.size() << "\n";
         SyntaxError e("Invalid Syntax please create index by: create index index_name on table_name(attributes)\n");
         throw e;
     }
@@ -886,7 +892,7 @@ void Interpreter::CreateTable(string str)
     else
     {
         // cout<<"[Catalog info]: Create Table Failed"<<"\n";s
-        DBError e("Create Table Failed because of duplicated table name" + tablename);
+        DBError e("Create Table Failed because of duplicated table name \"" + tablename + "\"");
         throw e;
     }
 
