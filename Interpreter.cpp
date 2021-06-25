@@ -262,21 +262,19 @@ void Interpreter::Delete(string str)
         SyntaxError e("Delete conditions error");
         throw e;
     }
-    else if (response.first == 0)
+    else if (response.first == 0 || response.first == 1)
     {
-        // 使用Record删除
+        // 使用Record删除 和 索引删除都是这里
         Table *table_pointer = Cata.GetTableCatalog(tablename);
         Record.DeleteTuple(*table_pointer, cond_vec);
         cout << "Delete successfully"
              << "\n";
-    }
-    else if (response.first == 1)
-    {
-        // 索引删除
-        string index_name = response.second;
-        cout << "[Interpreter Delete]: by index " << index_name << "\n";
-        cout << "not supported yet"
-             << "\n";
+
+        // // 索引删除
+        // string index_name = response.second;
+        // cout << "[Interpreter Delete]: by index " << index_name << "\n";
+        // cout << "not supported yet"
+        //      << "\n";
     }
     else
     {
