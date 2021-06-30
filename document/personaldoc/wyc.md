@@ -1,4 +1,8 @@
+**Minisql 实验报告**
+
 **3180105843 汪奕晨**
+
+全体组员：汪奕晨，罗志凡，张效源，章茹，陈信宇
 
 [TOC]
 
@@ -549,8 +553,6 @@ delete错误几乎与select重合，判断条件错误会和select一样处理
 <img src="../src/wyc/error/drop.png" style="width:100%"/>
 
 
-
-### 图形化GUI界面
 
 
 
