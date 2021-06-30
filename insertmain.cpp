@@ -23,11 +23,32 @@ int main(int argc, char *argv[])
     int i;
     string str;
     Interpreter I;
-    for( i = 10; i < 210; i++){
-        str = "insert into speedtest values( " + to_string(i) + " , " + to_string(i) +" , \"" + to_string(i) + "str\")";
+    for( i = 10; i < 10010; i++){
+        str = "insert into speedtest4 values( " + to_string(i) + " , " + to_string(i) + "\")";
+        if( i == 10){
+            cout<<str<<endl;
+        }
         I.Parse(str);
         printf("\r%d", i);
     }
+    // for( i = 10; i < 1010; i++){
+    //     str = "insert into speedtest3 values( " + to_string(i) + " , " + to_string(i) + " , \"" + to_string(i) + "\")";
+    //     if( i == 10){
+    //         cout<<str<<endl;
+    //     }
+    //     I.Parse(str);
+    //     printf("\r%d", i);
+    // }
+    // for( i = 10; i < 1050; i++){
+    //     str = "insert into speedtest values( " + to_string(i) + " , " + to_string(i) + ")";
+    //     I.Parse(str);
+    //     printf("\r%d", i);
+    // }
+    // for( i = 10; i < 1050; i++){
+    //     str = "insert into speedtest2 values( \" " + to_string(i) + "\")";
+    //     I.Parse(str);
+    //     printf("\r%d", i);
+    // }
     delete &I;
     // system("pause");
     return 0;
