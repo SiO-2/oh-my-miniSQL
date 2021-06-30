@@ -1,29 +1,27 @@
-#include <regex>
 #include "MiniSQL.h"
+
+#include <regex>
+
 #include "SqlError.h"
 
-TableMetadata::TableMetadata()
-{
-}
+TableMetadata::TableMetadata() {}
 
-TableMetadata::TableMetadata(string name, int attr_num, int primary_key, int primary_index)
-{
+TableMetadata::TableMetadata(string name, int attr_num, int primary_key,
+                             int primary_index) {
     this->name = name;
     this->attr_num = attr_num;
     this->primary_key = primary_key;
     this->primary_index = primary_index;
 }
 
-TableMetadata::TableMetadata(TableMetadata &t)
-{
+TableMetadata::TableMetadata(TableMetadata& t) {
     this->attr_num = t.attr_num;
     this->name = t.name;
     this->primary_index = t.primary_index;
     this->primary_key = t.primary_key;
 }
 
-void TableMetadata::Print()
-{
+void TableMetadata::Print() {
     cout << "[Table Meta]:\n";
     cout << "Name:" << this->name << "\n";
     cout << "Attr num:" << this->attr_num << "\n";
@@ -31,31 +29,24 @@ void TableMetadata::Print()
     // cout << "Primary Index:" << this->primary_index << "\n";
 }
 
-Attribute::Attribute(){
-    
-}
-Attribute::Attribute(string name, string typestr, bool notnull, bool unique, bool primary_key)
-{
+Attribute::Attribute() {}
+
+Attribute::Attribute(string name, string typestr, bool notnull, bool unique,
+                     bool primary_key) {
     std::regex re_char("char\\(\\d+\\)", regex_constants::icase);
     std::regex re_int("int", regex_constants::icase);
     std::regex re_float("float", regex_constants::icase);
     std::regex re_num("\\d+", regex_constants::icase);
     this->charlen = -1;
-    if (std::regex_match(typestr, re_int))
-    {
+    if (std::regex_match(typestr, re_int)) {
         this->type = INT_UNIT;
-    }
-    else if (std::regex_match(typestr, re_float))
-    {
+    } else if (std::regex_match(typestr, re_float)) {
         this->type = FLOAT_UNIT;
-    }
-    else if (std::regex_match(typestr, re_char))
-    {
+    } else if (std::regex_match(typestr, re_char)) {
         this->type = CHAR_UNIT;
         sregex_iterator itr1(typestr.begin(), typestr.end(), re_num);
         sregex_iterator itr2;
-        for (sregex_iterator itr = itr1; itr != itr2; ++itr)
-        {
+        for (sregex_iterator itr = itr1; itr != itr2; ++itr) {
             // ！！！ 这里可能有点隐患，默认\d+是贪婪匹配了
             // string L = itr->str();
             // cout<<L<<"\n";
@@ -63,8 +54,8 @@ Attribute::Attribute(string name, string typestr, bool notnull, bool unique, boo
             break;
             // cout << itr->str() << "\n";
         }
-    }else{
-        SyntaxError e("Invalid type \"" + typestr +"\"");
+    } else {
+        SyntaxError e("Invalid type \"" + typestr + "\"");
         throw e;
     }
     this->name = name;
@@ -72,66 +63,55 @@ Attribute::Attribute(string name, string typestr, bool notnull, bool unique, boo
     this->notnull = notnull;
     this->unique = unique;
     this->primary_key = primary_key;
-    // cout<<"[info]: Create Attribute "<<(this->name)<<", type = "<<this->type<<", charlen = "<<this->charlen<<"\n";
-    // cout<<"[debug]: "<<this->name.length()<<"\n";
+    // cout<<"[info]: Create Attribute "<<(this->name)<<", type =
+    // "<<this->type<<", charlen = "<<this->charlen<<"\n"; cout<<"[debug]:
+    // "<<this->name.length()<<"\n";
 }
 
-void Attribute::set_pk(bool pk)
-{
-    // cout << "[debug]: call set pk for " << this->name << " to pk=" << pk << "\n";
+void Attribute::set_pk(bool pk) {
+    // cout << "[debug]: call set pk for " << this->name << " to pk=" << pk <<
+    // "\n";
     this->primary_key = pk;
 }
 
-void Attribute::Print()
-{
+void Attribute::Print() {
     // cout<<"[debug]: "<<this->name.length()<<"\n";
     cout << "[Attribute info]: Attr:" << this->name << ", type:";
-    if (this->type == INT_UNIT)
-    {
+    if (this->type == INT_UNIT) {
         cout << "int";
-    }
-    else if (this->type == FLOAT_UNIT)
-    {
+    } else if (this->type == FLOAT_UNIT) {
         cout << "float";
-    }
-    else if (this->type == CHAR_UNIT)
-    {
+    } else if (this->type == CHAR_UNIT) {
         cout << "char(" << this->charlen << ")";
-    }
-    else
-    {
+    } else {
         cout << "Invalid";
     }
-    if (this->notnull)
-    {
+    if (this->notnull) {
         cout << ", not null";
     }
-    if (this->unique)
-    {
+    if (this->unique) {
         cout << ", unique";
     }
-    if (this->primary_key)
-    {
+    if (this->primary_key) {
         cout << ", primary key";
     }
 
     cout << "\n";
 }
 
-Table::Table(TableMetadata m_metadata, vector<Attribute> m_attribute) : m_metadata(m_metadata), m_attribute(m_attribute){};
+Table::Table(TableMetadata m_metadata, vector<Attribute> m_attribute)
+    : m_metadata(m_metadata), m_attribute(m_attribute){};
 
-Table::Table(Table &table)
-{
+Table::Table(Table& table) {
     this->m_metadata = table.m_metadata;
-    this->m_attribute.assign(table.m_attribute.begin(), table.m_attribute.end());
+    this->m_attribute.assign(table.m_attribute.begin(),
+                             table.m_attribute.end());
 }
 
-void Table::Print()
-{
+void Table::Print() {
     cout << "[Table Info]:\n";
     this->m_metadata.Print();
-    for (auto Attr : this->m_attribute)
-    {
+    for (auto Attr : this->m_attribute) {
         Attr.Print();
     }
 }
@@ -144,18 +124,18 @@ void Table::Print()
 //     this->table_name = index.table_name;
 // }
 
-Index::Index()
-{
-}
+Index::Index() {}
 
-Index::Index(string index_name, Table* table, string table_name, int attr_num):index_name(index_name), table(table), table_name(table_name), attr_num(attr_num){
+Index::Index(string index_name, Table* table, string table_name, int attr_num)
+    : index_name(index_name),
+      table(table),
+      table_name(table_name),
+      attr_num(attr_num) {}
 
-}
-
-
-void Index::Print() const
-{
-    cout << "[Index Info]: index name = " << this->index_name <<" on table \"" << this->table_name << "\" attribute \""<<this->table->m_attribute[this->attr_num].name<<"\"\n";
+void Index::Print() const {
+    cout << "[Index Info]: index name = " << this->index_name << " on table \""
+         << this->table_name << "\" attribute \""
+         << this->table->m_attribute[this->attr_num].name << "\"\n";
     // Table *table = this->table;
     // table->Print();
     // cout<<this->attr_num;
@@ -163,58 +143,50 @@ void Index::Print() const
     // cout<<"\""<< "\n";
 }
 
-Unit::Unit()
-{
-}
+Unit::Unit() {}
 
-Unit::Unit(Value value, DataType datatype) : value(value)
-{
+Unit::Unit(Value value, DataType datatype) : value(value) {
     // this->value = value;
     this->datatype = datatype;
 }
 
-void Unit::Print()
-{
+void Unit::Print() {
     // cout << "[Unit info]: ";
     string str;
-    switch (this->datatype)
-    {
-    case INT_UNIT:
-        cout << "(int)" << this->value.int_value <<" ";
-        break;
-    case FLOAT_UNIT:
-        cout << "(float)" << this->value.float_value<<" ";
-        break;
-    case CHAR_UNIT:
-        str = this->value.char_n_value;
-        cout << "(string)" << str <<" ";
-        break;
-    default:
-        break;
+    switch (this->datatype) {
+        case INT_UNIT:
+            cout << "(int)" << this->value.int_value << " ";
+            break;
+        case FLOAT_UNIT:
+            cout << "(float)" << this->value.float_value << " ";
+            break;
+        case CHAR_UNIT:
+            str = this->value.char_n_value;
+            cout << "(string)" << str << " ";
+            break;
+        default:
+            break;
     }
 }
-Tuple::Tuple() : tuple_value(), valid(true)
-{
-}
+Tuple::Tuple() : tuple_value(), valid(true) {}
 
-void Tuple::Print()
-{
+void Tuple::Print() {
     cout << "[Tuple]:";
-    for (auto unit : this->tuple_value)
-    {
+    for (auto unit : this->tuple_value) {
         unit.Print();
     }
-    cout << "[End]" << "\n";
+    cout << "[End]"
+         << "\n";
 }
 
-void Tuple::Print(vector<int>& int_vec){
+void Tuple::Print(vector<int>& int_vec) {
     cout << "[Tuple]:";
-    for (int idx : int_vec)
-    {
+    for (int idx : int_vec) {
         this->tuple_value[idx].Print();
         // unit.Print();
     }
-    cout << "[End]" << "\n";
+    cout << "[End]"
+         << "\n";
 }
 // void DataUnit::Print(){
 //     cout<<"[DataUnit]: attrname = "<<this->attr_name<<", DataType = ";
@@ -236,56 +208,55 @@ void Tuple::Print(vector<int>& int_vec){
 //     cout<<"\n";
 // }
 
-ConditionUnit::ConditionUnit(string attr_name, int attr_num, OpCode op_code, DataType data_type) : value()
-{
+ConditionUnit::ConditionUnit(string attr_name, int attr_num, OpCode op_code,
+                             DataType data_type)
+    : value() {
     this->attr_name = attr_name;
     this->attr_num = attr_num;
     this->op_code = op_code;
     this->data_type = data_type;
 }
 
-void ConditionUnit::Print()
-{
+void ConditionUnit::Print() {
     cout << "[Condition Unit]:\n"
          << "attr name = \"" << this->attr_name << "\", Op = \"";
-    switch (this->op_code)
-    {
-    case EQ_:
-        cout << "=\"";
-        break;
-    case NE_:
-        cout << "!=\"";
-        break;
-    case LE_:
-        cout << "<=\"";
-        break;
-    case GE_:
-        cout << ">=\"";
-        break;
-    case L_:
-        cout << "<\"";
-        break;
-    case G_:
-        cout << ">\"";
-        break;
-    default:
-        break;
+    switch (this->op_code) {
+        case EQ_:
+            cout << "=\"";
+            break;
+        case NE_:
+            cout << "!=\"";
+            break;
+        case LE_:
+            cout << "<=\"";
+            break;
+        case GE_:
+            cout << ">=\"";
+            break;
+        case L_:
+            cout << "<\"";
+            break;
+        case G_:
+            cout << ">\"";
+            break;
+        default:
+            break;
     }
     cout << ", value = \"";
-    switch (this->data_type)
-    {
-    case INT_UNIT:
-        cout << "int:" << this->value.int_value;
-        break;
-    case FLOAT_UNIT:
-        cout << "float:" << this->value.float_value;
-        break;
-    case CHAR_UNIT:
-        cout << "char:" << this->value.char_n_value;
-        break;
+    switch (this->data_type) {
+        case INT_UNIT:
+            cout << "int:" << this->value.int_value;
+            break;
+        case FLOAT_UNIT:
+            cout << "float:" << this->value.float_value;
+            break;
+        case CHAR_UNIT:
+            cout << "char:" << this->value.char_n_value;
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
-    cout << "\"" << "\n";
+    cout << "\""
+         << "\n";
 }
