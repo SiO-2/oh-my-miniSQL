@@ -9,8 +9,9 @@
 using namespace std;
 
 typedef unsigned int BID;
-const BID MAX_BLOCK_NUMBER = 4096 ;
-const unsigned int BLOCKSIZE = 4096 * 100 ;
+const BID MAX_BLOCK_NUMBER = 4096;
+const unsigned int BLOCKSIZE = 4096;    //第0个字节存储block的valid位，第1~0x60个字节存储filename，第0x61~0x64个字节存储blockoffset;
+const unsigned int DATASIZE = 3996;     
 
 class Block
 {
@@ -37,7 +38,7 @@ public:
     string GetFilename() const
     {
 #ifdef DEBUG
-        // cout << "GetFilename return filename = " << this->filename << "output finish" << "\n";
+        // cout << "GetFilename return filename = " << this->filename << "output finish" << endl;
 #endif
         return this->filename;
     }
@@ -48,8 +49,8 @@ public:
     bool IsValid() const
     {
 #ifdef DEBUG
-        // cout << "BufferManager.h::IsValid():49" << "\n";
-        // cout << "GetFilename return valid = " << this->valid << "   output finish" << "\n";
+        // cout << "BufferManager.h::IsValid():49" << endl;
+        // cout << "GetFilename return valid = " << this->valid << "   output finish" << endl;
 #endif
         return this->valid;
     }
@@ -117,7 +118,7 @@ public:
             if (blocks[bid].IsDirty() && blocks[bid].IsValid())
                 WriteBlock2File(bid);
 
-        // cout << "BufferManager.h>BufferManager>~BufferManager() finished" << "\n";
+        // cout << "BufferManager.h>BufferManager>~BufferManager() finished" << endl;
     };
 
     /*

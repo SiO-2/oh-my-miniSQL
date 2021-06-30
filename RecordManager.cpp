@@ -17,7 +17,7 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
 
     //计算block_offset和tuple_offset来获取bid
     unsigned int file_size = bmanager->GetFileSize(filename_data); //每次写入时都写到文件的最后一个block中
-    unsigned int boffset = file_size / BLOCKSIZE;                  //根据文件大小计算block
+    unsigned int boffset = file_size / BLOCKSIZE;                  //根据文件大小计算blockoffset
     if (boffset != 0)
         boffset--;
     unsigned int toffset = 0;
@@ -29,10 +29,13 @@ void RecordManager::InsertTuple(const Table &table, const Tuple &tuple)
         if (bmanager->blocks[*bids.begin()].data[toffset] == 0)
             break;
     }
-    if (toffset >= BLOCKSIZE) //当前block内写不下时，新建一个block
+    if (toffset >= BLOCKSIZE) //当前block内写不下时，新建一个block，并从第一条开始写入
     {
+        
+        block_offset.pop_back();
         boffset++;
         toffset = 0;
+        block_offset.push_back(boffset);
         bids = bmanager->ReadFile2Block(filename_data, block_offset);
     }
     tuple_offset.push_back(toffset);
